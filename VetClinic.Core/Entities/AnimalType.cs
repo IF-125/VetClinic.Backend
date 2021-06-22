@@ -4,7 +4,7 @@ using System.Text;
 
 namespace VetClinic.Core.Entities
 {
-    class AnimalTypes
+    public class AnimalType
     {
         public int Id { get; set; }
         public string Type { get; set; }
