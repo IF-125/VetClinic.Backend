@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.Query;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace VetClinic.Core.Interfaces.Repositories
+namespace VetClinic.Core.Interfaces.Repositories.Base
 {
     public interface IRepository<TEntity>
         where TEntity : class
@@ -12,14 +13,15 @@ namespace VetClinic.Core.Interfaces.Repositories
         Task<IList<TEntity>> GetAsync(
             Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-            string includeProperties = "",
+            Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
             bool asNoTracking = false);
 
         Task<TEntity> GetByIdAsync(object id);
 
         Task<TEntity> GetFirstOrDefaultAsync(
             Expression<Func<TEntity, bool>> filter = null,
-            string includeProperties = "",
+            Func<IQueryable<TEntity>,
+                IIncludableQueryable<TEntity, object>> include = null,
             bool asNoTracking = false);
 
         Task<bool> IsAnyAsync(Expression<Func<TEntity, bool>> filter = null);

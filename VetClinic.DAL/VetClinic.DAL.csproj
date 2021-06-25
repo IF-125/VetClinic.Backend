@@ -5,9 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Context\" />
     <Folder Include="Configurations\" />
-    <Folder Include="Repositories\" />
     <Folder Include="Seeders\" />
   </ItemGroup>
 
