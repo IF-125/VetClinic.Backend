@@ -1,3 +1,7 @@
+[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=IF-125_VetClinic.Backend)](https://sonarcloud.io/dashboard?id=IF-125_VetClinic.Backend)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=IF-125_VetClinic.Backend&metric=coverage)](https://sonarcloud.io/dashboard?id=IF-125_VetClinic.Backend)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=IF-125_VetClinic.Backend&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=IF-125_VetClinic.Backend)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=IF-125_VetClinic.Backend&metric=security_rating)](https://sonarcloud.io/dashboard?id=IF-125_VetClinic.Backend)
 # VetClinic
 ## About
 This web application aims to provide a simple and intuitive way for customers to interact with veterinary clinic services online.
