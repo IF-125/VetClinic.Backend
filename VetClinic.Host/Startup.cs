@@ -14,14 +14,28 @@ namespace VetClinic.Host
         }
 
         public IConfiguration Configuration { get; }
+
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<VetClinicContext>(options =>
+               options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddControllers();
         }
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
+                app.UseSwagger();
+
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Staff.WebAPI v1");
+                    c.RoutePrefix = string.Empty;
+                    c.OAuthClientId("swagger");
+                    c.OAuthAppName("api1");
+                    c.OAuthUsePkce();
+                    c.OAuthClientSecret("secret");
+                });
                 app.UseDeveloperExceptionPage();
             }
 
