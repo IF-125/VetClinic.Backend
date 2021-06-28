@@ -4,7 +4,7 @@ using System.Text;
 
 namespace VetClinic.Core.Entities
 {
-    class Client
+    public class Client
     {
         public int Id { get; set; }
 
