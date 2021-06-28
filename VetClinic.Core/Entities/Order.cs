@@ -9,6 +9,7 @@ namespace VetClinic.Core.Entities
         public int Id { get; set; }
         public DateTime CreatedTime { get; set; }
         public bool IsPaid { get; set; }
-        public virtual OrderProcedure OrderProcedure { get; set; }
+        public int OrderProcedureId { get; set; }
+        public OrderProcedure OrderProcedure { get; set; }
     }
 }

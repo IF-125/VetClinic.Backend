@@ -18,6 +18,10 @@ namespace VetClinic.DAL.Configurations
             builder
                 .Property(b => b.Price)
                 .IsRequired();
+            builder
+                .HasMany(b => b.AnimalTypes)
+                .WithOne()
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
