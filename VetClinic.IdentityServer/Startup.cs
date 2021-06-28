@@ -28,6 +28,16 @@ namespace VetClinic.IdentityServer
                 .AddInMemoryIdentityResources(Config.IdentityResources)
                 .AddInMemoryApiScopes(Config.ApiScopes);
 
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("ApiScope", policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireClaim("scope", "api1");
+                });
+            });
+            
             services.AddControllers();
 
             services.AddDbContext<UserDbContext>(options =>
@@ -57,7 +67,8 @@ namespace VetClinic.IdentityServer
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapDefaultControllerRoute();
+                endpoints.MapControllers()
+                .RequireAuthorization("ApiScope");
             });
         }
     }

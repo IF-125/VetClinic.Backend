@@ -13,7 +13,7 @@ namespace VetClinic.IdentityServer.Configurations
 {
     public static class Config
     {
-        public static List<User> GetUsers() =>
+        public static List<User> GetUsers =>
             new List<User>
             {
                 new User
@@ -35,7 +35,7 @@ namespace VetClinic.IdentityServer.Configurations
                     Password = "qwerty",
                     Claims = new List<Claim>
                     {
-                        //new Claim(ClaimsIdentity.DefaultRoleClaimType, nameof(Role.Client)),
+                        new Claim(ClaimsIdentity.DefaultRoleClaimType, "Client")
                         
                     }
                 }
@@ -122,7 +122,8 @@ namespace VetClinic.IdentityServer.Configurations
                     },
                     AllowedCorsOrigins =
                     {
-                        "https://localhost:5001"
+                        "https://localhost:5001",
+                        "https://localhost:44308"
                     },
 
                     AllowedScopes =

@@ -24,6 +24,7 @@ namespace VetClinic.Host
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors();
             services.AddDbContext<VetClinicContext>(options =>
                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
@@ -69,12 +70,13 @@ namespace VetClinic.Host
         {
             if (env.IsDevelopment())
             {
+                app.UseStaticFiles();
                 app.UseSwagger();
 
                 app.UseSwaggerUI(c =>
                 {
                     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Staff.WebAPI v1");
-                    c.RoutePrefix = string.Empty;
+                    c.RoutePrefix = "swagger/ui";
                     c.OAuthClientId("swagger");
                     c.OAuthAppName("api1");
                     c.OAuthUsePkce();
@@ -89,6 +91,11 @@ namespace VetClinic.Host
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseCors(x => x
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
 
             app.UseEndpoints(endpoints =>
             {
