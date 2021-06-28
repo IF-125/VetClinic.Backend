@@ -1,8 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using VetClinic.Core.Entities;
 
 namespace VetClinic.DAL.Configurations
@@ -29,4 +26,5 @@ namespace VetClinic.DAL.Configurations
             builder.HasMany(c => c.PhoneNumbers)
                 .WithOne(p => p.Client).HasForeignKey(p => p.ClientId);
         }
+    }
 }

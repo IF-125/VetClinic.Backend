@@ -36,7 +36,7 @@ namespace VetClinic.IdentityServer.Configurations
                     Claims = new List<Claim>
                     {
                         //new Claim(ClaimsIdentity.DefaultRoleClaimType, nameof(Role.Client)),
-                        new Claim(JwtClaimTypes.Role, nameof(Role.Client))
+                        
                     }
                 }
            };

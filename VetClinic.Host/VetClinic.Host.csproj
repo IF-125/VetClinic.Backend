@@ -5,11 +5,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.16" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.7" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.4" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\VetClinic.DAL\VetClinic.DAL.csproj" />
+    <ProjectReference Include="..\VetClinic.IdentityServer\VetClinic.IdentityServer.csproj" />
     <ProjectReference Include="..\VetClinic.WebApi\VetClinic.WebApi.csproj" />
   </ItemGroup>
 

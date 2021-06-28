@@ -7,7 +7,7 @@ using VetClinic.Core.Entities;
 
 namespace VetClinic.DAL.Context
 {
-    class VetClinicContext : DbContext
+    public class VetClinicContext : DbContext
     {
         public DbSet<Client> Clients { get; set; }
 
