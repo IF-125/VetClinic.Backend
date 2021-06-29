@@ -1,3 +1,4 @@
+using IdentityServer4.AspNetIdentity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -26,28 +27,13 @@ namespace VetClinic.IdentityServer
                 .AddInMemoryClients(Config.Clients)
                 .AddInMemoryApiResources(Config.ApiResources)
                 .AddInMemoryIdentityResources(Config.IdentityResources)
-                .AddInMemoryApiScopes(Config.ApiScopes);
-
-
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("ApiScope", policy =>
-                {
-                    policy.RequireAuthenticatedUser();
-                    policy.RequireClaim("scope", "api1");
-                });
-            });
+                .AddInMemoryApiScopes(Config.ApiScopes)
+                .AddProfileService<ProfileService>();
             
             services.AddControllers();
 
             services.AddDbContext<UserDbContext>(options =>
-            
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-
-            //services.AddIdentity<UserDbContext, IdentityRole>()
-            //    .AddEntityFrameworkStores<UserDbContext>()
-            //    .AddDefaultTokenProviders();
-           
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -59,6 +45,8 @@ namespace VetClinic.IdentityServer
 
             app.UseIdentityServer();
 
+            app.UseHttpsRedirection();
+
             app.UseRouting();
 
             app.UseAuthentication();
@@ -67,8 +55,7 @@ namespace VetClinic.IdentityServer
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers()
-                .RequireAuthorization("ApiScope");
+                endpoints.MapControllers();
             });
         }
     }

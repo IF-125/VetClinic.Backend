@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -10,28 +11,17 @@ namespace VetClinic.WebApi.Controllers
     [ApiController]
     public class HomeController : ControllerBase
     {
+        [Authorize(Policy = "Client")]
         [HttpGet]
-        public IActionResult GetHello()
+        public ActionResult GetHello()
         {
             return Ok("Everyone gangsta till project initialization");
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetHelloById(int id)
+        public ActionResult GetHelloById(int id)
         {
             return Ok($"You got nothing for {id}");
         }
-
-        //[HttpGet]
-        //public async Task<IActionResult> CallApi()
-        //{
-        //    var accessToken = await HttpContext.GetTokenAsync("access_token");
-
-        //    var client = new HttpClient();
-        //    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-        //    var content = await client.GetStringAsync("https://localhost:5101/connect/token");
-        
-        //    return Ok(content);
-        //}
     }
 }

@@ -12,19 +12,7 @@ using VetClinic.IdentityServer.Models;
 namespace VetClinic.IdentityServer.Configurations
 {
     public static class Config
-    {
-        public static List<User> GetUsers =>
-            new List<User>
-            {
-                new User
-                {
-                    Id = "1",
-                    Email = "base@gmail.com",
-                    PhoneNumber = "+380504443322"
-
-                }
-            };         
-
+    {        
         public static List<TestUser> TestUsers =>
            new List<TestUser>
            {
@@ -35,8 +23,7 @@ namespace VetClinic.IdentityServer.Configurations
                     Password = "qwerty",
                     Claims = new List<Claim>
                     {
-                        new Claim(ClaimsIdentity.DefaultRoleClaimType, "Client")
-                        
+                        new Claim("RoleType", "Client")
                     }
                 }
            };
@@ -45,13 +32,11 @@ namespace VetClinic.IdentityServer.Configurations
             new List<ApiScope>
             {
                 new ApiScope("api1", "My API"),
-
             };
 
         public static IEnumerable<ApiResource> ApiResources =>
             new[]
             {
-                //new ApiResource("api1", "API #1") {Scopes = {"api1"}},
                 new ApiResource
                 {
                     Name = "api1",
@@ -85,36 +70,11 @@ namespace VetClinic.IdentityServer.Configurations
             {
                 new Client
                 {
-                    ClientId = "client",
-                    AllowedGrantTypes = GrantTypes.ClientCredentials,
-                    ClientSecrets =
-                    {
-                        new Secret("secret".Sha256())
-                    },
-                    AllowedScopes = {"api1"}
-                },
-
-                new Client
-                {
-                    ClientId = "swagger3",
-                    ClientName = "Swagger UI for demo_api",
-                    ClientSecrets = {new Secret("secret".Sha256())}, // change me!
-                    AllowedGrantTypes = GrantTypes.Code,
-                    RequirePkce = true,
-                    RequireClientSecret = false,
-                    //RedirectUris = {"https://localhost:5001/swagger/oauth2-redirect.html"},
-                    AllowedCorsOrigins = {"https://localhost:5001"},
-                    AllowedScopes = {"api1"}
-                },
-
-                new Client
-                {
                     ClientId = "swagger",
-                    //ClientName = "swagger",
+                    
                     RequireClientSecret = false,
 
                     AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
-                    //AllowedGrantTypes = GrantTypes.Code,
 
                     ClientSecrets =
                     {
@@ -123,7 +83,7 @@ namespace VetClinic.IdentityServer.Configurations
                     AllowedCorsOrigins =
                     {
                         "https://localhost:5001",
-                        "https://localhost:44308"
+                        "https://localhost:44350"
                     },
 
                     AllowedScopes =
@@ -134,35 +94,7 @@ namespace VetClinic.IdentityServer.Configurations
                         IdentityServerConstants.StandardScopes.Email,
                         JwtClaimTypes.Role
                     },
-
-                    //RequirePkce = true,
-                    //AllowPlainTextPkce = false
-                },
-                new Client
-                {
-                    ClientId = "swagger2",
-                    //ClientName = "swagger2",
-                    RequireClientSecret = false,
-                    
-
-                    //AllowedGrantTypes = GrantTypes.HybridAndClientCredentials,
-                    AllowedGrantTypes = GrantTypes.Code,
-
-                    ClientSecrets =
-                    {
-                        new Secret("secret".Sha256())
-                    },
-                  
-
-                    AllowedScopes =
-                    {
-                        "api1",
-                        IdentityServerConstants.StandardScopes.OpenId,
-                        IdentityServerConstants.StandardScopes.Profile
-                    },
-                    AllowOfflineAccess = true,
-                    AllowAccessTokensViaBrowser = true
-                },
+                }, 
             };
     }
 }

@@ -9,6 +9,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using VetClinic.DAL.Context;
 
 namespace VetClinic.Host
@@ -24,23 +26,28 @@ namespace VetClinic.Host
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCors();
             services.AddDbContext<VetClinicContext>(options =>
-               options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+            services.AddControllers();
 
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Version = "v1",
-                    Title = "Staff.WebAPI"
+                    Title = "VetClinic.Backend"
                 });
+
+                var xmlFile = $"{Assembly.GetEntryAssembly()!.GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
+
                 c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
                 {
                     Type = SecuritySchemeType.OAuth2,
                     Flows = new OpenApiOAuthFlows
                     {
-                        
                         Password = new OpenApiOAuthFlow
                         {
                             TokenUrl = new Uri("https://localhost:5101/connect/token"),
@@ -64,18 +71,25 @@ namespace VetClinic.Host
                     RoleClaimType = "role"
                 };
             });
-            services.AddControllers();
+           
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("Client", policy =>
+                {
+                    policy.RequireClaim("RoleType", "Client");
+                });
+            });
         }
+
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
-                app.UseStaticFiles();
                 app.UseSwagger();
 
                 app.UseSwaggerUI(c =>
                 {
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Staff.WebAPI v1");
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "VetClinic.Backend v1");
                     c.RoutePrefix = "swagger/ui";
                     c.OAuthClientId("swagger");
                     c.OAuthAppName("api1");
@@ -90,12 +104,8 @@ namespace VetClinic.Host
             app.UseRouting();
 
             app.UseAuthentication();
-            app.UseAuthorization();
 
-            app.UseCors(x => x
-                .AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader());
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
