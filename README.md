@@ -10,7 +10,9 @@ This web application aims to provide a simple and intuitive way for customers to
 2. [Cloning](#cloning)
 3. [Frontend repository](#frontend-repository)
 ## Requirements
-
+ASP.NET Core 3.1.16
+.NET Core 3.1.16
 ## Cloning
-
+You can clone this repository using $ git clone https://github.com/IF-125/VetClinic.Backend.git
 ## Frontend repository
+Frontend part of this project can be found here - 
