@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -11,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using VetClinic.DAL.Context;
 
 namespace VetClinic.Host
 {
@@ -26,9 +24,6 @@ namespace VetClinic.Host
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<VetClinicContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-
             services.AddControllers();
 
             services.AddSwaggerGen(c =>
