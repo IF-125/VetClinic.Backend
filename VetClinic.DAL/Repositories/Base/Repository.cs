@@ -13,8 +13,8 @@ namespace VetClinic.DAL.Repositories.Base
     public class Repository<TEntity> : IRepository<TEntity>
         where TEntity : class
     {
-        private readonly FakeDbContext _context;
-        public Repository(FakeDbContext context)
+        private readonly VetClinicDbContext _context;
+        public Repository(VetClinicDbContext context)
         {
             _context = context;
         }
@@ -42,11 +42,6 @@ namespace VetClinic.DAL.Repositories.Base
                 return await orderBy(query).ToListAsync();
             }
             return await query.ToListAsync();
-        }
-
-        public async Task<TEntity> GetByIdAsync(object id)
-        {
-            return await _context.Set<TEntity>().FindAsync(id);
         }
 
         /// <summary>

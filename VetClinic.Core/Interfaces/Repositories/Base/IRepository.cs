@@ -16,8 +16,6 @@ namespace VetClinic.Core.Interfaces.Repositories.Base
             Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
             bool asNoTracking = false);
 
-        Task<TEntity> GetByIdAsync(object id);
-
         Task<TEntity> GetFirstOrDefaultAsync(
             Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>,
