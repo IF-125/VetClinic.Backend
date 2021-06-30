@@ -8,20 +8,7 @@ namespace VetClinic.DAL.Configurations
     {
         public void Configure(EntityTypeBuilder<Client> builder)
         {
-            builder.ToTable("clients", "vetclinic");
-
-            builder.HasKey(c => c.Id);
-
-            builder.Property(c => c.FirstName)
-                    .HasMaxLength(20)
-                    .IsRequired();
-
-            builder.Property(c => c.LastName)
-                    .HasMaxLength(50)
-                    .IsRequired();
-
-            builder.Property(c => c.UserId)
-                    .IsRequired();
+            builder.ToTable("Clients", "VetClinic");
 
             builder.HasMany(c => c.PhoneNumbers)
                 .WithOne(p => p.Client).HasForeignKey(p => p.ClientId);
