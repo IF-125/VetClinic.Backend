@@ -14,6 +14,11 @@ namespace VetClinic.DAL.Configurations
             builder
                 .Property(b => b.IsPaid)
                 .IsRequired();
+
+            builder
+                .HasOne(b => b.OrderProcedure)
+                .WithOne(b => b.Order)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
