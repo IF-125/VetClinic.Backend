@@ -18,8 +18,7 @@ namespace VetClinic.Core.Interfaces.Repositories.Base
 
         public Task<TEntity> GetFirstOrDefaultAsync(
             Expression<Func<TEntity, bool>> filter = null,
-            Func<IQueryable<TEntity>,
-                IIncludableQueryable<TEntity, object>> include = null,
+            Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
             bool asNoTracking = false);
 
         public Task<bool> IsAnyAsync(Expression<Func<TEntity, bool>> filter = null);
