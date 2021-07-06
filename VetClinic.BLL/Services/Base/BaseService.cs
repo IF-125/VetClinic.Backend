@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using VetClinic.Core.Interfaces.Repositories.Base;
 using VetClinic.Core.Interfaces.Services.Base;
 
-namespace VetClinic.DAL.Services.Base
+namespace VetClinic.BLL.Services.Base
 {
     public class BaseService<TEntity> : IBaseService<TEntity> where TEntity : class
     {
@@ -18,7 +18,7 @@ namespace VetClinic.DAL.Services.Base
             _repository = repository;
         }
         public async Task<IList<TEntity>> GetAsync(
-            Expression<Func<TEntity, bool>> filter = null, 
+            Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
             bool asNoTracking = false)
@@ -35,7 +35,7 @@ namespace VetClinic.DAL.Services.Base
             return await _repository
                 .GetFirstOrDefaultAsync(filter, include, asNoTracking);
         }
-        
+
         public async Task InsertAsync(TEntity entity)
         {
             await _repository.InsertAsync(entity);

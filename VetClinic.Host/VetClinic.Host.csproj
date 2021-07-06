@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\VetClinic.BLL\VetClinic.BLL.csproj" />
     <ProjectReference Include="..\VetClinic.DAL\VetClinic.DAL.csproj" />
     <ProjectReference Include="..\VetClinic.WebApi\VetClinic.WebApi.csproj" />
   </ItemGroup>
