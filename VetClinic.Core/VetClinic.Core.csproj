@@ -17,4 +17,8 @@
     <Folder Include="Entities\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\VetClinic.IdentityServer\VetClinic.IdentityServer.csproj" />
+  </ItemGroup>
+
 </Project>
