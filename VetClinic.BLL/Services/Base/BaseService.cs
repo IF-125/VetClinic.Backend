@@ -9,7 +9,8 @@ using VetClinic.Core.Interfaces.Services.Base;
 
 namespace VetClinic.BLL.Services.Base
 {
-    public class BaseService<TEntity> : IBaseService<TEntity> where TEntity : class
+    public class BaseService<TEntity> : IBaseService<TEntity>
+        where TEntity : class
     {
         private readonly IRepository<TEntity> _repository;
 

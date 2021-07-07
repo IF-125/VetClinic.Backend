@@ -5,5 +5,6 @@ namespace VetClinic.Core.Interfaces.Services
 {
     public interface IEmployeeService : IBaseService<Employee>
     {
+        //public void UpdateEmployeeById(EmployeeViewModel)
     }
 }

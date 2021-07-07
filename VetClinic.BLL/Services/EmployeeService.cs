@@ -9,7 +9,7 @@ namespace VetClinic.BLL.Services
     {
         public EmployeeService(IRepository<Employee> repository) : base(repository)
         {
-
+            
         }
     }
 }
