@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace VetClinic.IdentityServer.Models
 {
-    public class User :IdentityUser
+    public class User : IdentityUser
     {
-
+        
     }
 }

@@ -7,6 +7,6 @@ namespace VetClinic.Core.Entities
 {
     public class Client : User
     {
-        public IList<PhoneNumber> PhoneNumbers { get; set; } = new List<PhoneNumber>();
+        public ICollection<PhoneNumber> PhoneNumbers { get; set; }
     }
 }

@@ -19,4 +19,8 @@
     <Folder Include="Interfaces\Services\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\VetClinic.IdentityServer\VetClinic.IdentityServer.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -54,7 +54,9 @@ namespace VetClinic.Host
                             Scopes = new Dictionary<string, string>
                             {
                                 {"api1","Api VetClinicBackend"}
-                            }
+                            },
+
+                            
                         }
                     }
                 });
