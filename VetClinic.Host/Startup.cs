@@ -11,7 +11,15 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using VetClinic.BLL.Services;
+using VetClinic.BLL.Services.Base;
+using VetClinic.Core.Interfaces.Repositories;
+using VetClinic.Core.Interfaces.Repositories.Base;
+using VetClinic.Core.Interfaces.Services;
+using VetClinic.Core.Interfaces.Services.Base;
 using VetClinic.DAL.Context;
+using VetClinic.DAL.Repositories;
+using VetClinic.DAL.Repositories.Base;
 
 namespace VetClinic.Host
 {
@@ -25,7 +33,17 @@ namespace VetClinic.Host
         public IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
-        {   
+        {
+            #region DI
+            //Repositories
+            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+
+            //Services
+            services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
+            services.AddScoped<IEmployeeService, EmployeeService>();
+            #endregion
+
             services.AddDbContext<VetClinicDbContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
