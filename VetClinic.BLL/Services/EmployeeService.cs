@@ -46,9 +46,14 @@ namespace VetClinic.BLL.Services
             await _employeeRepository.InsertAsync(entity);
         }
 
-        public void Update(Employee entityToUpdate)
+        public void Update(string id, Employee employeeToUpdate)
         {
-            throw new System.NotImplementedException();
+            if(id != employeeToUpdate.Id)
+            {
+                throw new ArgumentException($"{nameof(Employee)} {IdsDoNotMatch}");
+            }
+            _employeeRepository.Update(employeeToUpdate);
+            
         }
 
         public async Task DeleteAsync(string id)

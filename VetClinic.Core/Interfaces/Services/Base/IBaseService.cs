@@ -17,7 +17,7 @@ namespace VetClinic.Core.Interfaces.Services.Base
 
         public Task InsertAsync(TEntity entity);
 
-        public void Update(TEntity entityToUpdate);
+        public void Update(TIdType id, TEntity entityToUpdate);
 
         public Task DeleteAsync(TIdType id);
 

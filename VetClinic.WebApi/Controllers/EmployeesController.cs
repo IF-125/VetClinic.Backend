@@ -7,16 +7,17 @@ using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Services;
 using VetClinic.WebApi.Validators.EntityValidators;
 using VetClinic.WebApi.ViewModels;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace VetClinic.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EmployeeController : ControllerBase
+    public class EmployeesController : ControllerBase
     {
         private readonly IEmployeeService _employeeService;
         private readonly IMapper _mapper;
-        public EmployeeController(IEmployeeService employeeService, IMapper mapper)
+        public EmployeesController(IEmployeeService employeeService, IMapper mapper)
         {
             _employeeService = employeeService;
             _mapper = mapper;
@@ -43,8 +44,6 @@ namespace VetClinic.WebApi.Controllers
             }
         }
 
-        //TODO: Add update method
-
         [HttpPost]
         public async Task<IActionResult> InsertEmployeeAsync(EmployeeViewModel model)
         {
@@ -59,6 +58,44 @@ namespace VetClinic.WebApi.Controllers
                 return CreatedAtAction("InsertEmployeeAsync", new { id = newEmployee.Id }, newEmployee);
             }
             return BadRequest(validationResult.Errors);
+        }
+
+        [HttpPut]
+        public IActionResult Update(string id, EmployeeViewModel model)
+        {
+            var employee = _mapper.Map<Employee>(model);
+
+            var validator = new EmployeeValidator();
+            var validationResult = validator.Validate(employee);
+
+            if (validationResult.IsValid)
+            {
+                try
+                {
+                    _employeeService.Update(id, employee);
+                    return Ok();
+                }
+                catch(ArgumentException ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+            }
+            return BadRequest(validationResult.Errors);
+        }
+
+        [HttpPatch("{id:string}")]
+        public async Task<IActionResult> UpdatePatch(string id, [FromBody] JsonPatchDocument<Employee> employeeToUpdate)
+        {
+            try
+            {
+                var employee = await _employeeService.GetByIdAsync(id);
+                employeeToUpdate.ApplyTo(employee, ModelState);
+                return Ok(employee);
+            }
+            catch(ArgumentException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [HttpDelete("{id}")]
