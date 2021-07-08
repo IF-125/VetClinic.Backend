@@ -13,7 +13,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using VetClinic.BLL.Services;
-using VetClinic.BLL.Services.Base;
 using VetClinic.Core.Interfaces.Repositories;
 using VetClinic.Core.Interfaces.Repositories.Base;
 using VetClinic.Core.Interfaces.Services;
@@ -42,7 +41,6 @@ namespace VetClinic.Host
             services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 
             //Services
-            services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
             services.AddScoped<IEmployeeService, EmployeeService>();
             #endregion
 
@@ -103,9 +101,6 @@ namespace VetClinic.Host
                     policy.RequireClaim("RoleType", "Client");
                 });
             });
-        }
-
-
             services.AddMvc(options =>
             {
                 options.Filters.Add(new ValidationFilter());
@@ -114,8 +109,8 @@ namespace VetClinic.Host
             {
                 options.RegisterValidatorsFromAssemblyContaining<Startup>();
             });
-
         }
+
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())

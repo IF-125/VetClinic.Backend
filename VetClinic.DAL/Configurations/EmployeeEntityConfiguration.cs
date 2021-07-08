@@ -17,6 +17,11 @@ namespace VetClinic.DAL.Configurations
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder
+               .HasMany(x => x.Schedules)
+               .WithOne()
+               .OnDelete(DeleteBehavior.Cascade);
+
+            builder
                 .Property(x => x.Address)
                 .IsRequired();
         }

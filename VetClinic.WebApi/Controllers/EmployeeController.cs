@@ -1,5 +1,7 @@
-﻿using AutoMapper;
+﻿using static VetClinic.Core.Resources.TextMessages;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Services;
@@ -23,19 +25,22 @@ namespace VetClinic.WebApi.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllEmployeesAsync()
         {
-            var employees = await _employeeService.GetAsync(asNoTracking: true);
+            var employees = await _employeeService.GetEmployees(asNoTracking: true);
             return Ok(employees);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetEmployeeByIdAsync(string id)
         {
-            var employee = await _employeeService.GetFirstOrDefaultAsync(x => x.Id == id);
-            if (employee != null)
+            try
             {
+                var employee = await _employeeService.GetByIdAsync(id);
                 return Ok(employee);
             }
-            return NotFound();
+            catch(ArgumentException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         //TODO: Add update method
@@ -43,7 +48,6 @@ namespace VetClinic.WebApi.Controllers
         [HttpPost]
         public async Task<IActionResult> InsertEmployeeAsync(EmployeeViewModel model)
         {
-            //TODO: Consider doing mapping in services, not in controllers
             var newEmployee = _mapper.Map<Employee>(model);
 
             var validator = new EmployeeValidator();
@@ -60,15 +64,29 @@ namespace VetClinic.WebApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEmployee(string id)
         {
-            var employeeToDelete = await _employeeService.GetFirstOrDefaultAsync(x => x.Id == id);
-            //throw exceptions in service when user was not found while delete
-            if (employeeToDelete != null)
+            try
             {
-                //TODO: Consider using class with constants to pass text for responses 
-                _employeeService.Delete(employeeToDelete);
-                return Ok("The employee has been deleted");
+                await _employeeService.DeleteAsync(id);
+                return Ok($"{nameof(Employee)} {EntityHasBeenDeleted}");
             }
-            return NotFound("Employee was not found");
+            catch(ArgumentException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteEmployees([FromQuery(Name = "idArr")] string[] idArr)
+        {
+            try
+            {
+                await _employeeService.DeleteRangeAsync(idArr);
+                return Ok();
+            }
+            catch(ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

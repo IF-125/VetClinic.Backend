@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace VetClinic.Core.Entities
 {
@@ -14,7 +12,7 @@ namespace VetClinic.Core.Entities
         public string Information { get; set; }
         public string Breed { get; set; }
         public int Age { get; set; }
-
         public ICollection<PetImages> PetImages { get; set; }
+        public ICollection<OrderProcedure> OrderProcedures { get; set; }
     }
 }
