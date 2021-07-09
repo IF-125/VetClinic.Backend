@@ -7,7 +7,7 @@ namespace VetClinic.WebApi.Validators.EntityValidators
     {
         public EmployeeValidator()
         {
-            RuleFor(x => x.Address).NotEmpty();
+            RuleFor(x => x.Address).NotEmpty().WithMessage("Employee must have address");
         }
     }
 }

@@ -1,13 +1,14 @@
-﻿using static VetClinic.Core.Resources.TextMessages;
-using AutoMapper;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Services;
 using VetClinic.WebApi.Validators.EntityValidators;
 using VetClinic.WebApi.ViewModels;
-using Microsoft.AspNetCore.JsonPatch;
+using static VetClinic.Core.Resources.TextMessages;
 
 namespace VetClinic.WebApi.Controllers
 {
@@ -27,7 +28,10 @@ namespace VetClinic.WebApi.Controllers
         public async Task<IActionResult> GetAllEmployeesAsync()
         {
             var employees = await _employeeService.GetEmployeesAsync(asNoTracking: true);
-            return Ok(employees);
+
+            var employeeViewModel = _mapper.Map<IEnumerable<EmployeeViewModel>>(employees);
+
+            return Ok(employeeViewModel);
         }
 
         [HttpGet("{id}")]
@@ -36,7 +40,9 @@ namespace VetClinic.WebApi.Controllers
             try
             {
                 var employee = await _employeeService.GetByIdAsync(id);
+
                 var employeeViewModel = _mapper.Map<EmployeeViewModel>(employee);
+
                 return Ok(employeeViewModel);
             }
             catch(ArgumentException ex)
@@ -100,7 +106,7 @@ namespace VetClinic.WebApi.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEmployee(string id)
+        public async Task<IActionResult> DeleteEmployeeAsync(string id)
         {
             try
             {
@@ -114,7 +120,7 @@ namespace VetClinic.WebApi.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteEmployees([FromQuery(Name = "idArr")] string[] idArr)
+        public async Task<IActionResult> DeleteEmployeesAsync([FromQuery(Name = "idArr")] string[] idArr)
         {
             try
             {

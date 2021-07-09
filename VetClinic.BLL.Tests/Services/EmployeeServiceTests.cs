@@ -91,6 +91,46 @@ namespace VetClinic.BLL.Tests.Services
         }
 
         [Fact]
+        public void CanUpdateEmployee()
+        {
+            var newEmployee = new Employee
+            {
+                Id = "f1a05cca-b479-4f72-bbda-96b8979f4123",
+                FirstName = "Added",
+                LastName = "User",
+                Address = "9 Grayhawk Alley",
+                Email = "tisacq0@unesco.org"
+            };
+
+            var id = "f1a05cca-b479-4f72-bbda-96b8979f4123";
+
+            _employeeRepository.Setup(x => x.Update(It.IsAny<Employee>()));
+
+            _employeeService.Update(id, newEmployee);
+
+            _employeeRepository.Verify(x => x.Update(newEmployee));
+        }
+
+        [Fact]
+        public void UpdateEmployee_ThrowsException()
+        {
+            var newEmployee = new Employee
+            {
+                Id = "f1a05cca-b479-4f72-bbda-96b8979f4123",
+                FirstName = "Added",
+                LastName = "User",
+                Address = "9 Grayhawk Alley",
+                Email = "tisacq0@unesco.org"
+            };
+
+            var id = "DummyIdentificator";
+
+            _employeeRepository.Setup(x => x.Update(It.IsAny<Employee>()));
+
+            Assert.Throws<ArgumentException>(() => _employeeService.Update(id, newEmployee));
+        }
+
+        [Fact]
         public async Task CanDeleteEmployeeAsync()
         {
             var id = "f1a05cca-b479-4f72-bbda-96b8979f4afe";
