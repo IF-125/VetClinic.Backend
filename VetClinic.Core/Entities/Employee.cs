@@ -9,6 +9,6 @@ namespace VetClinic.Core.Entities
         public int? EmployeePositionId { get; set; }
         public EmployeePosition EmployeePosition { get; set; }
         public ICollection<OrderProcedure> OrderProcedures { get; set; } 
-        public ICollection<Schedule> Schedules { get; set; }
+        public ICollection<Schedule> Schedule { get; set; }
     }
 }

@@ -4,19 +4,19 @@ using VetClinic.Core.Entities;
 
 namespace VetClinic.DAL.Configurations
 {
-    public class PositionEntityConfiguration : IEntityTypeConfiguration<Position>
+    class AnimalTypeConfiguration : IEntityTypeConfiguration<AnimalType>
     {
-        public void Configure(EntityTypeBuilder<Position> builder)
+        public void Configure(EntityTypeBuilder<AnimalType> builder)
         {
             builder
                 .HasKey(x => x.Id);
 
             builder
-                .Property(x => x.Title)
+                .Property(x => x.Type)
                 .IsRequired();
 
             builder
-                .HasMany(x => x.EmployeePositions)
+                .HasMany(x => x.Pets)
                 .WithOne()
                 .OnDelete(DeleteBehavior.SetNull);
         }

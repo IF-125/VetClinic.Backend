@@ -1,6 +1,6 @@
 ﻿namespace VetClinic.Core.Entities
 {
-    public class PetImages
+    public class PetImage
     {
         public int Id { get; set; }
         public string Path { get; set; }
