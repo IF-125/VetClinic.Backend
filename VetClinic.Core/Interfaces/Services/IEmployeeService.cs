@@ -11,7 +11,7 @@ namespace VetClinic.Core.Interfaces.Services
 {
     public interface IEmployeeService : IBaseService<Employee, string>
     {
-        public Task<IList<Employee>> GetEmployees(
+        public Task<IList<Employee>> GetEmployeesAsync(
             Expression<Func<Employee, bool>> filter = null,
             Func<IQueryable<Employee>, IOrderedQueryable<Employee>> orderBy = null,
             Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>> include = null,

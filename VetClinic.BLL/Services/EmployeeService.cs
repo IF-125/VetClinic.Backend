@@ -19,14 +19,14 @@ namespace VetClinic.BLL.Services
             _employeeRepository = employeeRepository;
         }
 
-        public async Task<IList<Employee>> GetEmployees(
+        public async Task<IList<Employee>> GetEmployeesAsync(
             Expression<Func<Employee, bool>> filter = null,
             Func<IQueryable<Employee>, IOrderedQueryable<Employee>> orderBy = null,
             Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>> include = null,
             bool asNoTracking = false)
         {
             return await _employeeRepository.GetAsync(filter, orderBy, include, asNoTracking);
-        }
+        }   
 
         public async Task<Employee> GetByIdAsync(
             string id,
@@ -69,9 +69,9 @@ namespace VetClinic.BLL.Services
 
         public async Task DeleteRangeAsync(string[] idArr)
         {
-            var employeesToDelete = await GetEmployees(x => idArr.Contains(x.Id));
+            var employeesToDelete = await GetEmployeesAsync(x => idArr.Contains(x.Id));
 
-            if(employeesToDelete.Any(i => i == null))
+            if(employeesToDelete.Count() != idArr.Length)
             {
                 throw new ArgumentException($"{SomeEntitiesInCollectionNotFound} {nameof(Employee)}s to delete");
             }

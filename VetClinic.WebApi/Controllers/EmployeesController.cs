@@ -26,7 +26,7 @@ namespace VetClinic.WebApi.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllEmployeesAsync()
         {
-            var employees = await _employeeService.GetEmployees(asNoTracking: true);
+            var employees = await _employeeService.GetEmployeesAsync(asNoTracking: true);
             return Ok(employees);
         }
 
@@ -36,7 +36,8 @@ namespace VetClinic.WebApi.Controllers
             try
             {
                 var employee = await _employeeService.GetByIdAsync(id);
-                return Ok(employee);
+                var employeeViewModel = _mapper.Map<EmployeeViewModel>(employee);
+                return Ok(employeeViewModel);
             }
             catch(ArgumentException ex)
             {
