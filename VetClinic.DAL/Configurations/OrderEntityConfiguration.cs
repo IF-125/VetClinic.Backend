@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VetClinic.Core.Entities;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System;
 
 namespace VetClinic.DAL.Configurations
 {
@@ -10,7 +11,8 @@ namespace VetClinic.DAL.Configurations
         {
             builder
                 .Property(b => b.CreatedAt)
-                .IsRequired();
+                .IsRequired()
+                .HasDefaultValue(DateTime.Now);
 
             builder
                 .Property(b => b.IsPaid)
