@@ -2,32 +2,25 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
+using VetClinic.Core.Entities;
 
 namespace VetClinic.Core.Interfaces.Services.Base
 {
-    public interface IBaseService<TEntity> 
+    public interface IBaseService<TEntity, TIdType> 
         where TEntity : class
     {
-        public Task<IList<TEntity>> GetAsync(
-            Expression<Func<TEntity, bool>> filter = null,
-            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+        public Task<Employee> GetByIdAsync(
+            TIdType id,
             Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
             bool asNoTracking = false);
 
-        public Task<TEntity> GetFirstOrDefaultAsync(
-            Expression<Func<TEntity, bool>> filter = null,
-            Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
-            bool asNoTracking = false);
         public Task InsertAsync(TEntity entity);
 
-        public Task InsertRangeAsync(IEnumerable<TEntity> entities);
+        public void Update(TIdType id, TEntity entityToUpdate);
 
-        public void Update(TEntity entityToUpdate);
+        public Task DeleteAsync(TIdType id);
 
-        public void Delete(TEntity entityToDelete);
-
-        public void DeleteRange(IEnumerable<TEntity> entitiesToDelete);
+        public Task DeleteRangeAsync(TIdType[] idArr);
     }
 }

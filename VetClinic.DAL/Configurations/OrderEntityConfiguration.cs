@@ -9,8 +9,9 @@ namespace VetClinic.DAL.Configurations
         public void Configure(EntityTypeBuilder<Order> builder)
         {
             builder
-                .Property(b => b.CreatedTime)
+                .Property(b => b.CreatedAt)
                 .IsRequired();
+
             builder
                 .Property(b => b.IsPaid)
                 .IsRequired();

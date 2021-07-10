@@ -5,7 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Configurations\" />
+    <Folder Include="Context\" />
+    <Folder Include="Repositories\" />
     <Folder Include="Seeders\" />
   </ItemGroup>
    
@@ -38,6 +39,10 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 	</ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\VetClinic.Core\VetClinic.Core.csproj" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\VetClinic.Core\VetClinic.Core.csproj" />
   </ItemGroup>

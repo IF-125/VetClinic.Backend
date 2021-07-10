@@ -13,10 +13,6 @@ namespace VetClinic.DAL.Configurations
                 .HasKey(x => x.Id);
 
             builder
-                .HasOne(x => x.EmployeePosition)
-                .WithMany(x => x.Salaries);
-
-            builder
                 .Property(x => x.Amount)
                 .IsRequired();
 
@@ -27,6 +23,10 @@ namespace VetClinic.DAL.Configurations
             builder
                 .Property(x => x.Date)
                 .HasDefaultValue(DateTime.Now);
+
+            builder
+                .HasOne(x => x.EmployeePosition)
+                .WithMany(x => x.Salaries);
         }
     }
 }

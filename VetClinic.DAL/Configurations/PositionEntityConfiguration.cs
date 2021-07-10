@@ -12,10 +12,13 @@ namespace VetClinic.DAL.Configurations
                 .HasKey(x => x.Id);
 
             builder
+                .Property(x => x.Title)
+                .IsRequired();
+
+            builder
                 .HasMany(x => x.EmployeePositions)
                 .WithOne()
                 .OnDelete(DeleteBehavior.SetNull);
-
         }
     }
 }
