@@ -26,14 +26,18 @@ namespace VetClinic.Host
         public IConfiguration Configuration { get; }
         public void ConfigureServices(IServiceCollection services)
         {
-            #region DI
+                #region DI
             //Repositories
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+            services.AddScoped<IPetRepository, PetRepository>();
+
+
 
             //Services
             services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
             services.AddScoped<IEmployeeService, EmployeeService>();
+            services.AddScoped<IPetService, PetServise>();
             #endregion
 
             services.AddDbContext<VetClinicDbContext>(options =>

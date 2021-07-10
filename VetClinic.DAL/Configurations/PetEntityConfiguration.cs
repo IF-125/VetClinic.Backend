@@ -11,9 +11,7 @@ namespace VetClinic.DAL.Configurations
         {
             builder
                 .HasKey(x => x.Id);
-
-            
-
+                        
             builder
                 .HasOne(x => x.AnimalType)
                 .WithMany(x=>x.Pets)
