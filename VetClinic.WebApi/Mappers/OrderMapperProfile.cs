@@ -4,11 +4,11 @@ using VetClinic.WebApi.ViewModels;
 
 namespace VetClinic.WebApi.Mappers
 {
-    public class ProcedureMapperProfile : Profile
+    public class OrderMapperProfile : Profile
     {
-        public ProcedureMapperProfile()
+        OrderMapperProfile()
         {
-            CreateMap<Procedure, ProcedureViewModel>().ReverseMap();
+            CreateMap<Order, OrderViewModel>().ReverseMap();
         }
     }
 }
