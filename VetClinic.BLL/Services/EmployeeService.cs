@@ -52,8 +52,8 @@ namespace VetClinic.BLL.Services
             {
                 throw new ArgumentException($"{nameof(Employee)} {IdsDoNotMatch}");
             }
+
             _employeeRepository.Update(employeeToUpdate);
-            
         }
 
         public async Task DeleteAsync(string id)
@@ -64,6 +64,7 @@ namespace VetClinic.BLL.Services
             {
                 throw new ArgumentException($"{nameof(Employee)} {EntityWasNotFound}");
             }
+
             _employeeRepository.Delete(employeeToDelete);
         }
 

@@ -16,7 +16,6 @@ using VetClinic.BLL.Services;
 using VetClinic.Core.Interfaces.Repositories;
 using VetClinic.Core.Interfaces.Repositories.Base;
 using VetClinic.Core.Interfaces.Services;
-using VetClinic.Core.Interfaces.Services.Base;
 using VetClinic.DAL.Context;
 using VetClinic.DAL.Repositories;
 using VetClinic.DAL.Repositories.Base;
@@ -39,9 +38,11 @@ namespace VetClinic.Host
             //Repositories
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+            services.AddScoped<IPositionRepository, PositionRepository>();
 
             //Services
             services.AddScoped<IEmployeeService, EmployeeService>();
+            services.AddScoped<IPositionService, PositionService>();
             #endregion
 
             services.AddDbContext<VetClinicDbContext>(options =>
