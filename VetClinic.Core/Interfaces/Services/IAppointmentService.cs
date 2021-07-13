@@ -11,10 +11,10 @@ namespace VetClinic.Core.Interfaces.Services
 {
     public interface IAppointmentService : IBaseService<Appointment, int>
     {
-        public Task<IList<Procedure>> GetAppointmentsAsync(
-            Expression<Func<Procedure, bool>> filter = null,
-            Func<IQueryable<Procedure>, IOrderedQueryable<Procedure>> orderBy = null,
-            Func<IQueryable<Procedure>, IIncludableQueryable<Procedure, object>> include = null,
+        public Task<IList<Appointment>> GetAppointmentsAsync(
+            Expression<Func<Appointment, bool>> filter = null,
+            Func<IQueryable<Appointment>, IOrderedQueryable<Appointment>> orderBy = null,
+            Func<IQueryable<Appointment>, IIncludableQueryable<Appointment, object>> include = null,
             bool asNoTracking = false);
     }
 }

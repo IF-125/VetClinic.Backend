@@ -50,40 +50,6 @@ namespace VetClinic.WebApi.Controllers
             }
         }
 
-        [HttpGet("{petId}")]
-        public async Task<IActionResult> GetOrderProcedureByPetIdAsync(int petId)
-        {
-            try
-            {
-                var orderProcedure = await _orderProcedureService.GetOrderProceduresAsync(b => b.PetId == petId);
-
-                var orderProcedureViewModel = _mapper.Map<OrderProcedureViewModel>(orderProcedure);
-
-                return Ok(orderProcedureViewModel);
-            }
-            catch (ArgumentException ex)
-            {
-                return NotFound(ex.Message);
-            }
-        }
-
-        [HttpGet("{employeeId}")]
-        public async Task<IActionResult> GetOrderProcedureByEmployeeIdAsync(int employeeId)
-        {
-            try
-            {
-                var orderProcedure = await _orderProcedureService.GetOrderProceduresAsync(b => b.EmployeeId == employeeId);
-
-                var orderProcedureViewModel = _mapper.Map<OrderProcedureViewModel>(orderProcedure);
-
-                return Ok(orderProcedureViewModel);
-            }
-            catch (ArgumentException ex)
-            {
-                return NotFound(ex.Message);
-            }
-        }
-
         [HttpPost]
         public async Task<IActionResult> InsertOrderProcedureAsync(OrderProcedureViewModel model)
         {

@@ -50,26 +50,6 @@ namespace VetClinic.WebApi.Controllers
             }
         }
 
-        [HttpGet("{lowest}/{highest}")]
-        public async Task<IActionResult> GetProceduresInPriceRangeAsync(int lowest, int highest)
-        {
-            var procedures = await _procedureService.GetProceduresAsync(filter:b => b.Price >= lowest && b.Price <= highest);
-
-            var procedureViewModel = _mapper.Map<IEnumerable<ProcedureViewModel>>(procedures);
-
-            return Ok(procedureViewModel);
-        }
-
-        [HttpGet("{shortest}/{longest}")]
-        public async Task<IActionResult> GetProceduresInDurationRangeAsync(TimeSpan shortest, TimeSpan longest)
-        {
-            var procedures = await _procedureService.GetProceduresAsync(filter: b => b.Duration >= shortest && b.Duration <= longest);
-
-            var procedureViewModel = _mapper.Map<IEnumerable<ProcedureViewModel>>(procedures);
-
-            return Ok(procedureViewModel);
-        }
-
         [HttpPost]
         public async Task<IActionResult> InsertProcedureAsync(ProcedureViewModel model)
         {

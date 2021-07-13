@@ -23,6 +23,17 @@ namespace VetClinic.WebApi.Controllers
             _mapper = mapper;
         }
 
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllOrdersAsync()
+        {
+            var orders = await _orderService.GetOrdersAsync(asNoTracking: true);
+
+            var orderViewModel = _mapper.Map<IEnumerable<OrderViewModel>>(orders);
+
+            return Ok(orderViewModel);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetOrderByIdAsync(int id)
         {
