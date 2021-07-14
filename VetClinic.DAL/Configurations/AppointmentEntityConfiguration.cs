@@ -11,11 +11,13 @@ namespace VetClinic.DAL.Configurations
             builder
                 .Property(b => b.Status)
                 .IsRequired();
+
             builder
-                .Property(b => b.Begin)
+                .Property(b => b.From)
                 .IsRequired();
+
             builder
-                .Property(b => b.End)
+                .Property(b => b.To)
                 .IsRequired();
 
             builder

@@ -1,3 +1,4 @@
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -12,14 +13,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using VetClinic.BLL.Services;
-using VetClinic.BLL.Services.Base;
 using VetClinic.Core.Interfaces.Repositories;
 using VetClinic.Core.Interfaces.Repositories.Base;
 using VetClinic.Core.Interfaces.Services;
-using VetClinic.Core.Interfaces.Services.Base;
 using VetClinic.DAL.Context;
 using VetClinic.DAL.Repositories;
 using VetClinic.DAL.Repositories.Base;
+using VetClinic.WebApi.Validators;
 
 namespace VetClinic.Host
 {
@@ -35,19 +35,30 @@ namespace VetClinic.Host
         public void ConfigureServices(IServiceCollection services)
         {
             #region DI
-            //Repositories
+            //Services
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+            services.AddScoped<IPetRepository, PetRepository>();
+            services.AddScoped<IPositionRepository, PositionRepository>();
+            services.AddScoped<IScheduleRepository, ScheduleRepository>();
+            services.AddScoped<ISalaryRepository, SalaryRepository>();
+            services.AddScoped<IEmployeePositionRepository, EmployeePositionRepository>();
 
             //Services
-            services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
             services.AddScoped<IEmployeeService, EmployeeService>();
+            services.AddScoped<IPetService, PetServise>();
+            services.AddScoped<IPositionService, PositionService>();
+            services.AddScoped<IScheduleService, ScheduleService>();
+            services.AddScoped<ISalaryService, SalaryService>();
+            services.AddScoped<IEmployeePositionService, EmployeePositionService>();
             #endregion
 
             services.AddDbContext<VetClinicDbContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddControllers();
+            services.AddAutoMapper(typeof(Startup));
+
+            services.AddControllers().AddNewtonsoftJson();
 
             services.AddSwaggerGen(c =>
             {
@@ -98,6 +109,14 @@ namespace VetClinic.Host
                 {
                     policy.RequireClaim("RoleType", "Client");
                 });
+            });
+            services.AddMvc(options =>
+            {
+                options.Filters.Add(new ValidationFilter());
+            })
+            .AddFluentValidation(options =>
+            {
+                options.RegisterValidatorsFromAssemblyContaining<Startup>();
             });
         }
 

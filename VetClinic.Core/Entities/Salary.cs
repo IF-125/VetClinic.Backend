@@ -10,6 +10,5 @@ namespace VetClinic.Core.Entities
         public decimal Bonus { get; set; }
         public int EmployeePositionId { get; set; }
         public EmployeePosition EmployeePosition { get; set; }
-
     }
 }

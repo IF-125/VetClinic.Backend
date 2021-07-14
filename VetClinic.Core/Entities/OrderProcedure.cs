@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace VetClinic.Core.Entities
 {
@@ -8,7 +6,7 @@ namespace VetClinic.Core.Entities
     {
         public int Id { get; set; }
         public int Count { get; set; }
-        public DateTime Time { get; set; }
+        public TimeSpan Time { get; set; }
         public string Conclusion { get; set; }
         public string Details { get; set; }
         public int OrderId { get; set; }

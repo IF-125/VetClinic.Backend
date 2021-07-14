@@ -34,7 +34,6 @@ namespace VetClinic.DAL.Repositories.Base
             bool asNoTracking = false)
         {
             IQueryable<TEntity> query = GetConfiguredSelection(filter, include, asNoTracking);
-            //consider using ternary operator
             if(orderBy != null)
             {
                 return await orderBy(query).ToListAsync();

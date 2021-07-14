@@ -1,0 +1,18 @@
+﻿using System;
+
+namespace VetClinic.WebApi.ViewModels
+{
+    public class OrderProcedureViewModel
+    {
+        public int Id { get; set; }
+        public int Count { get; set; }
+        public TimeSpan Time { get; set; }
+        public string Conclusion { get; set; }
+        public string Details { get; set; }
+        public int OrderId { get; set; }
+        public int AppointmentId { get; set; }
+        public int ProcedureId { get; set; }
+        public int PetId { get; set; }
+        public int EmployeeId { get; set; }
+    }
+}

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using VetClinic.Core.Entities;
 
 namespace VetClinic.DAL.Context
 {
@@ -7,8 +8,10 @@ namespace VetClinic.DAL.Context
     { 
         public VetClinicDbContext(DbContextOptions<VetClinicDbContext> options) : base(options)
         {
+            Database.EnsureCreated();
         }
 
+      
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
