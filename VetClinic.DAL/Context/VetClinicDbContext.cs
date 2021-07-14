@@ -11,8 +11,7 @@ namespace VetClinic.DAL.Context
             Database.EnsureCreated();
         }
 
-        public DbSet<Pet> Pets { get; set; }
-
+      
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
