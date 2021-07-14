@@ -68,7 +68,7 @@ namespace VetClinic.WebApi.Controllers
         }
 
         [HttpPut]
-        public IActionResult Update(string id, EmployeeViewModel model)
+        public IActionResult UpdateEmployee(string id, EmployeeViewModel model)
         {
             var employee = _mapper.Map<Employee>(model);
 

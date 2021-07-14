@@ -10,7 +10,7 @@ namespace VetClinic.Core.Interfaces.Services.Base
     public interface IBaseService<TEntity, TIdType> 
         where TEntity : class
     {
-        public Task<Employee> GetByIdAsync(
+        public Task<TEntity> GetByIdAsync(
             TIdType id,
             Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
             bool asNoTracking = false);
