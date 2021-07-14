@@ -16,7 +16,6 @@ using VetClinic.BLL.Services;
 using VetClinic.Core.Interfaces.Repositories;
 using VetClinic.Core.Interfaces.Repositories.Base;
 using VetClinic.Core.Interfaces.Services;
-using VetClinic.Core.Interfaces.Services.Base;
 using VetClinic.DAL.Context;
 using VetClinic.DAL.Repositories;
 using VetClinic.DAL.Repositories.Base;
@@ -35,17 +34,31 @@ namespace VetClinic.Host
 
         public void ConfigureServices(IServiceCollection services)
         {
-                #region DI
-            //Repositories
+            #region DI
+            //Services
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddScoped<IEmployeeRepository, EmployeeRepository>();
             services.AddScoped<IPetRepository, PetRepository>();
-
-
+            services.AddScoped<IPositionRepository, PositionRepository>();
+            services.AddScoped<IScheduleRepository, ScheduleRepository>();
+            services.AddScoped<ISalaryRepository, SalaryRepository>();
+            services.AddScoped<IEmployeePositionRepository, EmployeePositionRepository>();
+            services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+            services.AddScoped<IOrderRepository, OrderRepository>();
+            services.AddScoped<IProcedureRepository, ProcedureRepository>();
+            services.AddScoped<IOrderProcedureRepository, OrderProcedureRepository>();
 
             //Services
             services.AddScoped<IEmployeeService, EmployeeService>();
             services.AddScoped<IPetService, PetServise>();
+            services.AddScoped<IPositionService, PositionService>();
+            services.AddScoped<IScheduleService, ScheduleService>();
+            services.AddScoped<ISalaryService, SalaryService>();
+            services.AddScoped<IEmployeePositionService, EmployeePositionService>();
+            services.AddScoped<IAppointmentService, AppointmentService>();
+            services.AddScoped<IOrderService, OrderService>();
+            services.AddScoped<IProcedureService, ProcedureService>();
+            services.AddScoped<IOrderProcedureService, OrderProcedureService>();
             #endregion
 
             services.AddDbContext<VetClinicDbContext>(options =>
