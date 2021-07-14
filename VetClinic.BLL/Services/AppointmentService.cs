@@ -11,7 +11,7 @@ using VetClinic.Core.Interfaces.Services;
 
 namespace VetClinic.BLL.Services
 {
-    class AppointmentService : IAppointmentService
+    public class AppointmentService : IAppointmentService
     {
         private readonly IAppointmentRepository _appointmentRepository;
         public AppointmentService(IAppointmentRepository appointmentRepository)

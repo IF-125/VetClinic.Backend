@@ -6,7 +6,7 @@ namespace VetClinic.WebApi.Mappers
 {
     public class AppointmentMapperProfile : Profile
     {
-        AppointmentMapperProfile()
+        public AppointmentMapperProfile()
         {
             CreateMap<Appointment, AppointmentViewModel>().ReverseMap();
         }

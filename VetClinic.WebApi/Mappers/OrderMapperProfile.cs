@@ -6,7 +6,7 @@ namespace VetClinic.WebApi.Mappers
 {
     public class OrderMapperProfile : Profile
     {
-        OrderMapperProfile()
+        public OrderMapperProfile()
         {
             CreateMap<Order, OrderViewModel>().ReverseMap();
         }
