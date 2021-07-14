@@ -11,6 +11,6 @@ namespace VetClinic.Core.Entities
         public DateTime Duration { get; set; }
         public decimal Price { get; set; }
         public ICollection<OrderProcedure> OrderProcedures { get; set; }
-        public ICollection<AnimalType> AnimalTypes { get; set; }
+        //public ICollection<AnimalType> AnimalTypes { get; set; }
     }
 }

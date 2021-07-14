@@ -39,9 +39,13 @@ namespace VetClinic.Host
             //Repositories
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+            services.AddScoped<IClientRepository, ClientRepository>();
 
             //Services
             services.AddScoped<IEmployeeService, EmployeeService>();
+            services.AddScoped<IClientService, ClientService>();
+
+
             #endregion
 
             services.AddDbContext<VetClinicDbContext>(options =>

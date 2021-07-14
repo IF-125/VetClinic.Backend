@@ -16,7 +16,7 @@ namespace VetClinic.Core.Entities
         public int ProcedureId { get; set; }
         public Procedure Procedure { get; set; }
         public int PetId { get; set; }
-        public Pet Pet { get; set; }
+        //public Pet Pet { get; set; }
         public int EmployeeId { get; set; }
         public Employee Employee { get; set; }
     }
