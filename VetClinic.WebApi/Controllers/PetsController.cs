@@ -1,75 +1,134 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
+using VetClinic.Core.Interfaces.Services;
 using VetClinic.DAL.Context;
+using VetClinic.WebApi.Validators.EntityValidators;
+using VetClinic.WebApi.ViewModels;
+using static VetClinic.Core.Resources.TextMessages;
 
 namespace VetClinic.WebApi.Controllers
 {
+
+    [Route("api/[controller]")]
     [ApiController]
-    [Route("api/pets")]
     public class PetsController : ControllerBase
     {
-        readonly VetClinicDbContext db;
+        private readonly IPetService _petService;
+        private readonly IMapper _mapper;
 
-
-        public PetsController(VetClinicDbContext context)
+        public PetsController(IPetService petService, IMapper mapper)
         {
-            db = context;
+            _petService = petService;
+            _mapper = mapper;
         }
 
 
         [HttpGet]
-        public IEnumerable<Pet> GetPets()
+        public async Task<IActionResult> GetAllPetsAsync()
         {
-            return db.Pets.ToList();        
+            var pets = await _petService.GetPetsAsync(asNoTracking: true);
+            var petViewModel = _mapper.Map<IEnumerable<PetViewModel>>(pets);
+
+            return Ok(petViewModel);
         }
 
         [HttpGet("{id}")]
-        public Pet Get(int id)
+        public async Task<IActionResult> GetPetByIdAsync(int id)
         {
-            Pet pet= db.Pets.FirstOrDefault(x => x.Id == id);
-            return pet;
+            try
+            {
+                var pet = await _petService.GetByIdAsync(id);
+                var petViewModel = _mapper.Map<PetViewModel>(pet);
+               
+                return Ok(petViewModel);
+            }
+            catch (ArgumentException  ex)
+            {
+                return NotFound(ex.Message);
+            }                     
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> InsertPetAsync(PetViewModel petViewModel)
+        {
+            var newPet = _mapper.Map<Pet>(petViewModel);
+
+            var validator = new PetValidator();
+            var validationResult = validator.Validate(newPet);
+
+            if (validationResult.IsValid)
+            {
+                await _petService.InsertAsync(newPet);
+                return CreatedAtAction("InsertPetAsync", new { id = newPet.Id }, newPet);
+            }
+
+            return BadRequest(validationResult.Errors);
         }
 
-        [HttpPost]
-        public IActionResult Post(Pet pet)
-        {
-            if (ModelState.IsValid)
-            {
-                db.Pets.Add(pet);
-                db.SaveChanges();
-                return Ok(pet);
-            }
-            return BadRequest(ModelState);
-        }
 
         [HttpPut]
-        public IActionResult Put(Pet pet)
+        public  IActionResult Update (int id, PetViewModel petViewModel)
         {
-            if (ModelState.IsValid)
+            var pet = _mapper.Map<Pet>(petViewModel);
+
+            var validator = new PetValidator();
+            var validationResult = validator.Validate(pet);
+
+            if (validationResult.IsValid)
             {
-                db.Update(pet);
-                db.SaveChanges();
-                return Ok(pet);
+                try
+                {
+                    _petService.Update(id, pet);
+                    return Ok();
+                }
+                catch (ArgumentException ex)
+                {
+
+                    return BadRequest(ex.Message);
+                }
             }
-            return BadRequest(ModelState);
+
+            return BadRequest(validationResult.Errors);
         }
 
-        [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+
+        ///HttpPatch
+        ///
+
+        [HttpDelete("id")]
+        public async Task<IActionResult> DeletePetAsync (int id)
         {
-            Pet pet = db.Pets.FirstOrDefault(x => x.Id == id);
-            if (pet != null)
+            try
             {
-                db.Pets.Remove(pet);
-                db.SaveChanges();
+                await _petService.DeleteAsync(id);
+                return Ok($"{nameof(Pet)} {EntityHasBeenDeleted}");
             }
-            return Ok(pet);
+            catch (ArgumentException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
+        [HttpDelete]
+        public async Task<IActionResult> DeletePetsAsync([FromQuery(Name = "idArr")] int[] idArr)
+        {
+            try
+            {
+                await _petService.DeleteRangeAsync(idArr);
+                return Ok();
+            }
+            catch (ArgumentException ex)
+            {
+
+                return BadRequest(ex.Message); 
+            }
+
+        }
     }
 }
