@@ -43,6 +43,10 @@ namespace VetClinic.Host
             services.AddScoped<IScheduleRepository, ScheduleRepository>();
             services.AddScoped<ISalaryRepository, SalaryRepository>();
             services.AddScoped<IEmployeePositionRepository, EmployeePositionRepository>();
+            services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+            services.AddScoped<IOrderRepository, OrderRepository>();
+            services.AddScoped<IProcedureRepository, ProcedureRepository>();
+            services.AddScoped<IOrderProcedureRepository, OrderProcedureRepository>();
 
             //Services
             services.AddScoped<IEmployeeService, EmployeeService>();
@@ -51,6 +55,10 @@ namespace VetClinic.Host
             services.AddScoped<IScheduleService, ScheduleService>();
             services.AddScoped<ISalaryService, SalaryService>();
             services.AddScoped<IEmployeePositionService, EmployeePositionService>();
+            services.AddScoped<IAppointmentService, AppointmentService>();
+            services.AddScoped<IOrderService, OrderService>();
+            services.AddScoped<IProcedureService, ProcedureService>();
+            services.AddScoped<IOrderProcedureService, OrderProcedureService>();
             #endregion
 
             services.AddDbContext<VetClinicDbContext>(options =>
