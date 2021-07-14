@@ -38,6 +38,7 @@ namespace VetClinic.BLL.Services
             {
                 throw new ArgumentException($"{nameof(Employee)} {EntityWasNotFound}");
             }
+
             return employee;
         }
 
