@@ -35,9 +35,10 @@ namespace VetClinic.Host
         public void ConfigureServices(IServiceCollection services)
         {
             #region DI
-            //Repositories
+            //Services
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+            services.AddScoped<IPetRepository, PetRepository>();
             services.AddScoped<IPositionRepository, PositionRepository>();
             services.AddScoped<IScheduleRepository, ScheduleRepository>();
             services.AddScoped<ISalaryRepository, SalaryRepository>();
@@ -45,6 +46,7 @@ namespace VetClinic.Host
 
             //Services
             services.AddScoped<IEmployeeService, EmployeeService>();
+            services.AddScoped<IPetService, PetServise>();
             services.AddScoped<IPositionService, PositionService>();
             services.AddScoped<IScheduleService, ScheduleService>();
             services.AddScoped<ISalaryService, SalaryService>();
