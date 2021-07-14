@@ -21,21 +21,14 @@ namespace VetClinic.BLL.Services
             _petRepository = petRepository;
         }
 
-        public async Task<IList<Pet>> GetPetsAsync(
-            Expression<Func<Pet, bool>> filter = null,
-            Func<IQueryable<Pet>, IOrderedQueryable<Pet>> orderBy = null,
-            Func<IQueryable<Pet>, IIncludableQueryable<Pet, object>> include = null,
-            bool asNoTracking = false)
+        public async Task<IList<Pet>> GetPetsAsync()
         {
-            return await _petRepository.GetAsync(filter, orderBy, include, asNoTracking);
+            return await _petRepository.GetAsync(asNoTracking: true);
         }
 
-        public async Task<Pet> GetByIdAsync(
-            int id, 
-            Func<IQueryable<Pet>, IIncludableQueryable<Pet, object>> include = null, 
-            bool asNoTracking = false)
+        public async Task<Pet> GetByIdAsync(int id)
         {
-            var pet = await _petRepository.GetFirstOrDefaultAsync(x => x.Id == id, include, asNoTracking);
+            var pet = await _petRepository.GetFirstOrDefaultAsync(filter: x => x.Id == id);
             if (pet == null)
                 throw new ArgumentException($"{nameof(pet)} {EntityWasNotFound}");
 
@@ -62,25 +55,21 @@ namespace VetClinic.BLL.Services
             if (petToDelete==null)
                 throw  new ArgumentException($"{nameof(petToDelete)} {EntityWasNotFound}");
             _petRepository.Delete(petToDelete);
-
+            await _petRepository.SaveAsync();
         }
 
         public async Task DeleteRangeAsync(int[] idArr)
         {
-            var petsToDelete = await GetPetsAsync(x => idArr.Contains(x.Id));
-
+            var pets = await _petRepository.GetAsync(asNoTracking: true);
+            var petsToDelete = pets.Where(x => idArr.Contains(x.Id));
+      
             if (petsToDelete.Count() != idArr.Length)
             {
                 throw new ArgumentException($"{SomeEntitiesInCollectionNotFound} {nameof(Pet)}s to delete");
             }
 
             _petRepository.DeleteRange(petsToDelete);
-
-
-
-
-
-
+            await _petRepository.SaveAsync();
         }
     }
 }

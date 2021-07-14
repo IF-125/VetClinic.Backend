@@ -2,19 +2,15 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Services;
-using VetClinic.DAL.Context;
 using VetClinic.WebApi.Validators.EntityValidators;
 using VetClinic.WebApi.ViewModels;
 using static VetClinic.Core.Resources.TextMessages;
 
 namespace VetClinic.WebApi.Controllers
 {
-
     [Route("api/[controller]")]
     [ApiController]
     public class PetsController : ControllerBase
@@ -28,11 +24,10 @@ namespace VetClinic.WebApi.Controllers
             _mapper = mapper;
         }
 
-
         [HttpGet]
         public async Task<IActionResult> GetAllPetsAsync()
         {
-            var pets = await _petService.GetPetsAsync(asNoTracking: true);
+            var pets = await _petService.GetPetsAsync();
             var petViewModel = _mapper.Map<IEnumerable<PetViewModel>>(pets);
 
             return Ok(petViewModel);
