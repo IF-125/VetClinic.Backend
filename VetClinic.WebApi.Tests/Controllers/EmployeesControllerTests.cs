@@ -13,7 +13,6 @@ using VetClinic.Core.Interfaces.Repositories;
 using VetClinic.Core.Interfaces.Services;
 using VetClinic.WebApi.Controllers;
 using VetClinic.WebApi.Mappers;
-using VetClinic.WebApi.Validators.EntityValidators;
 using VetClinic.WebApi.ViewModels;
 using Xunit;
 using static VetClinic.Core.Resources.TextMessages;
@@ -174,8 +173,6 @@ namespace VetClinic.WebApi.Tests.Controllers
         {
             var employeeController = new EmployeesController(_employeeService, _mapper);
 
-            var employees = GetTestEmployees().AsQueryable();
-
             var id = "IDoNotExist";
 
             var result = employeeController.GetEmployeeByIdAsync(id).Result;
@@ -243,7 +240,7 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             _mockEmployeeRepository.Setup(x => x.Update(It.IsAny<Employee>()));
 
-            var result = employeeController.Update(id, employeeVM);
+            var result = employeeController.UpdateEmployee(id, employeeVM);
 
             Assert.IsType<OkResult>(result);
         }
@@ -266,7 +263,7 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             _mockEmployeeRepository.Setup(x => x.Update(It.IsAny<Employee>()));
 
-            var result = employeeController.Update(id, employeeVM);
+            var result = employeeController.UpdateEmployee(id, employeeVM);
 
             var badRequest = result as BadRequestObjectResult;
 
@@ -292,7 +289,7 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             _mockEmployeeRepository.Setup(x => x.Update(It.IsAny<Employee>()));
 
-            var result = employeeController.Update(id, employeeVM);
+            var result = employeeController.UpdateEmployee(id, employeeVM);
 
             var badRequest = result as BadRequestObjectResult;
 
