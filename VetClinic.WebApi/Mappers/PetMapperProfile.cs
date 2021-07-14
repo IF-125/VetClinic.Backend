@@ -7,7 +7,7 @@ using VetClinic.WebApi.ViewModels;
 
 namespace VetClinic.WebApi.Mappers
 {
-    class PetMapperProfile:Profile
+    public class PetMapperProfile:Profile
     {
         public PetMapperProfile()
         {

@@ -8,7 +8,7 @@ namespace VetClinic.DAL.Context
     { 
         public VetClinicDbContext(DbContextOptions<VetClinicDbContext> options) : base(options)
         {
-            Database.EnsureCreated();
+
         }
 
       
