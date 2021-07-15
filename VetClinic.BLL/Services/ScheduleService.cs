@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Repositories;
 using VetClinic.Core.Interfaces.Services;
+using SendGrid.Helpers.Errors.Model;
 
 namespace VetClinic.BLL.Services
 {
@@ -19,16 +20,10 @@ namespace VetClinic.BLL.Services
             _scheduleRepository = scheduleRepository;
         }
 
-        public async Task<Schedule> GetByIdAsync(
-            int id,
-            Func<IQueryable<Schedule>, IIncludableQueryable<Schedule, object>> include = null,
-            bool asNoTracking = false)
+        public async Task<Schedule> GetByIdAsync(int id)
         {
-            var schedude = await _scheduleRepository.GetFirstOrDefaultAsync(x => x.Id == id, include, asNoTracking);
-            if(schedude == null)
-            {
-                throw new ArgumentException($"{nameof(Schedule)} {EntityWasNotFound}");
-            }
+            var schedude = await _scheduleRepository.GetFirstOrDefaultAsync(x => x.Id == id) ?? 
+                throw new NotFoundException($"{nameof(Schedule)} {EntityWasNotFound}");
 
             return schedude;
         }
@@ -36,54 +31,50 @@ namespace VetClinic.BLL.Services
         public async Task InsertAsync(Schedule entity)
         {
             await _scheduleRepository.InsertAsync(entity);
+            await _scheduleRepository.SaveChangesAsync();
         }
 
         public async Task InsertRangeAsync(IEnumerable<Schedule> schedule)
         {
             await _scheduleRepository.InsertRangeAsync(schedule);
+            await _scheduleRepository.SaveChangesAsync();
         }
 
         public void Update(int id, Schedule entityToUpdate)
         {
             if (id != entityToUpdate.Id)
             {
-                throw new ArgumentException($"{nameof(Schedule)} {IdsDoNotMatch}");
+                throw new BadRequestException($"{nameof(Schedule)} {IdsDoNotMatch}");
             }
 
             _scheduleRepository.Update(entityToUpdate);
+            _scheduleRepository.SaveChanges();
         }
 
         public async Task DeleteAsync(int id)
         {
-            var scheduleToDelete = await _scheduleRepository.GetFirstOrDefaultAsync(x => x.Id == id);
-
-            if(scheduleToDelete == null)
-            {
-                throw new ArgumentException($"{nameof(Schedule)} {EntityWasNotFound}");
-            }
+            var scheduleToDelete = await _scheduleRepository.GetFirstOrDefaultAsync(x => x.Id == id) ??
+                throw new NotFoundException($"{nameof(Schedule)} {EntityWasNotFound}");
 
             _scheduleRepository.Delete(scheduleToDelete);
+            await _scheduleRepository.SaveChangesAsync();
         }
 
-        public async Task DeleteRangeAsync(int[] idArr)
+        public async Task DeleteRangeAsync(IList<int> listOfIds)
         {
-            var scheduleToDelete = await _scheduleRepository.GetAsync(x => idArr.Contains(x.Id));
+            var scheduleToDelete = await _scheduleRepository.GetAsync(x => listOfIds.Contains(x.Id));
 
-            if (scheduleToDelete.Count() != idArr.Length)
+            if (scheduleToDelete.Count() != listOfIds.Count)
             {
-                throw new ArgumentException($"{SomeEntitiesInCollectionNotFound} {nameof(Schedule)}s to delete");
+                throw new BadRequestException($"{SomeEntitiesInCollectionNotFound} {nameof(Schedule)}s to delete");
             }
             _scheduleRepository.DeleteRange(scheduleToDelete);
+            await _scheduleRepository.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<Schedule>> GetScheduleOfEmployee(string emoloyeeId)
         {
             var schedule = await _scheduleRepository.GetAsync(x => x.EmployeeId == emoloyeeId);
-
-            if(schedule == null)
-            {
-                throw new ArgumentException($"No schedule for employee of id {emoloyeeId} provided");
-            }
 
             return schedule;
         }

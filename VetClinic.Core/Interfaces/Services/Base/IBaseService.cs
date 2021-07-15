@@ -1,19 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore.Query;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using VetClinic.Core.Entities;
 
 namespace VetClinic.Core.Interfaces.Services.Base
 {
     public interface IBaseService<TEntity, TIdType> 
         where TEntity : class
     {
-        public Task<TEntity> GetByIdAsync(
-            TIdType id,
-            Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
-            bool asNoTracking = false);
+        public Task<TEntity> GetByIdAsync(TIdType id);
 
         public Task InsertAsync(TEntity entity);
 
@@ -21,6 +14,6 @@ namespace VetClinic.Core.Interfaces.Services.Base
 
         public Task DeleteAsync(TIdType id);
 
-        public Task DeleteRangeAsync(TIdType[] idArr);
+        public Task DeleteRangeAsync(IList<TIdType> listOfIds);
     }
 }

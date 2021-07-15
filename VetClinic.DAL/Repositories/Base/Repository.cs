@@ -70,39 +70,34 @@ namespace VetClinic.DAL.Repositories.Base
         public async Task InsertAsync(TEntity entity)
         {
             await _context.Set<TEntity>().AddAsync(entity);
-            await SaveAsync();
         }
 
         public async Task InsertRangeAsync(IEnumerable<TEntity> entities)
         {
             await _context.Set<TEntity>().AddRangeAsync(entities);
-            await SaveAsync();
         }
 
         public void Update(TEntity entityToUpdate)
         {
             _context.Set<TEntity>().Update(entityToUpdate);
-            SaveChanges();
         }
 
         public void Delete(TEntity entityToDelete)
         {
             _context.Set<TEntity>().Remove(entityToDelete);
-            SaveChanges();
         }
 
         public void DeleteRange(IEnumerable<TEntity> entitiesToDelete)
         {
             _context.Set<TEntity>().RemoveRange(entitiesToDelete);
-            SaveChanges();
         }
 
-        public async Task SaveAsync()
+        public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();
         }
 
-        private void SaveChanges()
+        public void SaveChanges()
         {
             _context.SaveChanges();
         }

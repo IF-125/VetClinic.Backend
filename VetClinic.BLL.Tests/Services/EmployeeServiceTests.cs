@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Query;
 using Moq;
+using SendGrid.Helpers.Errors.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,36 +27,45 @@ namespace VetClinic.BLL.Tests.Services
         [Fact]
         public async Task CanReturnAllEmployees()
         {
+            //Arrange
             _employeeRepository.Setup(x => x.GetAsync(null, null, null, true).Result)
                 .Returns(EmployeeFakeData.GetEmployeeFakeData());
 
-            IList<Employee> testEmployees = await _employeeService.GetEmployeesAsync(null, null, null, asNoTracking: true);
+            int expectedCount = 10;
 
+            //Act
+            IList<Employee> testEmployees = await _employeeService.GetEmployeesAsync();
+
+            //Assert
             Assert.NotNull(testEmployees);
-            Assert.Equal(10, testEmployees.Count);
+            Assert.Equal(expectedCount, testEmployees.Count);
         }
 
         [Fact]
         public async Task CanReturnEmployeeById()
         {
+            //Arrange
             var id = "f1a05cca-b479-4f72-bbda-96b8979f4afe";
 
             var employees = EmployeeFakeData.GetEmployeeFakeData().AsQueryable();
 
             _employeeRepository.Setup(x => x.GetFirstOrDefaultAsync(
-                x => x.Id == id, null, true).Result)
+                x => x.Id == id, null, false).Result)
                 .Returns((Expression<Func<Employee, bool>> filter,
                 Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>> include,
                 bool asNoTracking) => employees.FirstOrDefault(filter));
 
-            var employee = await _employeeService.GetByIdAsync(id, null, true);
+            //Act
+            var employee = await _employeeService.GetByIdAsync(id);
 
+            //Assert
             Assert.Equal("Bob", employee.FirstName);
         }
 
         [Fact]
-        public void GetEmployeeById_ShouldReturnException()
+        public async Task GetEmployeeById_ShouldReturnException()
         {
+            //Arrange
             var id = "fffff";
 
             var employees = EmployeeFakeData.GetEmployeeFakeData().AsQueryable();
@@ -66,7 +76,9 @@ namespace VetClinic.BLL.Tests.Services
                 Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>> include,
                 bool asNoTracking) => employees.FirstOrDefault(filter));
 
-            Assert.Throws<AggregateException>(() => _employeeService.GetByIdAsync(id).Result);
+            //Act, Assert
+            await Assert.ThrowsAsync<NotFoundException>(async () =>
+            await _employeeService.GetByIdAsync(id));
 
             
         }
@@ -74,6 +86,7 @@ namespace VetClinic.BLL.Tests.Services
         [Fact]
         public async Task CanInsertEmployeeAsync()
         {
+            //Arrange
             var newEmployee = new Employee
             {
                 Id = "f1a05cca-b479-4f72-bbda-96b8979f4123",
@@ -85,14 +98,17 @@ namespace VetClinic.BLL.Tests.Services
 
             _employeeRepository.Setup(x => x.InsertAsync(It.IsAny<Employee>()));
 
+            //Act
             await _employeeService.InsertAsync(newEmployee);
 
+            //Assert
             _employeeRepository.Verify(a => a.InsertAsync(newEmployee));
         }
 
         [Fact]
         public void CanUpdateEmployee()
         {
+            //Arrange
             var newEmployee = new Employee
             {
                 Id = "f1a05cca-b479-4f72-bbda-96b8979f4123",
@@ -106,14 +122,17 @@ namespace VetClinic.BLL.Tests.Services
 
             _employeeRepository.Setup(x => x.Update(It.IsAny<Employee>()));
 
+            //Act
             _employeeService.Update(id, newEmployee);
 
+            //Assert
             _employeeRepository.Verify(x => x.Update(newEmployee));
         }
 
         [Fact]
         public void UpdateEmployee_ThrowsException()
         {
+            //Arrange
             var newEmployee = new Employee
             {
                 Id = "f1a05cca-b479-4f72-bbda-96b8979f4123",
@@ -127,12 +146,14 @@ namespace VetClinic.BLL.Tests.Services
 
             _employeeRepository.Setup(x => x.Update(It.IsAny<Employee>()));
 
-            Assert.Throws<ArgumentException>(() => _employeeService.Update(id, newEmployee));
+            //Act, Assert
+            Assert.Throws<BadRequestException>(() => _employeeService.Update(id, newEmployee));
         }
 
         [Fact]
         public async Task CanDeleteEmployeeAsync()
         {
+            //Arrange
             var id = "f1a05cca-b479-4f72-bbda-96b8979f4afe";
 
             _employeeRepository.Setup(x => x.GetFirstOrDefaultAsync(
@@ -141,23 +162,27 @@ namespace VetClinic.BLL.Tests.Services
 
             _employeeRepository.Setup(x => x.Delete(It.IsAny<Employee>())).Verifiable();
 
+            //Act
             await _employeeService.DeleteAsync(id);
 
+            //Assert
             _employeeRepository.Verify(x => x.Delete(It.IsAny<Employee>()));
 
 
         }
 
         [Fact]
-        public void DeleteEmployee_WhenEmployeeDoesNotExist()
+        public async Task DeleteEmployee_WhenEmployeeDoesNotExist()
         { 
-             Assert.Throws<AggregateException>(() => _employeeService.DeleteAsync("ShouldnotFind").Wait());
+             await Assert.ThrowsAsync<NotFoundException>(async () =>
+                await _employeeService.DeleteAsync("ShouldnotFind"));
         }
 
         [Fact]
         public void CanDeleteRangeAsync()
         {
-            var idArr = new string[] 
+            //Arrange
+            var listOfIds = new List<string> 
             { 
                 "f1a05cca-b479-4f72-bbda-96b8979f4afe",
                 "6fca381a-40d0-4bf9-a076-706e1a995662",
@@ -174,15 +199,17 @@ namespace VetClinic.BLL.Tests.Services
 
             _employeeRepository.Setup(x => x.DeleteRange(It.IsAny<IEnumerable<Employee>>()));
 
-            _employeeService.DeleteRangeAsync(idArr).Wait();
+            //Act
+            _employeeService.DeleteRangeAsync(listOfIds).Wait();
 
+            //Assert
             _employeeRepository.Verify(x => x.DeleteRange(It.IsAny<IEnumerable<Employee>>()));
         }
 
         [Fact]
         public void DeleteRangeAsync_ShouldReturnException_BecauseOneEmployeeWasNotFound()
         {
-            var idArr = new string[]
+            var listOfIds = new List<string>
             {
                 "f1a05cca-b479-4f72-bbda-96b8979f4afe",
                 "IDoNotExist",
@@ -199,7 +226,7 @@ namespace VetClinic.BLL.Tests.Services
 
             _employeeRepository.Setup(x => x.DeleteRange(It.IsAny<IEnumerable<Employee>>()));
 
-            Assert.Throws<AggregateException>(() => _employeeService.DeleteRangeAsync(idArr).Wait());
+            Assert.Throws<AggregateException>(() => _employeeService.DeleteRangeAsync(listOfIds).Wait());
         }
     }
 }
