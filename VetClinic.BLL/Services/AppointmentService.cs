@@ -67,11 +67,11 @@ namespace VetClinic.BLL.Services
             await _appointmentRepository.SaveChangesAsync();
         }
 
-        public async Task DeleteRangeAsync(IList<int> idArr)
+        public async Task DeleteRangeAsync(IList<int> listOfIds)
         {
             var appointmentsToDelete = await GetAppointmentsAsync(x => listOfIds.Contains(x.Id));
 
-            if (appointmentsToDelete.Count() != idArr.Count)
+            if (appointmentsToDelete.Count() != listOfIds.Count)
             {
                 throw new ArgumentException($"{SomeEntitiesInCollectionNotFound} {nameof(Appointment)}s to delete");
             }

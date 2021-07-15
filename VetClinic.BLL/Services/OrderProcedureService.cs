@@ -67,11 +67,11 @@ namespace VetClinic.BLL.Services
             await _orderProcedureRepository.SaveChangesAsync();
         }
 
-        public async Task DeleteRangeAsync(IList<int> idArr)
+        public async Task DeleteRangeAsync(IList<int> listOfIds)
         {
             var orderProceduresToDelete = await GetOrderProceduresAsync(x => listOfIds.Contains(x.Id));
 
-            if (orderProceduresToDelete.Count() != idArr.Count)
+            if (orderProceduresToDelete.Count() != listOfIds.Count)
             {
                 throw new ArgumentException($"{SomeEntitiesInCollectionNotFound} {nameof(OrderProcedure)}s to delete");
             }
