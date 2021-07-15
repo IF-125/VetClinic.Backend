@@ -20,6 +20,7 @@ using VetClinic.DAL.Context;
 using VetClinic.DAL.Repositories;
 using VetClinic.DAL.Repositories.Base;
 using VetClinic.WebApi.Validators;
+using VetClinic.WebApi.Validators.EntityValidators;
 
 namespace VetClinic.Host
 {
@@ -59,6 +60,12 @@ namespace VetClinic.Host
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IProcedureService, ProcedureService>();
             services.AddScoped<IOrderProcedureService, OrderProcedureService>();
+
+            //Validators
+            services.AddScoped<AppointmentValidator>();
+            services.AddScoped<OrderValidator>();
+            services.AddScoped<ProcedureValidator>();
+            services.AddScoped<OrderProcedureValidator>();
             #endregion
 
             services.AddDbContext<VetClinicDbContext>(options =>

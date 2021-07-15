@@ -28,12 +28,9 @@ namespace VetClinic.BLL.Services
             return await _orderProcedureRepository.GetAsync(filter, orderBy, include, asNoTracking);
         }
 
-        public async Task<OrderProcedure> GetByIdAsync(
-            int id,
-            Func<IQueryable<OrderProcedure>, IIncludableQueryable<OrderProcedure, object>> include = null,
-            bool asNoTracking = false)
+        public async Task<OrderProcedure> GetByIdAsync(int id)
         {
-            var orderProcedure = await _orderProcedureRepository.GetFirstOrDefaultAsync(x => x.Id == id, include, asNoTracking);
+            var orderProcedure = await _orderProcedureRepository.GetFirstOrDefaultAsync(x => x.Id == id);
             if (orderProcedure == null)
             {
                 throw new ArgumentException($"{nameof(OrderProcedure)} {EntityWasNotFound}");
@@ -44,6 +41,7 @@ namespace VetClinic.BLL.Services
         public async Task InsertAsync(OrderProcedure entity)
         {
             await _orderProcedureRepository.InsertAsync(entity);
+            await _orderProcedureRepository.SaveChangesAsync();
         }
 
         public void Update(int id, OrderProcedure orderProcedureToUpdate)
@@ -53,6 +51,7 @@ namespace VetClinic.BLL.Services
                 throw new ArgumentException($"{nameof(OrderProcedure)} {IdsDoNotMatch}");
             }
             _orderProcedureRepository.Update(orderProcedureToUpdate);
+            _orderProcedureRepository.SaveChanges();
 
         }
 
@@ -65,17 +64,19 @@ namespace VetClinic.BLL.Services
                 throw new ArgumentException($"{nameof(OrderProcedure)} {EntityWasNotFound}");
             }
             _orderProcedureRepository.Delete(orderProcedureToDelete);
+            await _orderProcedureRepository.SaveChangesAsync();
         }
 
-        public async Task DeleteRangeAsync(int[] idArr)
+        public async Task DeleteRangeAsync(IList<int> idArr)
         {
             var orderProceduresToDelete = await GetOrderProceduresAsync(x => idArr.Contains(x.Id));
 
-            if (orderProceduresToDelete.Count() != idArr.Length)
+            if (orderProceduresToDelete.Count() != idArr.Count)
             {
                 throw new ArgumentException($"{SomeEntitiesInCollectionNotFound} {nameof(OrderProcedure)}s to delete");
             }
             _orderProcedureRepository.DeleteRange(orderProceduresToDelete);
+            await _orderProcedureRepository.SaveChangesAsync();
         }
     }
 }

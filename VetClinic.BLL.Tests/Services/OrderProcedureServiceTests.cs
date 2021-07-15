@@ -26,11 +26,12 @@ namespace VetClinic.BLL.Tests.Services
         [Fact]
         public async Task CanReturnAllOrderProcedures()
         {
+            //arrange
             _orderProcedureRepository.Setup(b => b.GetAsync(null, null, null, true).Result)
                 .Returns(OrderProcedureFakeData.GetOrderProcedureFakeData());
-
+            //act
             IList<OrderProcedure> OrderProcedures = await _orderProcedureService.GetOrderProceduresAsync(null, null, null, asNoTracking: true);
-
+            //assert
             Assert.NotNull(OrderProcedures);
             Assert.Equal(10, OrderProcedures.Count);
         }
@@ -38,6 +39,7 @@ namespace VetClinic.BLL.Tests.Services
         [Fact]
         public async Task CanReturnOrderProcedureById()
         {
+            //arrange
             int id = 3;
 
             var OrderProcedures = OrderProcedureFakeData.GetOrderProcedureFakeData().AsQueryable();
@@ -47,15 +49,16 @@ namespace VetClinic.BLL.Tests.Services
                 .Returns((Expression<Func<OrderProcedure, bool>> filter,
                 Func<IQueryable<OrderProcedure>, IIncludableQueryable<OrderProcedure, object>> include,
                 bool asNoTracking) => OrderProcedures.FirstOrDefault(filter));
-
+            //act
             var OrderProcedure = await _orderProcedureService.GetByIdAsync(id, null, true);
-
+            //assert
             Assert.Equal("Procedure was unsuccessful.", OrderProcedure.Conclusion);
         }
 
         [Fact]
         public void GetOrderProcedureByInvalidId()
         {
+            //arrange
             int id = 45;
 
             var OrderProcedures = OrderProcedureFakeData.GetOrderProcedureFakeData().AsQueryable();
@@ -65,13 +68,16 @@ namespace VetClinic.BLL.Tests.Services
                 .Returns((Expression<Func<OrderProcedure, bool>> filter,
                 Func<IQueryable<OrderProcedure>, IIncludableQueryable<OrderProcedure, object>> include,
                 bool asNoTracking) => OrderProcedures.FirstOrDefault(filter));
-
-            Assert.Throws<AggregateException>(() => _orderProcedureService.GetByIdAsync(id).Result);
+            //act
+            var orderProcedure = _orderProcedureService.GetByIdAsync(id);
+            //assert
+            Assert.Throws<AggregateException>(() => orderProcedure.Result);
         }
 
         [Fact]
         public async Task CanInsertOrderProcedure()
         {
+            //arrange
             OrderProcedure OrderProcedureToInsert = new OrderProcedure
             {
                 Id = 11,
@@ -87,15 +93,16 @@ namespace VetClinic.BLL.Tests.Services
             };
 
             _orderProcedureRepository.Setup(b => b.InsertAsync(It.IsAny<OrderProcedure>()));
-
+            //act
             await _orderProcedureService.InsertAsync(OrderProcedureToInsert);
-
+            //assert
             _orderProcedureRepository.Verify(b => b.InsertAsync(OrderProcedureToInsert));
         }
 
         [Fact]
         public void CanUpdateOrderProcedure()
         {
+            //arrange
             OrderProcedure OrderProcedureToUpdate = new OrderProcedure
             {
                 Id = 11,
@@ -113,15 +120,16 @@ namespace VetClinic.BLL.Tests.Services
             int id = 11;
 
             _orderProcedureRepository.Setup(b => b.Update(It.IsAny<OrderProcedure>()));
-
+            //act
             _orderProcedureService.Update(id, OrderProcedureToUpdate);
-
+            //assert
             _orderProcedureRepository.Verify(b => b.Update(OrderProcedureToUpdate));
         }
 
         [Fact]
         public void UpdateOrderProcedure_InvalidId()
         {
+            //arrange
             OrderProcedure OrderProcedureToUpdate = new OrderProcedure
             {
                 Id = 11,
@@ -139,13 +147,14 @@ namespace VetClinic.BLL.Tests.Services
             int id = 10;
 
             _orderProcedureRepository.Setup(b => b.Update(It.IsAny<OrderProcedure>()));
-
+            //assert
             Assert.Throws<ArgumentException>(() => _orderProcedureService.Update(id, OrderProcedureToUpdate));
         }
 
         [Fact]
         public async Task CanDeleteOrderProcedure()
         {
+            //arrange
             var id = 10;
 
             _orderProcedureRepository.Setup(b => b.GetFirstOrDefaultAsync(
@@ -153,21 +162,23 @@ namespace VetClinic.BLL.Tests.Services
                 .Returns(new OrderProcedure() { Id = id });
 
             _orderProcedureRepository.Setup(b => b.Delete(It.IsAny<OrderProcedure>())).Verifiable();
-
+            //act
             await _orderProcedureService.DeleteAsync(id);
-
+            //assert
             _orderProcedureRepository.Verify(b => b.Delete(It.IsAny<OrderProcedure>()));
         }
 
         [Fact]
         public void DeleteOrderProcedureByInvalidId()
         {
+            //assert
             Assert.Throws<AggregateException>(() => _orderProcedureService.DeleteAsync(100).Wait());
         }
 
         [Fact]
         public void CanDeleteRange()
         {
+            //arrange
             int[] ids = new int[] { 8, 9, 10 };
 
             var OrderProcedures = OrderProcedureFakeData.GetOrderProcedureFakeData().AsQueryable();
@@ -179,15 +190,16 @@ namespace VetClinic.BLL.Tests.Services
                 bool asNoTracking) => OrderProcedures.Where(filter).ToList());
 
             _orderProcedureRepository.Setup(b => b.DeleteRange(It.IsAny<IEnumerable<OrderProcedure>>()));
-
+            //act
             _orderProcedureService.DeleteRangeAsync(ids).Wait();
-
+            //assert
             _orderProcedureRepository.Verify(b => b.DeleteRange(It.IsAny<IEnumerable<OrderProcedure>>()));
         }
 
         [Fact]
         public void DeleteRangeWithInvalidId()
         {
+            //arrange
             int[] ids = new int[] { 8, 9, 100 };
 
             var OrderProcedures = OrderProcedureFakeData.GetOrderProcedureFakeData().AsQueryable();
@@ -199,7 +211,7 @@ namespace VetClinic.BLL.Tests.Services
                 bool asNoTracking) => OrderProcedures.Where(filter).ToList());
 
             _orderProcedureRepository.Setup(b => b.DeleteRange(It.IsAny<IEnumerable<OrderProcedure>>()));
-
+            //assert
             Assert.Throws<AggregateException>(() => _orderProcedureService.DeleteRangeAsync(ids).Wait());
         }
     }

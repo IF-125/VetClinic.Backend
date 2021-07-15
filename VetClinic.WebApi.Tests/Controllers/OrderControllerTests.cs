@@ -41,14 +41,15 @@ namespace VetClinic.WebApi.Tests.Controllers
         [Fact]
         public void CanGetAllOrders()
         {
+            //arrange
             var orderController = new OrderController(_orderService, _mapper);
 
             var orders = OrderFakeData.GetOrderFakeData();
 
             _orderRepository.Setup(b => b.GetAsync(null, null, null, true).Result).Returns(() => orders);
-
+            //act
             var result = orderController.GetAllOrdersAsync().Result;
-
+            //assert
             var viewResult = Assert.IsType<OkObjectResult>(result);
             var model = Assert.IsAssignableFrom<IEnumerable<OrderViewModel>>(viewResult.Value);
             Assert.Equal(OrderFakeData.GetOrderFakeData().Count, model.Count());
@@ -57,6 +58,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         [Fact]
         public void CanReturnOrderById()
         {
+            //arrange
             var orderController = new OrderController(_orderService, _mapper);
 
             var orders = OrderFakeData.GetOrderFakeData().AsQueryable();
@@ -67,9 +69,9 @@ namespace VetClinic.WebApi.Tests.Controllers
                 .Returns((Expression<Func<Order, bool>> filter,
                 Func<IQueryable<Order>, IIncludableQueryable<Order, object>> include,
                 bool asNoTracking) => orders.FirstOrDefault(filter));
-
+            //act
             var result = orderController.GetOrderByIdAsync(id).Result;
-
+            //assert
             var viewResult = Assert.IsType<OkObjectResult>(result);
             var model = Assert.IsType<OrderViewModel>(viewResult.Value);
 
@@ -80,18 +82,20 @@ namespace VetClinic.WebApi.Tests.Controllers
         [Fact]
         public void GetOrderByInvalidId()
         {
+            //arrange
             var orderController = new OrderController(_orderService, _mapper);
 
             int id = 100;
-
+            //act
             var result = orderController.GetOrderByIdAsync(id).Result;
-
+            //assert
             Assert.IsType<NotFoundObjectResult>(result);
         }
 
         [Fact]
         public void CanInsertOrder()
         {
+            //arrange
             OrderViewModel order = new OrderViewModel
             {
                 Id = 11,
@@ -103,15 +107,16 @@ namespace VetClinic.WebApi.Tests.Controllers
             var orderController = new OrderController(_orderService, _mapper);
 
             _orderRepository.Setup(b => b.InsertAsync(It.IsAny<Order>()));
-
+            //act
             var result = orderController.InsertOrderAsync(order).Result;
-
+            //assert
             Assert.IsType<CreatedAtActionResult>(result);
         }
 
         [Fact]
         public void CanUpdateOrder()
         {
+            //arrange
             OrderViewModel order = new OrderViewModel
             {
                 Id = 11,
@@ -125,15 +130,16 @@ namespace VetClinic.WebApi.Tests.Controllers
             var orderController = new OrderController(_orderService, _mapper);
 
             _orderRepository.Setup(b => b.InsertAsync(It.IsAny<Order>()));
-
+            //act
             var result = orderController.Update(id, order);
-
+            //assert
             Assert.IsType<OkResult>(result);
         }
 
         [Fact]
         public void UpdateOrder_InvalidId()
         {
+            //arrange
             Order orderToUpdate = new Order
             {
                 Id = 11,
@@ -145,13 +151,14 @@ namespace VetClinic.WebApi.Tests.Controllers
             int id = 10;
 
             _orderRepository.Setup(b => b.Update(It.IsAny<Order>()));
-
+            //assert
             Assert.Throws<ArgumentException>(() => _orderService.Update(id, orderToUpdate));
         }
 
         [Fact]
         public void CanDeleteOrder()
         {
+            //arrange
             int id = 5;
 
             _orderRepository.Setup(b => b.GetFirstOrDefaultAsync(
@@ -161,27 +168,29 @@ namespace VetClinic.WebApi.Tests.Controllers
             _orderRepository.Setup(b => b.Delete(It.IsAny<Order>()));
 
             var orderController = new OrderController(_orderService, _mapper);
-
+            //act
             var result = orderController.DeleteOrderAsync(id).Result;
-
+            //assert
             Assert.IsType<OkObjectResult>(result);
         }
 
         [Fact]
         public void DeleteOrderByInvalidId()
         {
+            //arrange
             int id = 500;
 
             var orderController = new OrderController(_orderService, _mapper);
-
+            //act
             var result = orderController.DeleteOrderAsync(id).Result;
-
+            //assert
             Assert.IsType<NotFoundObjectResult>(result);
         }
 
         [Fact]
         public void CanDeleteRange()
         {
+            //arrange
             int[] ids = new int[]{4, 8, 9};
 
             var orders = OrderFakeData.GetOrderFakeData().AsQueryable();
@@ -196,15 +205,16 @@ namespace VetClinic.WebApi.Tests.Controllers
             _orderRepository.Setup(b => b.DeleteRange(It.IsAny<IEnumerable<Order>>()));
 
             var orderController = new OrderController(_orderService, _mapper);
-
+            //act
             var result = orderController.DeleteOrdersAsync(ids).Result;
-
+            //assert
             Assert.IsType<OkResult>(result);
         }
 
         [Fact]
         public void DeleteRangeWithInvalidId()
         {
+            //arrange
             int[] ids = new int[] { 4, 8, 100 };
 
             var orders = OrderFakeData.GetOrderFakeData().AsQueryable();
@@ -219,11 +229,11 @@ namespace VetClinic.WebApi.Tests.Controllers
             _orderRepository.Setup(b => b.DeleteRange(It.IsAny<IEnumerable<Order>>()));
 
             var orderController = new OrderController(_orderService, _mapper);
-
+            //act
             var result = orderController.DeleteOrdersAsync(ids).Result;
 
             var badRequest = result as BadRequestObjectResult;
-
+            //assert
             Assert.IsType<BadRequestObjectResult>(result);
             Assert.Equal($"{SomeEntitiesInCollectionNotFound} {nameof(Order)}s to delete", badRequest.Value);
         }

@@ -17,14 +17,17 @@ namespace VetClinic.WebApi.Controllers
     {
         private readonly IOrderProcedureService _orderProcedureService;
         private readonly IMapper _mapper;
-        public OrderProcedureController(IOrderProcedureService orderProcedureService, IMapper mapper)
+        private readonly OrderProcedureValidator _validator;
+        public OrderProcedureController(IOrderProcedureService orderProcedureService, IMapper mapper, 
+            OrderProcedureValidator validator)
         {
             _orderProcedureService = orderProcedureService;
             _mapper = mapper;
+            _validator = validator;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllOrderProceduresAsync()
+        public async Task<IActionResult> GetAllOrderProcedures()
         {
             var orderProcedures = await _orderProcedureService.GetOrderProceduresAsync(asNoTracking: true);
 
@@ -34,7 +37,7 @@ namespace VetClinic.WebApi.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetOrderProcedureByIdAsync(int id)
+        public async Task<IActionResult> GetOrderProcedure(int id)
         {
             try
             {
@@ -51,12 +54,11 @@ namespace VetClinic.WebApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> InsertOrderProcedureAsync(OrderProcedureViewModel model)
+        public async Task<IActionResult> InsertOrderProcedure(OrderProcedureViewModel model)
         {
             var newOrderProcedure = _mapper.Map<OrderProcedure>(model);
 
-            var validator = new OrderProcedureValidator();
-            var validationResult = validator.Validate(newOrderProcedure);
+            var validationResult = _validator.Validate(newOrderProcedure);
 
             if (validationResult.IsValid)
             {
@@ -71,8 +73,7 @@ namespace VetClinic.WebApi.Controllers
         {
             var orderProcedure = _mapper.Map<OrderProcedure>(model);
 
-            var validator = new OrderProcedureValidator();
-            var validationResult = validator.Validate(orderProcedure);
+            var validationResult = _validator.Validate(orderProcedure);
 
             if (validationResult.IsValid)
             {
@@ -90,7 +91,7 @@ namespace VetClinic.WebApi.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteOrderProcedureAsync(int id)
+        public async Task<IActionResult> DeleteOrderProcedure(int id)
         {
             try
             {
@@ -104,11 +105,11 @@ namespace VetClinic.WebApi.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteOrderProceduresAsync([FromQuery(Name = "idArr")] int[] idArr)
+        public async Task<IActionResult> DeleteOrderProcedures([FromQuery(Name = "ids")] IList<int> ids)
         {
             try
             {
-                await _orderProcedureService.DeleteRangeAsync(idArr);
+                await _orderProcedureService.DeleteRangeAsync(ids);
                 return Ok();
             }
             catch (ArgumentException ex)

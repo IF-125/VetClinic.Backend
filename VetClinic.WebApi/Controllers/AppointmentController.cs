@@ -17,14 +17,16 @@ namespace VetClinic.WebApi.Controllers
     {
         private readonly IAppointmentService _appointmentService;
         private readonly IMapper _mapper;
-        public AppointmentController(IAppointmentService appointmentService, IMapper mapper)
+        private readonly AppointmentValidator _validator;
+        public AppointmentController(IAppointmentService appointmentService, IMapper mapper, AppointmentValidator validator)
         {
             _appointmentService = appointmentService;
             _mapper = mapper;
+            _validator = validator;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllAppointmentsAsync()
+        public async Task<IActionResult> GetAllAppointments()
         {
             var appointments = await _appointmentService.GetAppointmentsAsync(asNoTracking: true);
 
@@ -34,7 +36,7 @@ namespace VetClinic.WebApi.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetAppointmentByIdAsync(int id)
+        public async Task<IActionResult> GetAppointment(int id)
         {
             try
             {
@@ -51,12 +53,11 @@ namespace VetClinic.WebApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> InsertAppointmentAsync(AppointmentViewModel model)
+        public async Task<IActionResult> InsertAppointment(AppointmentViewModel model)
         {
             var newAppointment = _mapper.Map<Appointment>(model);
 
-            var validator = new AppointmentValidator();
-            var validationResult = validator.Validate(newAppointment);
+            var validationResult = _validator.Validate(newAppointment);
 
             if (validationResult.IsValid)
             {
@@ -71,8 +72,7 @@ namespace VetClinic.WebApi.Controllers
         {
             var appointment = _mapper.Map<Appointment>(model);
 
-            var validator = new AppointmentValidator();
-            var validationResult = validator.Validate(appointment);
+            var validationResult = _validator.Validate(appointment);
 
             if (validationResult.IsValid)
             {
@@ -90,7 +90,7 @@ namespace VetClinic.WebApi.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAppointmentAsync(int id)
+        public async Task<IActionResult> DeleteAppointment(int id)
         {
             try
             {
@@ -104,11 +104,11 @@ namespace VetClinic.WebApi.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteAppointmentsAsync([FromQuery(Name = "idArr")] int[] idArr)
+        public async Task<IActionResult> DeleteAppointments([FromQuery(Name = "ids")] IList<int> ids)
         {
             try
             {
-                await _appointmentService.DeleteRangeAsync(idArr);
+                await _appointmentService.DeleteRangeAsync(ids);
                 return Ok();
             }
             catch (ArgumentException ex)

@@ -28,12 +28,9 @@ namespace VetClinic.BLL.Services
             return await _orderRepository.GetAsync(filter, orderBy, include, asNoTracking);
         }
 
-        public async Task<Order> GetByIdAsync(
-            int id,
-            Func<IQueryable<Order>, IIncludableQueryable<Order, object>> include = null,
-            bool asNoTracking = false)
+        public async Task<Order> GetByIdAsync(int id)
         {
-            var order = await _orderRepository.GetFirstOrDefaultAsync(x => x.Id == id, include, asNoTracking);
+            var order = await _orderRepository.GetFirstOrDefaultAsync(x => x.Id == id);
             if (order == null)
             {
                 throw new ArgumentException($"{nameof(Order)} {EntityWasNotFound}");
@@ -44,6 +41,7 @@ namespace VetClinic.BLL.Services
         public async Task InsertAsync(Order entity)
         {
             await _orderRepository.InsertAsync(entity);
+            await _orderRepository.SaveChangesAsync();
         }
 
         public void Update(int id, Order orderToUpdate)
@@ -53,6 +51,7 @@ namespace VetClinic.BLL.Services
                 throw new ArgumentException($"{nameof(Order)} {IdsDoNotMatch}");
             }
             _orderRepository.Update(orderToUpdate);
+            _orderRepository.SaveChanges();
 
         }
 
@@ -65,17 +64,19 @@ namespace VetClinic.BLL.Services
                 throw new ArgumentException($"{nameof(Order)} {EntityWasNotFound}");
             }
             _orderRepository.Delete(orderToDelete);
+            await _orderRepository.SaveChangesAsync();
         }
 
-        public async Task DeleteRangeAsync(int[] idArr)
+        public async Task DeleteRangeAsync(IList<int> idArr)
         {
             var ordersToDelete = await GetOrdersAsync(x => idArr.Contains(x.Id));
 
-            if (ordersToDelete.Count() != idArr.Length)
+            if (ordersToDelete.Count() != idArr.Count)
             {
                 throw new ArgumentException($"{SomeEntitiesInCollectionNotFound} {nameof(Order)}s to delete");
             }
             _orderRepository.DeleteRange(ordersToDelete);
+            await _orderRepository.SaveChangesAsync();
         }
     }
 }

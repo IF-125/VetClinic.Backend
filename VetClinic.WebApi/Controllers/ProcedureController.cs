@@ -17,14 +17,16 @@ namespace VetClinic.WebApi.Controllers
     {
         private readonly IProcedureService _procedureService;
         private readonly IMapper _mapper;
-        public ProcedureController(IProcedureService procedureService, IMapper mapper)
+        private readonly ProcedureValidator _validator;
+        public ProcedureController(IProcedureService procedureService, IMapper mapper, ProcedureValidator validator)
         {
             _procedureService = procedureService;
             _mapper = mapper;
+            _validator = validator;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllProceduresAsync()
+        public async Task<IActionResult> GetAllProcedures()
         {
             var procedures = await _procedureService.GetProceduresAsync(asNoTracking: true);
 
@@ -34,7 +36,7 @@ namespace VetClinic.WebApi.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetProcedureByIdAsync(int id)
+        public async Task<IActionResult> GetProcedure(int id)
         {
             try
             {
@@ -51,12 +53,11 @@ namespace VetClinic.WebApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> InsertProcedureAsync(ProcedureViewModel model)
+        public async Task<IActionResult> InsertProcedure(ProcedureViewModel model)
         {
             var newProcedure = _mapper.Map<Procedure>(model);
 
-            var validator = new ProcedureValidator();
-            var validationResult = validator.Validate(newProcedure);
+            var validationResult = _validator.Validate(newProcedure);
 
             if (validationResult.IsValid)
             {
@@ -71,8 +72,7 @@ namespace VetClinic.WebApi.Controllers
         {
             var procedure = _mapper.Map<Procedure>(model);
 
-            var validator = new ProcedureValidator();
-            var validationResult = validator.Validate(procedure);
+            var validationResult = _validator.Validate(procedure);
 
             if (validationResult.IsValid)
             {
@@ -90,7 +90,7 @@ namespace VetClinic.WebApi.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProcedureAsync(int id)
+        public async Task<IActionResult> DeleteProcedure(int id)
         {
             try
             {
@@ -104,11 +104,11 @@ namespace VetClinic.WebApi.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteProceduresAsync([FromQuery(Name = "idArr")] int[] idArr)
+        public async Task<IActionResult> DeleteProcedures([FromQuery(Name = "ids")] IList<int> ids)
         {
             try
             {
-                await _procedureService.DeleteRangeAsync(idArr);
+                await _procedureService.DeleteRangeAsync(ids);
                 return Ok();
             }
             catch (ArgumentException ex)
