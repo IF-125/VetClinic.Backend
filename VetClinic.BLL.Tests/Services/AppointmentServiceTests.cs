@@ -45,7 +45,7 @@ namespace VetClinic.BLL.Tests.Services
             var Appointments = AppointmentFakeData.GetAppointmentFakeData().AsQueryable();
 
             _appointmentRepository.Setup(b => b.GetFirstOrDefaultAsync(
-                b => b.Id == id, null, true).Result)
+                b => b.Id == id, null, false).Result)
                 .Returns((Expression<Func<Appointment, bool>> filter,
                 Func<IQueryable<Appointment>, IIncludableQueryable<Appointment, object>> include,
                 bool asNoTracking) => Appointments.FirstOrDefault(filter));

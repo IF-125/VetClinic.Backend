@@ -45,7 +45,7 @@ namespace VetClinic.BLL.Tests.Services
             var Procedures = ProcedureFakeData.GetProcedureFakeData().AsQueryable();
 
             _procedureRepository.Setup(b => b.GetFirstOrDefaultAsync(
-                b => b.Id == id, null, true).Result)
+                b => b.Id == id, null, false).Result)
                 .Returns((Expression<Func<Procedure, bool>> filter,
                 Func<IQueryable<Procedure>, IIncludableQueryable<Procedure, object>> include,
                 bool asNoTracking) => Procedures.FirstOrDefault(filter));

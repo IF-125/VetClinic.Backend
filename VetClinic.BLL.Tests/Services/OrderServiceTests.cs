@@ -45,7 +45,7 @@ namespace VetClinic.BLL.Tests.Services
             var orders = OrderFakeData.GetOrderFakeData().AsQueryable();
 
             _orderRepository.Setup(b => b.GetFirstOrDefaultAsync(
-                b => b.Id == id, null, true).Result)
+                b => b.Id == id, null, false).Result)
                 .Returns((Expression<Func<Order, bool>> filter,
                 Func<IQueryable<Order>, IIncludableQueryable<Order, object>> include,
                 bool asNoTracking) => orders.FirstOrDefault(filter));
