@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using VetClinic.Core.Entities;
 
 namespace VetClinic.DAL.Context
 {
@@ -9,6 +10,7 @@ namespace VetClinic.DAL.Context
         {
         }
 
+      
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());

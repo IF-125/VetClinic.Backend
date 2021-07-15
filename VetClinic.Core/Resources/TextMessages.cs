@@ -6,5 +6,6 @@
         public const string EntityHasBeenDeleted = "has been deleted";
         public const string SomeEntitiesInCollectionNotFound = "Could not find some";
         public const string IdsDoNotMatch = "id and passed id did not match";
+        public const string IdIsRequired = "id is required";
     }
 }

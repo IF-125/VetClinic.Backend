@@ -70,7 +70,6 @@ namespace VetClinic.DAL.Repositories.Base
         public async Task InsertAsync(TEntity entity)
         {
             await _context.Set<TEntity>().AddAsync(entity);
-            await SaveChangesAsync();
         }
 
         public async Task InsertRangeAsync(IEnumerable<TEntity> entities)
@@ -91,7 +90,6 @@ namespace VetClinic.DAL.Repositories.Base
         public void DeleteRange(IEnumerable<TEntity> entitiesToDelete)
         {
             _context.Set<TEntity>().RemoveRange(entitiesToDelete);
-            SaveChanges();
         }
 
         public async Task SaveChangesAsync()

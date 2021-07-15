@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace VetClinic.Core.Entities
 {
@@ -7,5 +9,6 @@ namespace VetClinic.Core.Entities
         public int Id { get; set; }
         public string Type { get; set; }
         public ICollection<Pet> Pets { get; set; }
+        public ICollection<AnimalTypeProcedure> AnimalTypesProcedures { get; set; }
     }
 }

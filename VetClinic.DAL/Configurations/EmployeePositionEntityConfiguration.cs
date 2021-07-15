@@ -11,6 +11,14 @@ namespace VetClinic.DAL.Configurations
             builder.HasKey(x => x.Id);
 
             builder
+                .Property(x => x.CurrentBaseSalary)
+                .IsRequired();
+
+            builder
+                .Property(x => x.Rate)
+                .IsRequired();
+
+            builder
                 .HasOne(x => x.Employee)
                 .WithOne()
                 .OnDelete(DeleteBehavior.SetNull);
@@ -23,14 +31,6 @@ namespace VetClinic.DAL.Configurations
                 .HasMany(x => x.Salaries)
                 .WithOne()
                 .OnDelete(DeleteBehavior.Cascade);
-
-            builder
-                .Property(x => x.CurrentBaseSalary)
-                .IsRequired();
-
-            builder
-                .Property(x => x.Rate)
-                .IsRequired();
         }
     }
 }

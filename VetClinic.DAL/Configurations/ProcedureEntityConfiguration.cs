@@ -12,16 +12,19 @@ namespace VetClinic.DAL.Configurations
                 .Property(b => b.Title)
                 .HasMaxLength(50)
                 .IsRequired();
+
             builder
                 .Property(b => b.Description)
                 .HasMaxLength(50);
+
             builder
                 .Property(b => b.Price)
                 .IsRequired();
-            //builder
-            //    .HasMany(b => b.AnimalTypes)
-            //    .WithOne()
-            //    .OnDelete(DeleteBehavior.Cascade);
+
+            builder
+                .HasMany(x => x.OrderProcedures)
+                .WithOne()
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }
