@@ -7,11 +7,11 @@ using VetClinic.WebApi.ViewModels;
 
 namespace VetClinic.WebApi.Mappers
 {
-    public class PetMapperProfile:Profile
+    class ClientMapperProfile : Profile
     {
-        public PetMapperProfile()
+        public ClientMapperProfile()
         {
-            CreateMap<Pet, PetViewModel>().ReverseMap();
+            CreateMap<Client, ClientViewModel>().ReverseMap();
         }
     }
 }

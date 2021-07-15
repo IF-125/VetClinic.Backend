@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using System;
+using SendGrid.Helpers.Errors.Model;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
@@ -16,11 +16,15 @@ namespace VetClinic.WebApi.Controllers
     {
         private readonly ISalaryService _salaryService;
         private readonly IMapper _mapper;
+        private readonly SalaryValidator _salaryValidator;
 
-        public SalariesController(ISalaryService salaryService, IMapper mapper)
+        public SalariesController(ISalaryService salaryService,
+            IMapper mapper,
+            SalaryValidator salaryValidator)
         {
             _salaryService = salaryService;
             _mapper = mapper;
+            _salaryValidator = salaryValidator;
         }
 
         [HttpGet]
@@ -32,7 +36,7 @@ namespace VetClinic.WebApi.Controllers
                 var model = _mapper.Map<IEnumerable<SalariesController>>(salaries);
                 return Ok(model);
             }
-            catch (ArgumentException ex)
+            catch (BadRequestException ex)
             {
                 return NotFound(ex.Message);
             }
@@ -49,7 +53,7 @@ namespace VetClinic.WebApi.Controllers
 
                 return Ok(model);
             }
-            catch (ArgumentException ex)
+            catch (NotFoundException ex)
             {
                 return NotFound(ex.Message);
             }
@@ -60,8 +64,7 @@ namespace VetClinic.WebApi.Controllers
         {
             var salary = _mapper.Map<Salary>(model);
 
-            var validator = new SalaryValidator();
-            var validationResult = validator.Validate(salary);
+            var validationResult = _salaryValidator.Validate(salary);
 
             if (validationResult.IsValid)
             {
@@ -70,7 +73,7 @@ namespace VetClinic.WebApi.Controllers
                     await _salaryService.AssignSalaryToEmployee(employeeId, salary);
                     return Ok();
                 }
-                catch (ArgumentException ex)
+                catch (NotFoundException ex)
                 {
                     return NotFound(ex.Message);
                 }
@@ -86,8 +89,7 @@ namespace VetClinic.WebApi.Controllers
         {
             var salary = _mapper.Map<Salary>(model);
 
-            var validator = new SalaryValidator();
-            var validationResult = validator.Validate(salary);
+            var validationResult = _salaryValidator.Validate(salary);
 
             if (validationResult.IsValid)
             {
@@ -96,7 +98,7 @@ namespace VetClinic.WebApi.Controllers
                     _salaryService.Update(id, salary);
                     return Ok();
                 }
-                catch (ArgumentException ex)
+                catch (BadRequestException ex)
                 {
                     return BadRequest(ex.Message);
                 }
@@ -113,7 +115,7 @@ namespace VetClinic.WebApi.Controllers
                 salaryToUpdate.ApplyTo(salary, ModelState);
                 return Ok(salary);
             }
-            catch (ArgumentException ex)
+            catch (NotFoundException ex)
             {
                 return NotFound(ex.Message);
             }
@@ -127,21 +129,21 @@ namespace VetClinic.WebApi.Controllers
                 await _salaryService.DeleteAsync(id);
                 return Ok($"{nameof(Salary)} {EntityHasBeenDeleted}");
             }
-            catch (ArgumentException ex)
+            catch (NotFoundException ex)
             {
                 return NotFound(ex.Message);
             }
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteListOfSalariesAsync([FromQuery(Name = "idArr")] int[] idArr)
+        public async Task<IActionResult> DeleteListOfSalariesAsync([FromQuery(Name = "listOfIds")] IList<int> listOfIds)
         {
             try
             {
-                await _salaryService.DeleteRangeAsync(idArr);
+                await _salaryService.DeleteRangeAsync(listOfIds);
                 return Ok();
             }
-            catch (ArgumentException ex)
+            catch (BadRequestException ex)
             {
                 return BadRequest(ex.Message);
             }

@@ -33,7 +33,9 @@ namespace VetClinic.Core.Interfaces.Repositories.Base
 
         public void DeleteRange(IEnumerable<TEntity> entitiesToDelete);
 
-        public Task SaveAsync();
+        public Task SaveChangesAsync();
+
+        public void SaveChanges();
     }
 
 }

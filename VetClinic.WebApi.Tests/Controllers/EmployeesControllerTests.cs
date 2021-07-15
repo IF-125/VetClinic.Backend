@@ -13,6 +13,7 @@ using VetClinic.Core.Interfaces.Repositories;
 using VetClinic.Core.Interfaces.Services;
 using VetClinic.WebApi.Controllers;
 using VetClinic.WebApi.Mappers;
+using VetClinic.WebApi.Validators.EntityValidators;
 using VetClinic.WebApi.ViewModels;
 using Xunit;
 using static VetClinic.Core.Resources.TextMessages;
@@ -24,11 +25,13 @@ namespace VetClinic.WebApi.Tests.Controllers
         private readonly IMapper _mapper;
         private readonly Mock<IEmployeeRepository> _mockEmployeeRepository;
         private readonly IEmployeeService _employeeService;
+        private readonly EmployeeValidator _employeeValidator;
 
         public EmployeesControllerTests()
         {
             _mockEmployeeRepository = new Mock<IEmployeeRepository>();
             _employeeService = new EmployeeService(_mockEmployeeRepository.Object);
+            _employeeValidator = new EmployeeValidator();
 
             if(_mapper == null)
             {
@@ -132,7 +135,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         [Fact]
         public void CanGetAllEmployees()
         {
-            var employeeController = new EmployeesController(_employeeService, _mapper);
+            var employeeController = new EmployeesController(_employeeService, _mapper, _employeeValidator);
 
             var employees = GetTestEmployees();
 
@@ -148,7 +151,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         [Fact]
         public void CanGetEmployeeById()
         {
-            var employeeController = new EmployeesController(_employeeService, _mapper);
+            var employeeController = new EmployeesController(_employeeService, _mapper, _employeeValidator);
 
             var employees = GetTestEmployees().AsQueryable();
 
@@ -171,7 +174,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         [Fact]
         public void GetEmployeeById_ReturnsNotFound()
         {
-            var employeeController = new EmployeesController(_employeeService, _mapper);
+            var employeeController = new EmployeesController(_employeeService, _mapper, _employeeValidator);
 
             var id = "IDoNotExist";
 
@@ -183,7 +186,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         [Fact]
         public void CanInsertEmployeeAsync()
         {
-            var employeeController = new EmployeesController(_employeeService, _mapper);
+            var employeeController = new EmployeesController(_employeeService, _mapper, _employeeValidator);
                 
             var employeeVM = new EmployeeViewModel
             {
@@ -204,7 +207,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         [Fact]
         public void InsertEmployeeAsync_ShouldReturnValidationError()
         {
-            var employeeController = new EmployeesController(_employeeService, _mapper);
+            var employeeController = new EmployeesController(_employeeService, _mapper, _employeeValidator);
 
             var employeeVM = new EmployeeViewModel
             {
@@ -225,7 +228,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         [Fact]
         public void CanUpdateEmployee()
         { 
-            var employeeController = new EmployeesController(_employeeService, _mapper);
+            var employeeController = new EmployeesController(_employeeService, _mapper, _employeeValidator);
 
             var employeeVM = new EmployeeViewModel
             {
@@ -248,7 +251,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         [Fact]
         public void UpdateEmployee_ReturnsBadRequest_DueToValidationError()
         { 
-            var employeeController = new EmployeesController(_employeeService, _mapper);
+            var employeeController = new EmployeesController(_employeeService, _mapper, _employeeValidator);
 
             var employeeVM = new EmployeeViewModel
             {
@@ -274,7 +277,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         [Fact]
         public void UpdateEmployee_ReturnsBadRequest_DueToIdsMismatch()
         {
-            var employeeController = new EmployeesController(_employeeService, _mapper);
+            var employeeController = new EmployeesController(_employeeService, _mapper, _employeeValidator);
 
             var employeeVM = new EmployeeViewModel
             {
@@ -308,7 +311,7 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             _mockEmployeeRepository.Setup(x => x.Delete(It.IsAny<Employee>()));
 
-            var employeeController = new EmployeesController(_employeeService, _mapper);
+            var employeeController = new EmployeesController(_employeeService, _mapper, _employeeValidator);
 
             var result = employeeController.DeleteEmployeeAsync(id).Result;
 
@@ -321,7 +324,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         {
             var id = "IDoNotExist";
 
-            var employeeController = new EmployeesController(_employeeService, _mapper);
+            var employeeController = new EmployeesController(_employeeService, _mapper, _employeeValidator);
 
             var result = employeeController.DeleteEmployeeAsync(id).Result;
 
@@ -349,7 +352,7 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             _mockEmployeeRepository.Setup(x => x.DeleteRange(It.IsAny<IEnumerable<Employee>>()));
 
-            var employeeController = new EmployeesController(_employeeService, _mapper);
+            var employeeController = new EmployeesController(_employeeService, _mapper, _employeeValidator);
 
             var result = employeeController.DeleteEmployeesAsync(idArr).Result;
 
@@ -377,7 +380,7 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             _mockEmployeeRepository.Setup(x => x.DeleteRange(It.IsAny<IEnumerable<Employee>>()));
 
-            var employeeController = new EmployeesController(_employeeService, _mapper);
+            var employeeController = new EmployeesController(_employeeService, _mapper, _employeeValidator);
 
             var result = employeeController.DeleteEmployeesAsync(idArr).Result;
 

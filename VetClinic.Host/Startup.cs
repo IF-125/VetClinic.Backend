@@ -2,6 +2,7 @@ using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,8 +20,10 @@ using VetClinic.Core.Interfaces.Services;
 using VetClinic.DAL.Context;
 using VetClinic.DAL.Repositories;
 using VetClinic.DAL.Repositories.Base;
+using VetClinic.IdentityServer.Models;
 using VetClinic.WebApi.Validators;
 using VetClinic.WebApi.ExceptionHandling;
+using VetClinic.WebApi.Validators.EntityValidators;
 
 namespace VetClinic.Host
 {
@@ -39,6 +42,7 @@ namespace VetClinic.Host
             //Services
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+            services.AddScoped<IClientRepository, ClientRepository>();
             services.AddScoped<IPetRepository, PetRepository>();
             services.AddScoped<IPositionRepository, PositionRepository>();
             services.AddScoped<IScheduleRepository, ScheduleRepository>();
@@ -50,8 +54,8 @@ namespace VetClinic.Host
             services.AddScoped<IOrderProcedureRepository, OrderProcedureRepository>();
 
             //Services
+            services.AddScoped<IClientService, ClientService>();
             services.AddScoped<IEmployeeService, EmployeeService>();
-            services.AddScoped<IPetService, PetServise>();
             services.AddScoped<IPositionService, PositionService>();
             services.AddScoped<IScheduleService, ScheduleService>();
             services.AddScoped<ISalaryService, SalaryService>();
@@ -60,10 +64,26 @@ namespace VetClinic.Host
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IProcedureService, ProcedureService>();
             services.AddScoped<IOrderProcedureService, OrderProcedureService>();
+
+            //Validators
+            services.AddScoped<AppointmentValidator>();
+            services.AddScoped<OrderValidator>();
+            services.AddScoped<ProcedureValidator>();
+            services.AddScoped<OrderProcedureValidator>();
             #endregion
 
             services.AddDbContext<VetClinicDbContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+            services.AddIdentity<User, IdentityRole>(options =>
+            {
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireDigit = false;
+
+            })
+           .AddEntityFrameworkStores<VetClinicDbContext>()
+           .AddDefaultTokenProviders();
 
             services.AddAutoMapper(typeof(Startup));
 

@@ -1,12 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using VetClinic.Core.Entities;
 
 namespace VetClinic.BLL.Tests.FakeData
 {
     public static class EmployeeFakeData
     {
-        public static List<Employee> GetEmployeeFakeData() =>
-            new List<Employee>
+        public static List<Employee> GetEmployeeFakeData()
+        {
+            List<Employee> employees = new List<Employee>
             {
                 new Employee
                 {
@@ -89,5 +91,11 @@ namespace VetClinic.BLL.Tests.FakeData
                     Email = "khussyo@elegantthemes.com"
                 }
             };
+
+            var schedule = ScheduleFakeData.GetScheduleFakeData();
+
+            employees[0].Schedule = schedule;
+            return employees;
+        }
     }
 }

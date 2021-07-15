@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using SendGrid.Helpers.Errors.Model;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -20,17 +21,21 @@ namespace VetClinic.WebApi.Controllers
     {
         private readonly IPositionService _positionService;
         private readonly IMapper _mapper;
+        private readonly PositionValidator _positionValidator;
 
-        public PositionsController(IPositionService positionService, IMapper mapper)
+        public PositionsController(IPositionService positionService, 
+            IMapper mapper,
+            PositionValidator positionValidator)
         {
             _positionService = positionService;
             _mapper = mapper;
+            _positionValidator = positionValidator;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllPositionsAsync()
+        public async Task<IActionResult> GetAllPositions()
         {
-            var positions = await _positionService.GetPositionsAsync(asNoTracking: true);
+            var positions = await _positionService.GetPositionsAsync();
 
             var positionViewModel = _mapper.Map<IEnumerable<PositionViewModel>>(positions);
 
@@ -38,7 +43,7 @@ namespace VetClinic.WebApi.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetPositionByIdAsync(int id)
+        public async Task<IActionResult> GetPosition(int id)
         {
             try
             {
@@ -48,19 +53,18 @@ namespace VetClinic.WebApi.Controllers
 
                 return Ok(positionViewModel);
             }
-            catch (ArgumentException ex)
+            catch (NotFoundException ex)
             {
                 return NotFound(ex.Message);
             }
         }
 
         [HttpPost]
-        public async Task<IActionResult> InsertPositionAsync(PositionViewModel model)
+        public async Task<IActionResult> InsertPosition(PositionViewModel model)
         {
             var newPosition = _mapper.Map<Position>(model);
 
-            var validator = new PositionValidator();
-            var validationResult = validator.Validate(newPosition);
+            var validationResult = _positionValidator.Validate(newPosition);
 
             if (validationResult.IsValid)
             {
@@ -75,8 +79,7 @@ namespace VetClinic.WebApi.Controllers
         {
             var position = _mapper.Map<Position>(model);
 
-            var validator = new PositionValidator();
-            var validationResult = validator.Validate(position);
+            var validationResult = _positionValidator.Validate(position);
 
             if (validationResult.IsValid)
             {
@@ -85,7 +88,7 @@ namespace VetClinic.WebApi.Controllers
                     _positionService.Update(id, position);
                     return Ok();
                 }
-                catch (ArgumentException ex)
+                catch (BadRequestException ex)
                 {
                     return BadRequest(ex.Message);
                 }
@@ -101,21 +104,21 @@ namespace VetClinic.WebApi.Controllers
                 await _positionService.DeleteAsync(id);
                 return Ok($"{nameof(Position)} {EntityHasBeenDeleted}");
             }
-            catch (ArgumentException ex)
+            catch (NotFoundException ex)
             {
                 return NotFound(ex.Message);
             }
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeletePositionsAsync([FromQuery(Name = "idArr")] int[] idArr)
+        public async Task<IActionResult> DeletePositionsAsync([FromQuery(Name = "listOfIds")] IList<int> listOfIds)
         {
             try
             {
-                await _positionService.DeleteRangeAsync(idArr);
+                await _positionService.DeleteRangeAsync(listOfIds);
                 return Ok();
             }
-            catch (ArgumentException ex)
+            catch (BadRequestException ex)
             {
                 return BadRequest(ex.Message);
             }

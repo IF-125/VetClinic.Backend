@@ -1,4 +1,4 @@
-﻿using static VetClinic.Core.Resources.TextMessages;
+﻿ using static VetClinic.Core.Resources.TextMessages;
 using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Repositories;
 using VetClinic.Core.Interfaces.Services;
+using SendGrid.Helpers.Errors.Model;
 
 namespace VetClinic.BLL.Services
 {
@@ -21,23 +22,18 @@ namespace VetClinic.BLL.Services
             _petRepository = petRepository;
         }
 
-        public async Task<IList<Pet>> GetPetsAsync(
-            Expression<Func<Pet, bool>> filter = null,
-            Func<IQueryable<Pet>, IOrderedQueryable<Pet>> orderBy = null,
-            Func<IQueryable<Pet>, IIncludableQueryable<Pet, object>> include = null,
-            bool asNoTracking = false)
+        public async Task<IList<Pet>> GetPetsAsync()
         {
-            return await _petRepository.GetAsync(filter, orderBy, include, asNoTracking);
+            return await _petRepository.GetAsync(asNoTracking: true);
         }
 
-        public async Task<Pet> GetByIdAsync(
-            int id, 
-            Func<IQueryable<Pet>, IIncludableQueryable<Pet, object>> include = null, 
-            bool asNoTracking = false)
+        public async Task<Pet> GetByIdAsync(int id)
         {
-            var pet = await _petRepository.GetFirstOrDefaultAsync(x => x.Id == id, include, asNoTracking);
+            var pet = await _petRepository.GetFirstOrDefaultAsync(filter: x => x.Id == id);
             if (pet == null)
-                throw new ArgumentException($"{nameof(pet)} {EntityWasNotFound}");
+            {
+                throw new NotFoundException($"{nameof(Pet)} {EntityWasNotFound}");
+            }
 
             return pet;
         }
@@ -45,6 +41,7 @@ namespace VetClinic.BLL.Services
         public async Task InsertAsync(Pet entity)
         {
             await _petRepository.InsertAsync(entity);
+            await _petRepository.SaveChangesAsync();
         }
 
 
@@ -53,6 +50,7 @@ namespace VetClinic.BLL.Services
             if (id != petToUpdate.Id)
                 throw new ArgumentException($"{nameof(petToUpdate)} {EntityWasNotFound}");
             _petRepository.Update(petToUpdate);
+            _petRepository.SaveChanges();
         }
 
         public async Task DeleteAsync(int id)
@@ -62,25 +60,20 @@ namespace VetClinic.BLL.Services
             if (petToDelete==null)
                 throw  new ArgumentException($"{nameof(petToDelete)} {EntityWasNotFound}");
             _petRepository.Delete(petToDelete);
-
+            await _petRepository.SaveChangesAsync();
         }
 
-        public async Task DeleteRangeAsync(int[] idArr)
+        public async Task DeleteRangeAsync(IList<int> listOfIds)
         {
-            var petsToDelete = await GetPetsAsync(x => idArr.Contains(x.Id));
-
-            if (petsToDelete.Count() != idArr.Length)
+            var petsToDelete = await _petRepository.GetAsync(x => listOfIds.Contains(x.Id));
+      
+            if (petsToDelete.Count() != listOfIds.Count)
             {
                 throw new ArgumentException($"{SomeEntitiesInCollectionNotFound} {nameof(Pet)}s to delete");
             }
 
             _petRepository.DeleteRange(petsToDelete);
-
-
-
-
-
-
+            await _petRepository.SaveChangesAsync();
         }
     }
 }

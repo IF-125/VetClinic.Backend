@@ -16,7 +16,7 @@ namespace VetClinic.DAL.Configurations
             builder
                 .Property(b => b.Pet)
                 .IsRequired();
-
+                
             builder
                 .Property(b => b.Employee)
                 .IsRequired();

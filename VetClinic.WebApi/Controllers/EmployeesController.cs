@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using System;
+using SendGrid.Helpers.Errors.Model;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
@@ -18,16 +18,20 @@ namespace VetClinic.WebApi.Controllers
     {
         private readonly IEmployeeService _employeeService;
         private readonly IMapper _mapper;
-        public EmployeesController(IEmployeeService employeeService, IMapper mapper)
+        private readonly EmployeeValidator _employeeValidator;
+        public EmployeesController(IEmployeeService employeeService,
+            IMapper mapper,
+            EmployeeValidator employeeValidator)
         {
             _employeeService = employeeService;
             _mapper = mapper;
+            _employeeValidator = employeeValidator;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllEmployeesAsync()
         {
-            var employees = await _employeeService.GetEmployeesAsync(asNoTracking: true);
+            var employees = await _employeeService.GetEmployeesAsync();
 
             var employeeViewModel = _mapper.Map<IEnumerable<EmployeeViewModel>>(employees);
 
@@ -45,7 +49,7 @@ namespace VetClinic.WebApi.Controllers
 
                 return Ok(employeeViewModel);
             }
-            catch(ArgumentException ex)
+            catch(NotFoundException ex)
             {
                 return NotFound(ex.Message);
             }
@@ -56,8 +60,7 @@ namespace VetClinic.WebApi.Controllers
         {
             var newEmployee = _mapper.Map<Employee>(model);
 
-            var validator = new EmployeeValidator();
-            var validationResult = validator.Validate(newEmployee);
+            var validationResult = _employeeValidator.Validate(newEmployee);
 
             if (validationResult.IsValid)
             {
@@ -72,8 +75,7 @@ namespace VetClinic.WebApi.Controllers
         {
             var employee = _mapper.Map<Employee>(model);
 
-            var validator = new EmployeeValidator();
-            var validationResult = validator.Validate(employee);
+            var validationResult = _employeeValidator.Validate(employee);
 
             if (validationResult.IsValid)
             {
@@ -82,7 +84,7 @@ namespace VetClinic.WebApi.Controllers
                     _employeeService.Update(id, employee);
                     return Ok();
                 }
-                catch(ArgumentException ex)
+                catch(BadRequestException ex)
                 {
                     return BadRequest(ex.Message);
                 }
@@ -99,7 +101,7 @@ namespace VetClinic.WebApi.Controllers
                 employeeToUpdate.ApplyTo(employee, ModelState);
                 return Ok(employee);
             }
-            catch(ArgumentException ex)
+            catch(NotFoundException ex)
             {
                 return NotFound(ex.Message);
             }
@@ -113,21 +115,21 @@ namespace VetClinic.WebApi.Controllers
                 await _employeeService.DeleteAsync(id);
                 return Ok($"{nameof(Employee)} {EntityHasBeenDeleted}");
             }
-            catch(ArgumentException ex)
+            catch(NotFoundException ex)
             {
                 return NotFound(ex.Message);
             }
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteEmployeesAsync([FromQuery(Name = "idArr")] string[] idArr)
+        public async Task<IActionResult> DeleteEmployeesAsync([FromQuery(Name = "listOfIds")] IList<string> listOfIds)
         {
             try
             {
-                await _employeeService.DeleteRangeAsync(idArr);
+                await _employeeService.DeleteRangeAsync(listOfIds);
                 return Ok();
             }
-            catch(ArgumentException ex)
+            catch(BadRequestException ex)
             {
                 return BadRequest(ex.Message);
             }

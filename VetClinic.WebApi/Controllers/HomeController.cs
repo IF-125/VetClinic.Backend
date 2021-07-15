@@ -11,7 +11,7 @@ namespace VetClinic.WebApi.Controllers
     [ApiController]
     public class HomeController : ControllerBase
     {
-        [Authorize(Policy = "Client")]
+        //[Authorize(Policy = "Client")]
         [HttpGet]
         public ActionResult GetHello()
         {
