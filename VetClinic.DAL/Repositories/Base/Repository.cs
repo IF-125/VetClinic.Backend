@@ -70,13 +70,13 @@ namespace VetClinic.DAL.Repositories.Base
         public async Task InsertAsync(TEntity entity)
         {
             await _context.Set<TEntity>().AddAsync(entity);
-            await SaveAsync();
+            await SaveChangesAsync();
         }
 
         public async Task InsertRangeAsync(IEnumerable<TEntity> entities)
         {
             await _context.Set<TEntity>().AddRangeAsync(entities);
-            await SaveAsync();
+            await SaveChangesAsync();
         }
 
         public void Update(TEntity entityToUpdate)
@@ -97,12 +97,12 @@ namespace VetClinic.DAL.Repositories.Base
             SaveChanges();
         }
 
-        public async Task SaveAsync()
+        public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();
         }
 
-        private void SaveChanges()
+        public void SaveChanges()
         {
             _context.SaveChanges();
         }

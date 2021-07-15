@@ -25,6 +25,7 @@ namespace VetClinic.BLL.Services
         public async Task<Client> AddAsync(Client client)
         {
             await _clientRepository.InsertAsync(client);
+            await _clientRepository.SaveChangesAsync();
 
             return client;
         }
@@ -39,15 +40,17 @@ namespace VetClinic.BLL.Services
         public async Task InsertAsync(Client entity)
         {
             await _clientRepository.InsertAsync(entity);
+            await _clientRepository.SaveChangesAsync(); 
         }
 
         public void Update(string id,  Client clientToUpdate)
         {
             if (id != clientToUpdate.Id)
             {
-                throw new ArgumentException();
+                throw new ArgumentException("id and passed id did not match");
             }
             _clientRepository.Update(clientToUpdate);
+            _clientRepository.SaveChangesAsync();
 
         }
 
@@ -57,9 +60,10 @@ namespace VetClinic.BLL.Services
 
             if (clientToDelete == null)
             {
-                throw new ArgumentException();
+                throw new ArgumentException("Entity was not found");
             }
             _clientRepository.Delete(clientToDelete);
+            await _clientRepository.SaveChangesAsync();
         }
     }
 }
