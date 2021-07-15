@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using SendGrid.Helpers.Errors.Model;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -44,7 +45,7 @@ namespace VetClinic.WebApi.Controllers
                
                 return Ok(petViewModel);
             }
-            catch (ArgumentException  ex)
+            catch (NotFoundException ex)
             {
                 return NotFound(ex.Message);
             }                     

@@ -30,7 +30,7 @@ namespace VetClinic.BLL.Services
         public async Task<Pet> GetByIdAsync(int id)
         {
             var pet = await _petRepository.GetFirstOrDefaultAsync(filter: x => x.Id == id);
-            if (pet==null)
+            if (pet == null)
             {
                 throw new NotFoundException($"{nameof(Pet)} {EntityWasNotFound}");
             }

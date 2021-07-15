@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Query;
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using VetClinic.BLL.Services;
 using VetClinic.Core.Entities;
@@ -135,11 +138,106 @@ namespace VetClinic.WebApi.Tests.Controllers
             var pets = GetTestPets();
             _mockPetRepository.Setup(x => x.GetAsync(null, null, null, true).Result).Returns(() => pets);
 
-            var result = _petController.GetAllPetsAsync().Result;
+            var result = _petController.GetAllPets().Result;
 
             var viewResult = Assert.IsType<OkObjectResult>(result);
             var model = Assert.IsAssignableFrom<IEnumerable<PetViewModel>>(viewResult.Value);
             Assert.Equal(pets.Count, model.Count());
+        }
+
+
+        [Fact]
+        public void CanGetPetById()
+        {
+            var pets = GetTestPets().AsQueryable();
+            var id = 10;
+            var name = "Lord10";
+
+            _mockPetRepository.Setup(x => x.GetFirstOrDefaultAsync(
+                It.IsAny<Expression<Func<Pet, bool>>>(), null, false).Result)
+                .Returns((Expression<Func<Pet, bool>> filter,
+                Func<IQueryable<Pet>, IIncludableQueryable<Pet, object>> include,
+                bool asNoTracking) => pets.FirstOrDefault(filter));
+
+            var result = _petController.GetPet(id).Result;
+
+            var viewResult = Assert.IsType<OkObjectResult>(result);
+            var model = Assert.IsAssignableFrom<PetViewModel>(viewResult.Value);
+
+            Assert.Equal(id, model.Id);
+            Assert.Equal(name, model.Name); 
+        }
+
+        [Fact]
+        public void GetPetById_ReturnsNotFound()
+        {
+            var pets = GetTestPets().AsQueryable();
+            var id = 999;
+
+            _mockPetRepository.Setup(x => x.GetFirstOrDefaultAsync(null,null,false)
+                .Result);
+
+            var result = _petController.GetPet(id).Result;
+
+            Assert.IsType<NotFoundObjectResult>(result);
+        }
+
+        [Fact]
+        public void CanInsertPetAsync()
+        {
+            var newPetVM = new PetViewModel
+            {
+                Id = 11,
+                Name = "Lord11",
+                Information = "Animal from the street11",
+                Breed = "Bebgal",
+                Age = 2
+            };
+
+            _mockPetRepository.Setup(x => x.InsertAsync(It.IsAny<Pet>()));
+
+            var result = _petController.InsertPet(newPetVM).Result;
+            Assert.IsType<CreatedAtActionResult>(result);
+        }
+
+        [Fact]
+        public void InsertPetAsync_ShouldReturnValidationError()
+        {
+            var newPetVM = new PetViewModel
+            {
+                Id = 11,
+                Name = "Lord11",
+                Information = "Animal from the street11",
+                Age = 2
+            };
+
+            _mockPetRepository.Setup(x => x.InsertAsync(It.IsAny<Pet>()));
+
+            var result = _petController.InsertPet(newPetVM).Result;
+
+            Assert.IsType<BadRequestObjectResult>(result);
+        }
+
+        [Fact]
+        public void CanUpdatePet()
+        {
+            var newPetVM = new PetViewModel
+            {
+                Id = 1,
+                Name = "Lord1",
+                Information = "New Information",
+                Breed = "Bebgal",
+                Age = 2
+            };
+
+            var id = 1;
+
+            _mockPetRepository.Setup(x => x.Update(It.IsAny<Pet>()));
+
+            var result = _petController.Update(id, newPetVM);
+
+            Assert.IsType<OkResult>(result);
+
         }
     }
 }
