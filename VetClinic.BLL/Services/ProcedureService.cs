@@ -29,11 +29,9 @@ namespace VetClinic.BLL.Services
         }
 
         public async Task<Procedure> GetByIdAsync(
-            int id,
-            Func<IQueryable<Procedure>, IIncludableQueryable<Procedure, object>> include = null,
-            bool asNoTracking = false)
+            int id)
         {
-            var procedure = await _procedureRepository.GetFirstOrDefaultAsync(x => x.Id == id, include, asNoTracking);
+            var procedure = await _procedureRepository.GetFirstOrDefaultAsync(x => x.Id == id);
             if (procedure == null)
             {
                 throw new ArgumentException($"{nameof(Procedure)} {EntityWasNotFound}");
@@ -67,11 +65,11 @@ namespace VetClinic.BLL.Services
             _procedureRepository.Delete(procedureToDelete);
         }
 
-        public async Task DeleteRangeAsync(int[] idArr)
+        public async Task DeleteRangeAsync(IList<int> listOfIds)
         {
-            var proceduresToDelete = await GetProceduresAsync(x => idArr.Contains(x.Id));
+            var proceduresToDelete = await GetProceduresAsync(x => listOfIds.Contains(x.Id));
 
-            if (proceduresToDelete.Count() != idArr.Length)
+            if (proceduresToDelete.Count() != listOfIds.Count)
             {
                 throw new ArgumentException($"{SomeEntitiesInCollectionNotFound} {nameof(Procedure)}s to delete");
             }

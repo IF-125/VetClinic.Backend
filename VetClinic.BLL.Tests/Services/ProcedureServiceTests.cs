@@ -48,7 +48,7 @@ namespace VetClinic.BLL.Tests.Services
                 Func<IQueryable<Procedure>, IIncludableQueryable<Procedure, object>> include,
                 bool asNoTracking) => Procedures.FirstOrDefault(filter));
 
-            var Procedure = await _procedureService.GetByIdAsync(id, null, true);
+            var Procedure = await _procedureService.GetByIdAsync(id);
 
             Assert.Equal("Procedure 4", Procedure.Title);
         }

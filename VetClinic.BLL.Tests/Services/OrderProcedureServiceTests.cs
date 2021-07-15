@@ -48,7 +48,7 @@ namespace VetClinic.BLL.Tests.Services
                 Func<IQueryable<OrderProcedure>, IIncludableQueryable<OrderProcedure, object>> include,
                 bool asNoTracking) => OrderProcedures.FirstOrDefault(filter));
 
-            var OrderProcedure = await _orderProcedureService.GetByIdAsync(id, null, true);
+            var OrderProcedure = await _orderProcedureService.GetByIdAsync(id);
 
             Assert.Equal("Procedure was unsuccessful.", OrderProcedure.Conclusion);
         }

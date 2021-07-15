@@ -29,11 +29,9 @@ namespace VetClinic.BLL.Services
         }
 
         public async Task<Appointment> GetByIdAsync(
-            int id,
-            Func<IQueryable<Appointment>, IIncludableQueryable<Appointment, object>> include = null,
-            bool asNoTracking = false)
+            int id)
         {
-            var appointment = await _appointmentRepository.GetFirstOrDefaultAsync(x => x.Id == id, include, asNoTracking);
+            var appointment = await _appointmentRepository.GetFirstOrDefaultAsync(x => x.Id == id);
             if (appointment == null)
             {
                 throw new ArgumentException($"{nameof(Appointment)} {EntityWasNotFound}");
@@ -67,11 +65,11 @@ namespace VetClinic.BLL.Services
             _appointmentRepository.Delete(appointmentToDelete);
         }
 
-        public async Task DeleteRangeAsync(int[] idArr)
+        public async Task DeleteRangeAsync(IList<int> listOfIds)
         {
-            var appointmentsToDelete = await GetAppointmentsAsync(x => idArr.Contains(x.Id));
+            var appointmentsToDelete = await GetAppointmentsAsync(x => listOfIds.Contains(x.Id));
 
-            if (appointmentsToDelete.Count() != idArr.Length)
+            if (appointmentsToDelete.Count() != listOfIds.Count)
             {
                 throw new ArgumentException($"{SomeEntitiesInCollectionNotFound} {nameof(Appointment)}s to delete");
             }

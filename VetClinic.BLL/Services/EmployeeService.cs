@@ -29,11 +29,9 @@ namespace VetClinic.BLL.Services
         }   
 
         public async Task<Employee> GetByIdAsync(
-            string id,
-            Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>> include = null,
-            bool asNoTracking = false)
+            string id)
         {
-            var employee = await _employeeRepository.GetFirstOrDefaultAsync(x => x.Id == id, include, asNoTracking);
+            var employee = await _employeeRepository.GetFirstOrDefaultAsync(x => x.Id == id);
             if(employee == null)
             {
                 throw new ArgumentException($"{nameof(Employee)} {EntityWasNotFound}");
@@ -69,11 +67,11 @@ namespace VetClinic.BLL.Services
             _employeeRepository.Delete(employeeToDelete);
         }
 
-        public async Task DeleteRangeAsync(string[] idArr)
+        public async Task DeleteRangeAsync(IList<string> listOfIds)
         {
-            var employeesToDelete = await GetEmployeesAsync(x => idArr.Contains(x.Id));
+            var employeesToDelete = await GetEmployeesAsync(x => listOfIds.Contains(x.Id));
 
-            if(employeesToDelete.Count() != idArr.Length)
+            if(employeesToDelete.Count() != listOfIds.Count)
             {
                 throw new ArgumentException($"{SomeEntitiesInCollectionNotFound} {nameof(Employee)}s to delete");
             }

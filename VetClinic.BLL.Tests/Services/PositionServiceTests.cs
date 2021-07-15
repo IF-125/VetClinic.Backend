@@ -49,7 +49,7 @@ namespace VetClinic.BLL.Tests.Services
                 Func<IQueryable<Employee>, IIncludableQueryable<Position, object>> include,
                 bool asNoTracking) => positions.FirstOrDefault(filter));
 
-            var employee = await _positionService.GetByIdAsync(id, null, true);
+            var employee = await _positionService.GetByIdAsync(id);
 
             Assert.Equal("Anesthetist", employee.Title);
         }

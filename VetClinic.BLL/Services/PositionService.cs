@@ -30,11 +30,9 @@ namespace VetClinic.BLL.Services
         }
 
         public async Task<Position> GetByIdAsync(
-            int id,
-            Func<IQueryable<Position>, IIncludableQueryable<Position, object>> include = null,
-            bool asNoTracking = false)
+            int id)
         {
-            var position = await _positionRepository.GetFirstOrDefaultAsync(x => x.Id == id, include, asNoTracking);
+            var position = await _positionRepository.GetFirstOrDefaultAsync(x => x.Id == id);
             if(position == null)
             {
                 throw new ArgumentException($"{nameof(Position)} {EntityWasNotFound}");
@@ -70,11 +68,11 @@ namespace VetClinic.BLL.Services
             _positionRepository.Delete(positionToDelete);
         }
 
-        public async Task DeleteRangeAsync(int[] idArr)
+        public async Task DeleteRangeAsync(IList<int> listOfIds)
         {
-            var positionsToDelete = await GetPositionsAsync(x => idArr.Contains(x.Id));
+            var positionsToDelete = await GetPositionsAsync(x => listOfIds.Contains(x.Id));
 
-            if (positionsToDelete.Count() != idArr.Length)
+            if (positionsToDelete.Count() != listOfIds.Count)
             {
                 throw new ArgumentException($"{SomeEntitiesInCollectionNotFound} {nameof(Position)}s to delete");
             }

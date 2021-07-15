@@ -30,7 +30,7 @@ namespace VetClinic.BLL.Tests.Services
             _petRepository.Setup(x => x.GetAsync(null, null, null, true).Result)
                 .Returns(PetFakeData.GetPetFakeData());
 
-            IList<Pet> tempPets = await _petServise.GetPetsAsync(null, null, null, true);
+            IList<Pet> tempPets = await _petServise.GetPetsAsync();
 
             Assert.NotNull(tempPets);
             Assert.Equal(10,tempPets.Count);
@@ -41,12 +41,11 @@ namespace VetClinic.BLL.Tests.Services
         {
             var id = 10;
             var pets = PetFakeData.GetPetFakeData().AsQueryable();
+       
+            _petRepository.Setup(x => x.GetFirstOrDefaultAsync(x => x.Id == id, null, false).Result)
+                .Returns(pets.FirstOrDefault(x => x.Id == id));
 
-            _petRepository.Setup(x => x.GetFirstOrDefaultAsync(
-            x => x.Id == id, null, true).Result)
-            .Returns(pets.FirstOrDefault(x=>x.Id==id));
-
-            var pet = await _petServise.GetByIdAsync(id, null, true);
+            var pet = await _petServise.GetByIdAsync(id);
 
             Assert.Equal("Lord10", pet.Name);
         }
@@ -62,11 +61,11 @@ namespace VetClinic.BLL.Tests.Services
                 x => x.Id == id, null, true).Result)
                 .Returns(pets.FirstOrDefault(x => x.Id == id));
 
-            Assert.Throws<AggregateException>(() => _petServise.GetByIdAsync(id, null, true).Result);
+            Assert.Throws<AggregateException>(() => _petServise.GetByIdAsync(id).Result);
 
         }
 
-        [Fact]
+        [Fact] 
         public async Task   CanInsertPetAsync()
         {
             var _newPet = new Pet
@@ -163,7 +162,8 @@ namespace VetClinic.BLL.Tests.Services
         [Fact]
         public void  CanDeleteRangeOfPetsAsync()
         {
-            var idArr = new int[]{1,2,3,4,5,6,7,8,9,10};
+            var listOfIds = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+            
             var pets = PetFakeData.GetPetFakeData().AsQueryable();
 
             _petRepository.Setup(x => x.GetAsync(It.IsAny<Expression<Func<Pet, bool>>>(), null, null, false).Result)
@@ -174,7 +174,7 @@ namespace VetClinic.BLL.Tests.Services
 
             _petRepository.Setup(x => x.DeleteRange(It.IsAny<IEnumerable<Pet>>()));
 
-            _petServise.DeleteRangeAsync(idArr).Wait();
+            _petServise.DeleteRangeAsync(listOfIds).Wait();
 
             _petRepository.Verify(x => x.DeleteRange(It.IsAny<IEnumerable<Pet>>()));
         }

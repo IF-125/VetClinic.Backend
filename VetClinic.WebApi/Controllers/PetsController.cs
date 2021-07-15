@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -25,7 +26,7 @@ namespace VetClinic.WebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllPetsAsync()
+        public async Task<IActionResult> GetAllPets()
         {
             var pets = await _petService.GetPetsAsync();
             var petViewModel = _mapper.Map<IEnumerable<PetViewModel>>(pets);
@@ -34,7 +35,7 @@ namespace VetClinic.WebApi.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetPetByIdAsync(int id)
+        public async Task<IActionResult> GetPet(int id)
         {
             try
             {
@@ -50,7 +51,7 @@ namespace VetClinic.WebApi.Controllers
         }
         
         [HttpPost]
-        public async Task<IActionResult> InsertPetAsync(PetViewModel petViewModel)
+        public async Task<IActionResult> InsertPet(PetViewModel petViewModel)
         {
             var newPet = _mapper.Map<Pet>(petViewModel);
 
@@ -93,11 +94,23 @@ namespace VetClinic.WebApi.Controllers
         }
 
 
-        ///HttpPatch
-        ///
+        [HttpPatch("{id:int}")]
+        public async Task<IActionResult> UpdatePatch(int id, [FromBody] JsonPatchDocument<Pet> petToUpdate)
+        {
+            try
+            {
+                var pet = await _petService.GetByIdAsync(id);
+                petToUpdate.ApplyTo(pet, ModelState);
+                return Ok(pet);
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
 
         [HttpDelete("id")]
-        public async Task<IActionResult> DeletePetAsync (int id)
+        public async Task<IActionResult> DeletePet (int id)
         {
             try
             {
@@ -111,7 +124,7 @@ namespace VetClinic.WebApi.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeletePetsAsync([FromQuery(Name = "idArr")] int[] idArr)
+        public async Task<IActionResult> DeletePets([FromQuery(Name = "idArr")] int[] idArr)
         {
             try
             {

@@ -48,7 +48,7 @@ namespace VetClinic.BLL.Tests.Services
                 Func<IQueryable<Appointment>, IIncludableQueryable<Appointment, object>> include,
                 bool asNoTracking) => Appointments.FirstOrDefault(filter));
 
-            var Appointment = await _AppointmentService.GetByIdAsync(id, null, true);
+            var Appointment = await _AppointmentService.GetByIdAsync(id);
 
             Assert.Equal(AppointmentStatus.Closed, Appointment.Status);
         }

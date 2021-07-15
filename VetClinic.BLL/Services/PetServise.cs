@@ -1,4 +1,4 @@
-﻿using static VetClinic.Core.Resources.TextMessages;
+﻿ using static VetClinic.Core.Resources.TextMessages;
 using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Repositories;
 using VetClinic.Core.Interfaces.Services;
+using SendGrid.Helpers.Errors.Model;
 
 namespace VetClinic.BLL.Services
 {
@@ -29,8 +30,10 @@ namespace VetClinic.BLL.Services
         public async Task<Pet> GetByIdAsync(int id)
         {
             var pet = await _petRepository.GetFirstOrDefaultAsync(filter: x => x.Id == id);
-            if (pet == null)
-                throw new ArgumentException($"{nameof(pet)} {EntityWasNotFound}");
+            if (pet==null)
+            {
+                throw new NotFoundException($"{nameof(Pet)} {EntityWasNotFound}");
+            }
 
             return pet;
         }
@@ -38,6 +41,7 @@ namespace VetClinic.BLL.Services
         public async Task InsertAsync(Pet entity)
         {
             await _petRepository.InsertAsync(entity);
+            await _petRepository.SaveChangesAsync();
         }
 
 
@@ -46,6 +50,7 @@ namespace VetClinic.BLL.Services
             if (id != petToUpdate.Id)
                 throw new ArgumentException($"{nameof(petToUpdate)} {EntityWasNotFound}");
             _petRepository.Update(petToUpdate);
+            _petRepository.SaveChanges();
         }
 
         public async Task DeleteAsync(int id)
@@ -55,21 +60,22 @@ namespace VetClinic.BLL.Services
             if (petToDelete==null)
                 throw  new ArgumentException($"{nameof(petToDelete)} {EntityWasNotFound}");
             _petRepository.Delete(petToDelete);
-            await _petRepository.SaveAsync();
+            await _petRepository.SaveChangesAsync();
+            await _petRepository.SaveChangesAsync();
         }
 
-        public async Task DeleteRangeAsync(int[] idArr)
+        public async Task DeleteRangeAsync(IList<int> listOfIds)
         {
-            var pets = await _petRepository.GetAsync(asNoTracking: true);
-            var petsToDelete = pets.Where(x => idArr.Contains(x.Id));
+            var petsToDelete = await _petRepository.GetAsync(x => listOfIds.Contains(x.Id));
       
-            if (petsToDelete.Count() != idArr.Length)
+            if (petsToDelete.Count() != listOfIds.Count)
             {
                 throw new ArgumentException($"{SomeEntitiesInCollectionNotFound} {nameof(Pet)}s to delete");
             }
 
             _petRepository.DeleteRange(petsToDelete);
-            await _petRepository.SaveAsync();
+            await _petRepository.SaveChangesAsync();
+            await _petRepository.SaveChangesAsync();
         }
     }
 }
