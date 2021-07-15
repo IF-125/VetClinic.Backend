@@ -249,7 +249,7 @@ namespace VetClinic.BLL.Tests.Services
 
             _mockPositionRepository.Setup(x => x
             .GetFirstOrDefaultAsync(x => x.Id == employeePosition.PositionId, null, false))
-                .ReturnsAsync(new Position { Id = employeePosition.PositionId });
+                .ReturnsAsync(new Position { Id = employeePosition.PositionId.Value });
 
             _mockEmployeePositionRepository.Setup(x => x.InsertAsync(employeePosition));
 
@@ -283,7 +283,7 @@ namespace VetClinic.BLL.Tests.Services
 
             _mockPositionRepository.Setup(x => x
             .GetFirstOrDefaultAsync(x => x.Id == employeePosition.PositionId, null, false))
-                .ReturnsAsync(new Position { Id = employeePosition.PositionId });
+                .ReturnsAsync(new Position { Id = employeePosition.PositionId.Value });
 
             _mockEmployeePositionRepository.Setup(x => x.InsertAsync(employeePosition));
 

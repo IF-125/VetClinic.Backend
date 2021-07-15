@@ -65,7 +65,7 @@ namespace VetClinic.WebApi.Controllers
             if (validationResult.IsValid)
             {
                 await _employeeService.InsertAsync(newEmployee);
-                return CreatedAtAction("InsertEmployeeAsync", new { id = newEmployee.Id }, newEmployee);
+                return Ok();
             }
             return BadRequest(validationResult.Errors);
         }
@@ -92,7 +92,7 @@ namespace VetClinic.WebApi.Controllers
             return BadRequest(validationResult.Errors);
         }
 
-        [HttpPatch("{id:string}")]
+        [HttpPatch("{id}")]
         public async Task<IActionResult> UpdatePatch(string id, [FromBody] JsonPatchDocument<Employee> employeeToUpdate)
         {
             try

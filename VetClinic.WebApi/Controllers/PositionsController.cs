@@ -14,7 +14,7 @@ using static VetClinic.Core.Resources.TextMessages;
 
 namespace VetClinic.WebApi.Controllers
 {
-    [Authorize(Policy = "Admin")]
+    //[Authorize(Policy = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class PositionsController : ControllerBase
@@ -69,7 +69,7 @@ namespace VetClinic.WebApi.Controllers
             if (validationResult.IsValid)
             {
                 await _positionService.InsertAsync(newPosition);
-                return CreatedAtAction("InsertPositionAsync", new { id = newPosition.Id }, newPosition);
+                return Ok();
             }
             return BadRequest(validationResult.Errors);
         }

@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using VetClinic.Core.Entities;
-using VetClinic.IdentityServer.Models;
+using VetClinic.DAL.Configurations;
 
 namespace VetClinic.DAL.Context
 {
@@ -29,9 +29,10 @@ namespace VetClinic.DAL.Context
         }
 
       
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder builder)
         {
-            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+            base.OnModelCreating(builder);
+            builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
     }
 }

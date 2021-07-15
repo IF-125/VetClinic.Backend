@@ -147,7 +147,6 @@ namespace VetClinic.WebApi.Tests.Controllers
             {
                 Id = 11,
                 IsPaid = false,
-                OrderProcedureId = 11,
                 CreatedAt = new DateTime(2021, 6, 11)
             };
 

@@ -157,6 +157,8 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             var id = "f1a05cca-b479-4f72-bbda-96b8979f4afe";
 
+            var expectedResult = "Bob";
+
             _mockEmployeeRepository.Setup(x => x.GetFirstOrDefaultAsync(x => x.Id == id, null, false).Result)
                 .Returns((Expression<Func<Employee, bool>> filter,
                 Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>> include,
@@ -167,8 +169,7 @@ namespace VetClinic.WebApi.Tests.Controllers
             var viewResult = Assert.IsType<OkObjectResult>(result);
             var model = Assert.IsType<EmployeeViewModel>(viewResult.Value);
 
-            Assert.Equal(id, model.Id);
-            Assert.Equal("Bob", model.FirstName);
+            Assert.Equal(expectedResult, model.FirstName);
         }
 
         [Fact]
@@ -190,7 +191,6 @@ namespace VetClinic.WebApi.Tests.Controllers
                 
             var employeeVM = new EmployeeViewModel
             {
-                Id = "f1a05cca-b479-4f72-bbda-96b8979f4123",
                 FirstName = "Added",
                 LastName = "User",
                 Address = "9 Grayhawk Alley",
@@ -211,7 +211,6 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             var employeeVM = new EmployeeViewModel
             {
-                Id = "f1a05cca-b479-4f72-bbda-96b8979f4123",
                 FirstName = "Added",
                 LastName = "User",
                 Address = string.Empty,
@@ -232,7 +231,6 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             var employeeVM = new EmployeeViewModel
             {
-                Id = "f1a05cca-b479-4f72-bbda-96b8979f4123",
                 FirstName = "Added",
                 LastName = "User",
                 Address = "9 Grayhawk Alley",
@@ -255,7 +253,6 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             var employeeVM = new EmployeeViewModel
             {
-                Id = "f1a05cca-b479-4f72-bbda-96b8979f4123",
                 FirstName = "Added",
                 LastName = "User",
                 Address = string.Empty,
@@ -281,7 +278,6 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             var employeeVM = new EmployeeViewModel
             {
-                Id = "f1a05cca-b479-4f72-bbda-96b8979f4123",
                 FirstName = "Added",
                 LastName = "User",
                 Address = "Good in here",

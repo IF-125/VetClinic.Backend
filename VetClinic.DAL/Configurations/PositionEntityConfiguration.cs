@@ -17,7 +17,8 @@ namespace VetClinic.DAL.Configurations
 
             builder
                 .HasMany(x => x.EmployeePositions)
-                .WithOne()
+                .WithOne(x => x.Position)
+                .HasForeignKey(x => x.PositionId)
                 .OnDelete(DeleteBehavior.SetNull);
         }
     }

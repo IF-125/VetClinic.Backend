@@ -106,10 +106,9 @@ namespace VetClinic.WebApi.Tests.Controllers
                 Conclusion = "Procedure was conducted successfully.",
                 Details = "The patient appearts to be stable.",
                 OrderId = 11,
-                AppointmentId = 11,
                 ProcedureId = 3,
                 PetId = 3,
-                EmployeeId = 9
+                EmployeeId = "f1a05cca-b479-4f72-bbda-96b8979f4afe"
             };
 
             var OrderProcedureController = new OrderProcedureController(_orderProcedureService, _mapper, _validator);
@@ -133,10 +132,9 @@ namespace VetClinic.WebApi.Tests.Controllers
                 Conclusion = "Procedure was conducted successfully.",
                 Details = "The patient appearts to be stable.",
                 OrderId = 11,
-                AppointmentId = 11,
                 ProcedureId = 3,
                 PetId = 3,
-                EmployeeId = 9
+                EmployeeId = "f1a05cca-b479-4f72-bbda-96b8979f4afe"
             };
 
             int id = 11;
@@ -162,10 +160,9 @@ namespace VetClinic.WebApi.Tests.Controllers
                 Conclusion = "Procedure was conducted successfully.",
                 Details = "The patient appearts to be stable.",
                 OrderId = 11,
-                AppointmentId = 11,
                 ProcedureId = 3,
                 PetId = 3,
-                EmployeeId = 9
+                EmployeeId = "f1a05cca-b479-4f72-bbda-96b8979f4afe"
             };
 
             int id = 10;

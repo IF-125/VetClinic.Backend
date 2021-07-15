@@ -13,7 +13,7 @@ using static VetClinic.Core.Resources.TextMessages;
 
 namespace VetClinic.WebApi.Controllers
 {
-    [Authorize(Policy = "Admin")]
+    //[Authorize(Policy = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class ScheduleController : ControllerBase
@@ -73,7 +73,7 @@ namespace VetClinic.WebApi.Controllers
             if (validationResult.IsValid)
             {
                 await _scheduleService.InsertAsync(newSchedule);
-                return CreatedAtAction("InsertScheduleAsync", new { id = newSchedule.Id }, newSchedule);
+                return Ok();
             }
             return BadRequest(validationResult.Errors);
         }

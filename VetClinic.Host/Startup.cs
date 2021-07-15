@@ -20,10 +20,10 @@ using VetClinic.Core.Interfaces.Services;
 using VetClinic.DAL.Context;
 using VetClinic.DAL.Repositories;
 using VetClinic.DAL.Repositories.Base;
-using VetClinic.IdentityServer.Models;
 using VetClinic.WebApi.Validators;
 using VetClinic.WebApi.ExceptionHandling;
 using VetClinic.WebApi.Validators.EntityValidators;
+using VetClinic.Core.Entities;
 
 namespace VetClinic.Host
 {
@@ -67,9 +67,16 @@ namespace VetClinic.Host
 
             //Validators
             services.AddScoped<AppointmentValidator>();
-            services.AddScoped<OrderValidator>();
-            services.AddScoped<ProcedureValidator>();
+            services.AddScoped<EmployeePositionValidator>();
+            services.AddScoped<EmployeeValidator>();
             services.AddScoped<OrderProcedureValidator>();
+            services.AddScoped<OrderValidator>();
+            services.AddScoped<PetValidator>();
+            services.AddScoped<PositionValidator>();
+            services.AddScoped<ProcedureValidator>();
+            services.AddScoped<SalaryValidator>();
+            services.AddScoped<ScheduleValidator>();
+            services.AddScoped<UserValidator>();
             #endregion
 
             services.AddDbContext<VetClinicDbContext>(options =>
@@ -85,7 +92,7 @@ namespace VetClinic.Host
            .AddEntityFrameworkStores<VetClinicDbContext>()
            .AddDefaultTokenProviders();
 
-            services.AddAutoMapper(typeof(Startup));
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             services.AddControllers().AddNewtonsoftJson();
 

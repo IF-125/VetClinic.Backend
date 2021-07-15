@@ -69,6 +69,7 @@ namespace VetClinic.WebApi.Controllers
                 try
                 {
                     await _employeePositionService.AssignPositionToEmployeeAsync(employeePosition);
+                    return Ok();
                 }
                 catch (BadRequestException ex)
                 {
@@ -100,7 +101,7 @@ namespace VetClinic.WebApi.Controllers
             return BadRequest(validationResult.Errors);
         }
 
-        [HttpPatch("{id:int}")]
+        [HttpPatch("{id}")]
         public async Task<IActionResult> UpdatePatch(int id, [FromBody] JsonPatchDocument<EmployeePosition> employeeToUpdate)
         {
             try
