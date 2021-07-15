@@ -2,6 +2,7 @@ using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,6 +20,7 @@ using VetClinic.Core.Interfaces.Services;
 using VetClinic.DAL.Context;
 using VetClinic.DAL.Repositories;
 using VetClinic.DAL.Repositories.Base;
+using VetClinic.IdentityServer.Models;
 using VetClinic.WebApi.Validators;
 
 namespace VetClinic.Host
@@ -63,6 +65,16 @@ namespace VetClinic.Host
 
             services.AddDbContext<VetClinicDbContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+            services.AddIdentity<User, IdentityRole>(options =>
+            {
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireDigit = false;
+
+            })
+           .AddEntityFrameworkStores<VetClinicDbContext>()
+           .AddDefaultTokenProviders();
 
             services.AddAutoMapper(typeof(Startup));
 

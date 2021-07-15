@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using VetClinic.IdentityServer.Configurations;
+using VetClinic.IdentityServer.Models;
 
 namespace VetClinic.IdentityServer
 {
@@ -32,8 +33,7 @@ namespace VetClinic.IdentityServer
             
             services.AddControllers();
 
-            services.AddDbContext<UserDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+           
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
