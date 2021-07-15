@@ -50,7 +50,7 @@ namespace VetClinic.BLL.Services
                 throw new ArgumentException("id and passed id did not match");
             }
             _clientRepository.Update(clientToUpdate);
-            _clientRepository.SaveChangesAsync();
+            _clientRepository.SaveChanges();
 
         }
 

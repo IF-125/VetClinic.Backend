@@ -76,19 +76,16 @@ namespace VetClinic.DAL.Repositories.Base
         public async Task InsertRangeAsync(IEnumerable<TEntity> entities)
         {
             await _context.Set<TEntity>().AddRangeAsync(entities);
-            await SaveChangesAsync();
         }
 
         public void Update(TEntity entityToUpdate)
         {
             _context.Set<TEntity>().Update(entityToUpdate);
-            SaveChanges();
         }
 
         public void Delete(TEntity entityToDelete)
         {
             _context.Set<TEntity>().Remove(entityToDelete);
-            SaveChanges();
         }
 
         public void DeleteRange(IEnumerable<TEntity> entitiesToDelete)

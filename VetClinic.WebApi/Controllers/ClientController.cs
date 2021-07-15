@@ -61,7 +61,7 @@ namespace VetClinic.WebApi.Controllers
             try
             {
                 await _clientService.DeleteAsync(id);
-                return Ok($"{nameof(Client)} EntityHasBeenDeleted");
+                return Ok($"{nameof(Client)} has been deleted");
             }
             catch (ArgumentException ex)
             {
