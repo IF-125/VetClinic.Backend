@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace VetClinic.Core.Interfaces.Services.Base
 {
-    public interface IBaseService<TEntity, TIdType> 
+    public interface IBaseService<TEntity, TIdType>
         where TEntity : class
     {
         public Task<TEntity> GetByIdAsync(TIdType id);

@@ -55,19 +55,16 @@ namespace VetClinic.Host
             services.AddScoped<IScheduleService, ScheduleService>();
             services.AddScoped<ISalaryService, SalaryService>();
             services.AddScoped<IEmployeePositionService, EmployeePositionService>();
+            services.AddScoped<IAppointmentService, AppointmentService>();
+            services.AddScoped<IOrderService, OrderService>();
+            services.AddScoped<IProcedureService, ProcedureService>();
+            services.AddScoped<IOrderProcedureService, OrderProcedureService>();
 
             //Validators
             services.AddScoped<AppointmentValidator>();
-            services.AddScoped<EmployeePositionValidator>();
-            services.AddScoped<EmployeeValidator>();
-            services.AddScoped<OrderProcedureValidator>();
             services.AddScoped<OrderValidator>();
-            services.AddScoped<PetValidator>();
-            services.AddScoped<PositionValidator>();
             services.AddScoped<ProcedureValidator>();
-            services.AddScoped<SalaryValidator>();
-            services.AddScoped<ScheduleValidator>();
-            services.AddScoped<UserValidator>();
+            services.AddScoped<OrderProcedureValidator>();
             #endregion
 
             services.AddDbContext<VetClinicDbContext>(options =>
