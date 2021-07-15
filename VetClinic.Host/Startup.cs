@@ -22,6 +22,7 @@ using VetClinic.DAL.Repositories;
 using VetClinic.DAL.Repositories.Base;
 using VetClinic.IdentityServer.Models;
 using VetClinic.WebApi.Validators;
+using VetClinic.WebApi.ExceptionHandling;
 using VetClinic.WebApi.Validators.EntityValidators;
 
 namespace VetClinic.Host
@@ -169,6 +170,8 @@ namespace VetClinic.Host
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseMiddleware<ExceptionMiddleware>();
 
             app.UseAuthentication();
 
