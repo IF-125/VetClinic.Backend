@@ -14,6 +14,7 @@ using VetClinic.Core.Interfaces.Repositories;
 using VetClinic.Core.Interfaces.Services;
 using VetClinic.WebApi.Controllers;
 using VetClinic.WebApi.Mappers;
+using VetClinic.WebApi.Validators.EntityValidators;
 using VetClinic.WebApi.ViewModels;
 using Xunit;
 using static VetClinic.Core.Resources.TextMessages;
@@ -25,6 +26,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         private readonly OrderService _orderService;
         private readonly Mock<IOrderRepository> _orderRepository = new Mock<IOrderRepository>();
         private readonly IMapper _mapper;
+        private readonly OrderValidator _validator;
         public OrderControllerTests()
         {
             _orderService = new OrderService(_orderRepository.Object);
@@ -36,19 +38,20 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             IMapper mapper = mapperConfig.CreateMapper();
             _mapper = mapper;
+            _validator = new OrderValidator();
         }
 
         [Fact]
         public void CanGetAllOrders()
         {
             //arrange
-            var orderController = new OrderController(_orderService, _mapper);
+            var orderController = new OrderController(_orderService, _mapper, _validator);
 
             var orders = OrderFakeData.GetOrderFakeData();
 
             _orderRepository.Setup(b => b.GetAsync(null, null, null, true).Result).Returns(() => orders);
             //act
-            var result = orderController.GetAllOrdersAsync().Result;
+            var result = orderController.GetAllOrders().Result;
             //assert
             var viewResult = Assert.IsType<OkObjectResult>(result);
             var model = Assert.IsAssignableFrom<IEnumerable<OrderViewModel>>(viewResult.Value);
@@ -59,7 +62,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         public void CanReturnOrderById()
         {
             //arrange
-            var orderController = new OrderController(_orderService, _mapper);
+            var orderController = new OrderController(_orderService, _mapper, _validator);
 
             var orders = OrderFakeData.GetOrderFakeData().AsQueryable();
 
@@ -70,7 +73,7 @@ namespace VetClinic.WebApi.Tests.Controllers
                 Func<IQueryable<Order>, IIncludableQueryable<Order, object>> include,
                 bool asNoTracking) => orders.FirstOrDefault(filter));
             //act
-            var result = orderController.GetOrderByIdAsync(id).Result;
+            var result = orderController.GetOrder(id).Result;
             //assert
             var viewResult = Assert.IsType<OkObjectResult>(result);
             var model = Assert.IsType<OrderViewModel>(viewResult.Value);
@@ -83,11 +86,11 @@ namespace VetClinic.WebApi.Tests.Controllers
         public void GetOrderByInvalidId()
         {
             //arrange
-            var orderController = new OrderController(_orderService, _mapper);
+            var orderController = new OrderController(_orderService, _mapper, _validator);
 
             int id = 100;
             //act
-            var result = orderController.GetOrderByIdAsync(id).Result;
+            var result = orderController.GetOrder(id).Result;
             //assert
             Assert.IsType<NotFoundObjectResult>(result);
         }
@@ -104,11 +107,11 @@ namespace VetClinic.WebApi.Tests.Controllers
                 CreatedAt = new DateTime(2021, 6, 11)
             };
 
-            var orderController = new OrderController(_orderService, _mapper);
+            var orderController = new OrderController(_orderService, _mapper, _validator);
 
             _orderRepository.Setup(b => b.InsertAsync(It.IsAny<Order>()));
             //act
-            var result = orderController.InsertOrderAsync(order).Result;
+            var result = orderController.InsertOrder(order).Result;
             //assert
             Assert.IsType<CreatedAtActionResult>(result);
         }
@@ -127,7 +130,7 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             int id = 11;
 
-            var orderController = new OrderController(_orderService, _mapper);
+            var orderController = new OrderController(_orderService, _mapper, _validator);
 
             _orderRepository.Setup(b => b.InsertAsync(It.IsAny<Order>()));
             //act
@@ -167,9 +170,9 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             _orderRepository.Setup(b => b.Delete(It.IsAny<Order>()));
 
-            var orderController = new OrderController(_orderService, _mapper);
+            var orderController = new OrderController(_orderService, _mapper, _validator);
             //act
-            var result = orderController.DeleteOrderAsync(id).Result;
+            var result = orderController.DeleteOrder(id).Result;
             //assert
             Assert.IsType<OkObjectResult>(result);
         }
@@ -180,9 +183,9 @@ namespace VetClinic.WebApi.Tests.Controllers
             //arrange
             int id = 500;
 
-            var orderController = new OrderController(_orderService, _mapper);
+            var orderController = new OrderController(_orderService, _mapper, _validator);
             //act
-            var result = orderController.DeleteOrderAsync(id).Result;
+            var result = orderController.DeleteOrder(id).Result;
             //assert
             Assert.IsType<NotFoundObjectResult>(result);
         }
@@ -191,7 +194,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         public void CanDeleteRange()
         {
             //arrange
-            int[] ids = new int[]{4, 8, 9};
+            List<int> ids = new List<int>() { 4, 8, 9};
 
             var orders = OrderFakeData.GetOrderFakeData().AsQueryable();
 
@@ -204,9 +207,9 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             _orderRepository.Setup(b => b.DeleteRange(It.IsAny<IEnumerable<Order>>()));
 
-            var orderController = new OrderController(_orderService, _mapper);
+            var orderController = new OrderController(_orderService, _mapper, _validator);
             //act
-            var result = orderController.DeleteOrdersAsync(ids).Result;
+            var result = orderController.DeleteOrders(ids).Result;
             //assert
             Assert.IsType<OkResult>(result);
         }
@@ -215,7 +218,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         public void DeleteRangeWithInvalidId()
         {
             //arrange
-            int[] ids = new int[] { 4, 8, 100 };
+            List<int> ids = new List<int>() { 4, 8, 100 };
 
             var orders = OrderFakeData.GetOrderFakeData().AsQueryable();
 
@@ -228,9 +231,9 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             _orderRepository.Setup(b => b.DeleteRange(It.IsAny<IEnumerable<Order>>()));
 
-            var orderController = new OrderController(_orderService, _mapper);
+            var orderController = new OrderController(_orderService, _mapper, _validator);
             //act
-            var result = orderController.DeleteOrdersAsync(ids).Result;
+            var result = orderController.DeleteOrders(ids).Result;
 
             var badRequest = result as BadRequestObjectResult;
             //assert

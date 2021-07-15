@@ -50,7 +50,7 @@ namespace VetClinic.BLL.Tests.Services
                 Func<IQueryable<Appointment>, IIncludableQueryable<Appointment, object>> include,
                 bool asNoTracking) => Appointments.FirstOrDefault(filter));
             //act
-            var Appointment = await _AppointmentService.GetByIdAsync(id, null, true);
+            var Appointment = await _AppointmentService.GetByIdAsync(id);
             //assert
             Assert.Equal(AppointmentStatus.Closed, Appointment.Status);
         }
@@ -164,7 +164,7 @@ namespace VetClinic.BLL.Tests.Services
         public void CanDeleteRange()
         {
             //arrange
-            int[] ids = new int[] { 8, 9, 10 };
+            List<int> ids = new List<int>() { 8, 9, 10 };
 
             var Appointments = AppointmentFakeData.GetAppointmentFakeData().AsQueryable();
 
@@ -185,7 +185,7 @@ namespace VetClinic.BLL.Tests.Services
         public void DeleteRangeWithInvalidId()
         {
             //arrange
-            int[] ids = new int[] { 8, 9, 100 };
+            List<int> ids = new List<int>() { 8, 9, 100 };
 
             var Appointments = AppointmentFakeData.GetAppointmentFakeData().AsQueryable();
 

@@ -14,6 +14,7 @@ using VetClinic.Core.Interfaces.Repositories;
 using VetClinic.Core.Interfaces.Services;
 using VetClinic.WebApi.Controllers;
 using VetClinic.WebApi.Mappers;
+using VetClinic.WebApi.Validators.EntityValidators;
 using VetClinic.WebApi.ViewModels;
 using Xunit;
 using static VetClinic.Core.Resources.TextMessages;
@@ -25,6 +26,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         private readonly AppointmentService _appointmentService;
         private readonly Mock<IAppointmentRepository> _appointmentRepository = new Mock<IAppointmentRepository>();
         private readonly IMapper _mapper;
+        private readonly AppointmentValidator _validator;
         public AppointmentControllerTests()
         {
             _appointmentService = new AppointmentService(_appointmentRepository.Object);
@@ -36,19 +38,20 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             IMapper mapper = mapperConfig.CreateMapper();
             _mapper = mapper;
+            _validator = new AppointmentValidator();
         }
 
         [Fact]
         public void CanGetAllAppointments()
         {
             //arrange
-            var AppointmentController = new AppointmentController(_appointmentService, _mapper);
+            var AppointmentController = new AppointmentController(_appointmentService, _mapper, _validator);
 
             var Appointments = AppointmentFakeData.GetAppointmentFakeData();
 
             _appointmentRepository.Setup(b => b.GetAsync(null, null, null, true).Result).Returns(() => Appointments);
             //act
-            var result = AppointmentController.GetAllAppointmentsAsync().Result;
+            var result = AppointmentController.GetAllAppointments().Result;
             //assert
             var viewResult = Assert.IsType<OkObjectResult>(result);
             var model = Assert.IsAssignableFrom<IEnumerable<AppointmentViewModel>>(viewResult.Value);
@@ -59,7 +62,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         public void CanReturnAppointmentById()
         {
             //arrange
-            var AppointmentController = new AppointmentController(_appointmentService, _mapper);
+            var AppointmentController = new AppointmentController(_appointmentService, _mapper, _validator);
 
             var Appointments = AppointmentFakeData.GetAppointmentFakeData().AsQueryable();
 
@@ -70,7 +73,7 @@ namespace VetClinic.WebApi.Tests.Controllers
                 Func<IQueryable<Appointment>, IIncludableQueryable<Appointment, object>> include,
                 bool asNoTracking) => Appointments.FirstOrDefault(filter));
             //act
-            var result = AppointmentController.GetAppointmentByIdAsync(id).Result;
+            var result = AppointmentController.GetAppointment(id).Result;
 
             var viewResult = Assert.IsType<OkObjectResult>(result);
             var model = Assert.IsType<AppointmentViewModel>(viewResult.Value);
@@ -83,11 +86,11 @@ namespace VetClinic.WebApi.Tests.Controllers
         public void GetAppointmentByInvalidId()
         {
             //arrange
-            var AppointmentController = new AppointmentController(_appointmentService, _mapper);
+            var AppointmentController = new AppointmentController(_appointmentService, _mapper, _validator);
 
             int id = 100;
             //act
-            var result = AppointmentController.GetAppointmentByIdAsync(id).Result;
+            var result = AppointmentController.GetAppointment(id).Result;
             //assert
             Assert.IsType<NotFoundObjectResult>(result);
         }
@@ -105,11 +108,11 @@ namespace VetClinic.WebApi.Tests.Controllers
                 OrderProcedureId = 11
             };
 
-            var AppointmentController = new AppointmentController(_appointmentService, _mapper);
+            var AppointmentController = new AppointmentController(_appointmentService, _mapper, _validator);
 
             _appointmentRepository.Setup(b => b.InsertAsync(It.IsAny<Appointment>()));
             //act
-            var result = AppointmentController.InsertAppointmentAsync(Appointment).Result;
+            var result = AppointmentController.InsertAppointment(Appointment).Result;
             //assert
             Assert.IsType<CreatedAtActionResult>(result);
         }
@@ -129,7 +132,7 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             int id = 11;
 
-            var AppointmentController = new AppointmentController(_appointmentService, _mapper);
+            var AppointmentController = new AppointmentController(_appointmentService, _mapper, _validator);
 
             _appointmentRepository.Setup(b => b.InsertAsync(It.IsAny<Appointment>()));
             //act
@@ -170,9 +173,9 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             _appointmentRepository.Setup(b => b.Delete(It.IsAny<Appointment>()));
 
-            var AppointmentController = new AppointmentController(_appointmentService, _mapper);
+            var AppointmentController = new AppointmentController(_appointmentService, _mapper, _validator);
             //act
-            var result = AppointmentController.DeleteAppointmentAsync(id).Result;
+            var result = AppointmentController.DeleteAppointment(id).Result;
             //assert
             Assert.IsType<OkObjectResult>(result);
         }
@@ -183,9 +186,9 @@ namespace VetClinic.WebApi.Tests.Controllers
             //arrange
             int id = 500;
 
-            var AppointmentController = new AppointmentController(_appointmentService, _mapper);
+            var AppointmentController = new AppointmentController(_appointmentService, _mapper, _validator);
             //act
-            var result = AppointmentController.DeleteAppointmentAsync(id).Result;
+            var result = AppointmentController.DeleteAppointment(id).Result;
             //assert
             Assert.IsType<NotFoundObjectResult>(result);
         }
@@ -194,7 +197,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         public void CanDeleteRange()
         {
             //arrange
-            int[] ids = new int[] { 4, 8, 9 };
+            List<int> ids = new List<int>(){ 4, 8, 9 };
 
             var Appointments = AppointmentFakeData.GetAppointmentFakeData().AsQueryable();
 
@@ -207,9 +210,9 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             _appointmentRepository.Setup(b => b.DeleteRange(It.IsAny<IEnumerable<Appointment>>()));
 
-            var AppointmentController = new AppointmentController(_appointmentService, _mapper);
+            var AppointmentController = new AppointmentController(_appointmentService, _mapper, _validator);
             //act
-            var result = AppointmentController.DeleteAppointmentsAsync(ids).Result;
+            var result = AppointmentController.DeleteAppointments(ids).Result;
             //assert
             Assert.IsType<OkResult>(result);
         }
@@ -218,7 +221,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         public void DeleteRangeWithInvalidId()
         {
             //arrange
-            int[] ids = new int[] { 4, 8, 100 };
+            List<int> ids = new List<int>() { 4, 8, 100 };
 
             var Appointments = AppointmentFakeData.GetAppointmentFakeData().AsQueryable();
 
@@ -231,9 +234,9 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             _appointmentRepository.Setup(b => b.DeleteRange(It.IsAny<IEnumerable<Appointment>>()));
 
-            var AppointmentController = new AppointmentController(_appointmentService, _mapper);
+            var AppointmentController = new AppointmentController(_appointmentService, _mapper, _validator);
             //act
-            var result = AppointmentController.DeleteAppointmentsAsync(ids).Result;
+            var result = AppointmentController.DeleteAppointments(ids).Result;
 
             var badRequest = result as BadRequestObjectResult;
             //assert

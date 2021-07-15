@@ -14,6 +14,7 @@ using VetClinic.Core.Interfaces.Repositories;
 using VetClinic.Core.Interfaces.Services;
 using VetClinic.WebApi.Controllers;
 using VetClinic.WebApi.Mappers;
+using VetClinic.WebApi.Validators.EntityValidators;
 using VetClinic.WebApi.ViewModels;
 using Xunit;
 using static VetClinic.Core.Resources.TextMessages;
@@ -25,6 +26,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         private readonly ProcedureService _procedureService;
         private readonly Mock<IProcedureRepository> _procedureRepository = new Mock<IProcedureRepository>();
         private readonly IMapper _mapper;
+        private readonly ProcedureValidator _validator;
         public ProcedureControllerTests()
         {
             _procedureService = new ProcedureService(_procedureRepository.Object);
@@ -36,19 +38,20 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             IMapper mapper = mapperConfig.CreateMapper();
             _mapper = mapper;
+            _validator = new ProcedureValidator();
         }
 
         [Fact]
         public void CanGetAllProcedures()
         {
             //arrange
-            var ProcedureController = new ProcedureController(_procedureService, _mapper);
+            var ProcedureController = new ProcedureController(_procedureService, _mapper, _validator);
 
             var Procedures = ProcedureFakeData.GetProcedureFakeData();
 
             _procedureRepository.Setup(b => b.GetAsync(null, null, null, true).Result).Returns(() => Procedures);
             //act
-            var result = ProcedureController.GetAllProceduresAsync().Result;
+            var result = ProcedureController.GetAllProcedures().Result;
             //assert
             var viewResult = Assert.IsType<OkObjectResult>(result);
             var model = Assert.IsAssignableFrom<IEnumerable<ProcedureViewModel>>(viewResult.Value);
@@ -59,7 +62,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         public void CanReturnProcedureById()
         {
             //arrange
-            var ProcedureController = new ProcedureController(_procedureService, _mapper);
+            var ProcedureController = new ProcedureController(_procedureService, _mapper, _validator);
 
             var Procedures = ProcedureFakeData.GetProcedureFakeData().AsQueryable();
 
@@ -70,7 +73,7 @@ namespace VetClinic.WebApi.Tests.Controllers
                 Func<IQueryable<Procedure>, IIncludableQueryable<Procedure, object>> include,
                 bool asNoTracking) => Procedures.FirstOrDefault(filter));
             //act
-            var result = ProcedureController.GetProcedureByIdAsync(id).Result;
+            var result = ProcedureController.GetProcedure(id).Result;
             //assert
             var viewResult = Assert.IsType<OkObjectResult>(result);
             var model = Assert.IsType<ProcedureViewModel>(viewResult.Value);
@@ -83,11 +86,11 @@ namespace VetClinic.WebApi.Tests.Controllers
         public void GetProcedureByInvalidId()
         {
             //arrange
-            var ProcedureController = new ProcedureController(_procedureService, _mapper);
+            var ProcedureController = new ProcedureController(_procedureService, _mapper, _validator);
 
             int id = 100;
             //act
-            var result = ProcedureController.GetProcedureByIdAsync(id).Result;
+            var result = ProcedureController.GetProcedure(id).Result;
             //assert
             Assert.IsType<NotFoundObjectResult>(result);
         }
@@ -105,11 +108,11 @@ namespace VetClinic.WebApi.Tests.Controllers
                 Price = 1600
             };
 
-            var ProcedureController = new ProcedureController(_procedureService, _mapper);
+            var ProcedureController = new ProcedureController(_procedureService, _mapper, _validator);
 
             _procedureRepository.Setup(b => b.InsertAsync(It.IsAny<Procedure>()));
             //act
-            var result = ProcedureController.InsertProcedureAsync(Procedure).Result;
+            var result = ProcedureController.InsertProcedure(Procedure).Result;
             //assert
             Assert.IsType<CreatedAtActionResult>(result);
         }
@@ -129,7 +132,7 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             int id = 11;
 
-            var ProcedureController = new ProcedureController(_procedureService, _mapper);
+            var ProcedureController = new ProcedureController(_procedureService, _mapper, _validator);
 
             _procedureRepository.Setup(b => b.InsertAsync(It.IsAny<Procedure>()));
             //act
@@ -170,9 +173,9 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             _procedureRepository.Setup(b => b.Delete(It.IsAny<Procedure>()));
 
-            var ProcedureController = new ProcedureController(_procedureService, _mapper);
+            var ProcedureController = new ProcedureController(_procedureService, _mapper, _validator);
             //act
-            var result = ProcedureController.DeleteProcedureAsync(id).Result;
+            var result = ProcedureController.DeleteProcedure(id).Result;
             //assert
             Assert.IsType<OkObjectResult>(result);
         }
@@ -183,9 +186,9 @@ namespace VetClinic.WebApi.Tests.Controllers
             //arrange
             int id = 500;
 
-            var ProcedureController = new ProcedureController(_procedureService, _mapper);
+            var ProcedureController = new ProcedureController(_procedureService, _mapper, _validator);
             //act
-            var result = ProcedureController.DeleteProcedureAsync(id).Result;
+            var result = ProcedureController.DeleteProcedure(id).Result;
             //assert
             Assert.IsType<NotFoundObjectResult>(result);
         }
@@ -194,7 +197,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         public void CanDeleteRange()
         {
             //arrange
-            int[] ids = new int[] { 4, 8, 9 };
+            List<int> ids = new List<int>() { 4, 8, 9 };
 
             var Procedures = ProcedureFakeData.GetProcedureFakeData().AsQueryable();
 
@@ -207,9 +210,9 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             _procedureRepository.Setup(b => b.DeleteRange(It.IsAny<IEnumerable<Procedure>>()));
 
-            var ProcedureController = new ProcedureController(_procedureService, _mapper);
+            var ProcedureController = new ProcedureController(_procedureService, _mapper, _validator);
             //act
-            var result = ProcedureController.DeleteProceduresAsync(ids).Result;
+            var result = ProcedureController.DeleteProcedures(ids).Result;
             //assert
             Assert.IsType<OkResult>(result);
         }
@@ -218,7 +221,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         public void DeleteRangeWithInvalidId()
         {
             //arrange
-            int[] ids = new int[] { 4, 8, 100 };
+            List<int> ids = new List<int>() { 4, 8, 100 };
 
             var Procedures = ProcedureFakeData.GetProcedureFakeData().AsQueryable();
 
@@ -231,9 +234,9 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             _procedureRepository.Setup(b => b.DeleteRange(It.IsAny<IEnumerable<Procedure>>()));
 
-            var ProcedureController = new ProcedureController(_procedureService, _mapper);
+            var ProcedureController = new ProcedureController(_procedureService, _mapper, _validator);
             //act
-            var result = ProcedureController.DeleteProceduresAsync(ids).Result;
+            var result = ProcedureController.DeleteProcedures(ids).Result;
 
             var badRequest = result as BadRequestObjectResult;
             //assert

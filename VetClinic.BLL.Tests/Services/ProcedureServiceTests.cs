@@ -50,7 +50,7 @@ namespace VetClinic.BLL.Tests.Services
                 Func<IQueryable<Procedure>, IIncludableQueryable<Procedure, object>> include,
                 bool asNoTracking) => Procedures.FirstOrDefault(filter));
             //act
-            var Procedure = await _procedureService.GetByIdAsync(id, null, true);
+            var Procedure = await _procedureService.GetByIdAsync(id);
             //assert
             Assert.Equal("Procedure 4", Procedure.Title);
         }
@@ -162,7 +162,7 @@ namespace VetClinic.BLL.Tests.Services
         public void CanDeleteRange()
         {
             //arrange
-            int[] ids = new int[] { 8, 9, 10 };
+            List<int> ids = new List<int>() { 8, 9, 10 };
 
             var Procedures = ProcedureFakeData.GetProcedureFakeData().AsQueryable();
 
@@ -183,7 +183,7 @@ namespace VetClinic.BLL.Tests.Services
         public void DeleteRangeWithInvalidId()
         {
             //arrange
-            int[] ids = new int[] { 8, 9, 100 };
+            List<int> ids = new List<int>() { 8, 9, 100 };
 
             var Procedures = ProcedureFakeData.GetProcedureFakeData().AsQueryable();
 

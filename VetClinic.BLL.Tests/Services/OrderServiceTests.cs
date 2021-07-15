@@ -50,7 +50,7 @@ namespace VetClinic.BLL.Tests.Services
                 Func<IQueryable<Order>, IIncludableQueryable<Order, object>> include,
                 bool asNoTracking) => orders.FirstOrDefault(filter));
             //act
-            var order = await _orderService.GetByIdAsync(id, null, true);
+            var order = await _orderService.GetByIdAsync(id);
             //assert
             Assert.Equal(new DateTime(2020, 10, 16), order.CreatedAt);
         }
@@ -161,7 +161,7 @@ namespace VetClinic.BLL.Tests.Services
         public void CanDeleteRange()
         {
             //arrange
-            int[] ids = new int[]{8, 9, 10};
+            List<int> ids = new List<int>() { 8, 9, 10};
 
             var orders = OrderFakeData.GetOrderFakeData().AsQueryable();
 
@@ -182,7 +182,7 @@ namespace VetClinic.BLL.Tests.Services
         public void DeleteRangeWithInvalidId()
         {
             //arrange
-            int[] ids = new int[]{8, 9, 100};
+            List<int> ids = new List<int>() { 8, 9, 100};
 
             var orders = OrderFakeData.GetOrderFakeData().AsQueryable();
 

@@ -28,10 +28,7 @@ namespace VetClinic.BLL.Services
             return await _employeeRepository.GetAsync(filter, orderBy, include, asNoTracking);
         }   
 
-        public async Task<Employee> GetByIdAsync(
-            string id,
-            Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>> include = null,
-            bool asNoTracking = false)
+        public async Task<Employee> GetByIdAsync(string id)
         {
             var employee = await _employeeRepository.GetFirstOrDefaultAsync(x => x.Id == id, include, asNoTracking);
             if(employee == null)
