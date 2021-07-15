@@ -61,7 +61,6 @@ namespace VetClinic.BLL.Services
                 throw  new ArgumentException($"{nameof(petToDelete)} {EntityWasNotFound}");
             _petRepository.Delete(petToDelete);
             await _petRepository.SaveChangesAsync();
-            await _petRepository.SaveChangesAsync();
         }
 
         public async Task DeleteRangeAsync(IList<int> listOfIds)
@@ -74,7 +73,6 @@ namespace VetClinic.BLL.Services
             }
 
             _petRepository.DeleteRange(petsToDelete);
-            await _petRepository.SaveChangesAsync();
             await _petRepository.SaveChangesAsync();
         }
     }

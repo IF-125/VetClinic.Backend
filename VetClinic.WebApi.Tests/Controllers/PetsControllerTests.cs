@@ -1,13 +1,12 @@
 ﻿using AutoMapper;
+using Google.Rpc;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Query;
 using Moq;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using VetClinic.BLL.Services;
 using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Repositories;
@@ -16,6 +15,8 @@ using VetClinic.WebApi.Controllers;
 using VetClinic.WebApi.Mappers;
 using VetClinic.WebApi.ViewModels;
 using Xunit;
+using static VetClinic.Core.Resources.TextMessages;
+
 
 namespace VetClinic.WebApi.Tests.Controllers
 {
@@ -171,8 +172,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         [Fact]
         public void GetPetById_ReturnsNotFound()
         {
-            var pets = GetTestPets().AsQueryable();
-            var id = 999;
+            var id = -10;
 
             _mockPetRepository.Setup(x => x.GetFirstOrDefaultAsync(null,null,false)
                 .Result);
@@ -237,6 +237,117 @@ namespace VetClinic.WebApi.Tests.Controllers
             var result = _petController.Update(id, newPetVM);
 
             Assert.IsType<OkResult>(result);
+        }
+
+        [Fact]
+        public void UpdatePet_ReturnBadRequest_DueToValidationError()
+        {
+            var newPetVM = new PetViewModel
+            {
+                Id = 1,
+                Name = "Lord1",
+                Information = "New Information",
+                Breed = string.Empty,
+                Age = 2
+            };
+
+            var id = 1;
+
+            _mockPetRepository.Setup(x => x.Update(It.IsAny<Pet>()));
+
+            var result = _petController.Update(id, newPetVM);
+
+            Assert.IsType<BadRequestObjectResult>(result);
+        }
+
+        [Fact]
+        public void UpdatePet_ReturnBadRequest_DueToIdMismatch()
+        {
+            var newPetVM = new PetViewModel
+            {
+                Id = 1,
+                Name = "Lord1",
+                Information = "New Information",
+                Breed = "Good in here",
+                Age = 2
+            };
+
+            var id = 99;
+
+            _mockPetRepository.Setup(x => x.Update(It.IsAny<Pet>()));
+
+            var result = _petController.Update(id, newPetVM);
+
+            Assert.IsType<BadRequestObjectResult>(result);
+        }
+
+        [Fact]
+        public void CanDeletePet()
+        {
+            var id = 1;
+
+            _mockPetRepository.Setup(
+                x => x.GetFirstOrDefaultAsync(x => x.Id == id, null, false).Result)
+                .Returns(new Pet { Id = id });
+
+            _mockPetRepository.Setup(x => x.Delete(It.IsAny<Pet>()));
+
+            var result = _petController.DeletePet(id).Result;
+
+            Assert.IsType<OkObjectResult>(result);
+        }
+
+        [Fact]
+        public void DeletePet_WhetPetDoesNotExist()
+        {
+            var id = -10;
+
+            _mockPetRepository.Setup(x => x.GetFirstOrDefaultAsync(null, null, false)
+               .Result);
+
+            var result = _petController.DeletePet(id).Result;
+
+            Assert.IsType<NotFoundObjectResult>(result);
+        }
+
+        [Fact]
+        public  void CanDeleteRange()
+        {
+            var pets = GetTestPets().AsQueryable();
+            var listOfIds = new List<int> { 1, 2, 3, 4 };
+
+            _mockPetRepository.Setup(x=>x.GetAsync(It.IsAny<Expression<Func<Pet, bool>>>(), null, null, false).Result)
+                .Returns((Expression<Func<Pet, bool>> filter,
+                Func<IQueryable<Pet>, IOrderedQueryable<Employee>> orderBy,
+                Func<IQueryable<Pet>, IIncludableQueryable<Employee, object>> include,
+                bool asNoTracking) => pets.Where(filter).ToList());
+
+            _mockPetRepository.Setup(x => x.DeleteRange(It.IsAny<IEnumerable<Pet>>()));
+
+            var result = _petController.DeletePets(listOfIds).Result;
+            Assert.IsType<OkResult>(result);
+        }
+
+        [Fact]
+        public void DeleteRange_WhenSomePetNotFound()
+        {
+            var pets = GetTestPets().AsQueryable();
+            var listOfIds = new List<int> { 1, 2, -100, 4 };
+
+            _mockPetRepository.Setup(x => x.GetAsync(It.IsAny<Expression<Func<Pet, bool>>>(), null, null, false).Result)
+                .Returns((Expression<Func<Pet, bool>> filter,
+                Func<IQueryable<Pet>, IOrderedQueryable<Employee>> orderBy,
+                Func<IQueryable<Pet>, IIncludableQueryable<Employee, object>> include,
+                bool asNoTracking) => pets.Where(filter).ToList());
+
+            _mockPetRepository.Setup(x => x.DeleteRange(It.IsAny<IEnumerable<Pet>>()));
+
+            var result = _petController.DeletePets(listOfIds).Result;
+
+            var badRequest = result as BadRequestObjectResult;
+
+            Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal($"{SomeEntitiesInCollectionNotFound} {nameof(Pet)}s to delete", badRequest.Value);
 
         }
     }

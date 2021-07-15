@@ -62,7 +62,7 @@ namespace VetClinic.WebApi.Controllers
             if (validationResult.IsValid)
             {
                 await _petService.InsertAsync(newPet);
-                return CreatedAtAction("InsertPetAsync", new { id = newPet.Id }, newPet);
+                return CreatedAtAction("InsertPet", new { id = newPet.Id }, newPet);
             }
 
             return BadRequest(validationResult.Errors);
@@ -125,11 +125,11 @@ namespace VetClinic.WebApi.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeletePets([FromQuery(Name = "idArr")] int[] idArr)
+        public async Task<IActionResult> DeletePets([FromQuery(Name = "listOfIds")] List<int> listOfIds)
         {
             try
             {
-                await _petService.DeleteRangeAsync(idArr);
+                await _petService.DeleteRangeAsync(listOfIds);
                 return Ok();
             }
             catch (ArgumentException ex)
