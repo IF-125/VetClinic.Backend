@@ -69,7 +69,7 @@ namespace VetClinic.BLL.Services
 
         public async Task DeleteRangeAsync(IList<int> idArr)
         {
-            var ordersToDelete = await GetOrdersAsync(x => idArr.Contains(x.Id));
+            var ordersToDelete = await GetOrdersAsync(x => listOfIds.Contains(x.Id));
 
             if (ordersToDelete.Count() != idArr.Count)
             {
