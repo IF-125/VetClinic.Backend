@@ -20,6 +20,7 @@ using VetClinic.DAL.Context;
 using VetClinic.DAL.Repositories;
 using VetClinic.DAL.Repositories.Base;
 using VetClinic.WebApi.Validators;
+using VetClinic.WebApi.ExceptionHandling;
 
 namespace VetClinic.Host
 {
@@ -149,6 +150,8 @@ namespace VetClinic.Host
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseMiddleware<ExceptionMiddleware>();
 
             app.UseAuthentication();
 
