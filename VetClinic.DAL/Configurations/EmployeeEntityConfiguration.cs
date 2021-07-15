@@ -9,9 +9,6 @@ namespace VetClinic.DAL.Configurations
         public void Configure(EntityTypeBuilder<Employee> builder)
         {
             builder
-                .HasKey(x => x.Id);
-
-            builder
                 .Property(x => x.Address)
                 .IsRequired();
 
@@ -22,12 +19,14 @@ namespace VetClinic.DAL.Configurations
 
             builder
                 .HasMany(o => o.OrderProcedures)
-                .WithOne()
+                .WithOne(e => e.Employee)
+                .HasForeignKey(x => x.EmployeeId)
                 .OnDelete(DeleteBehavior.SetNull);
 
             builder
                .HasMany(x => x.Schedule)
-               .WithOne()
+               .WithOne(x => x.Employee)
+               .HasForeignKey(x => x.EmployeeId)
                .OnDelete(DeleteBehavior.Cascade);
         }
     }

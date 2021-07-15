@@ -12,7 +12,7 @@ namespace VetClinic.Core.Entities
         public DateTime? DismissedDate { get; set; }
         public string EmployeeId { get; set; }
         public Employee Employee { get; set; }
-        public int PositionId { get; set; }
+        public int? PositionId { get; set; }
         public Position Position { get; set; }
         public ICollection<Salary> Salaries { get; set; }
     }

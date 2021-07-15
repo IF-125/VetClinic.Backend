@@ -8,7 +8,7 @@ namespace VetClinic.WebApi.Mappers
     {
         public SalaryMapperProfile()
         {
-            CreateMap<Salary, SalaryViewModel>();
+            CreateMap<Salary, SalaryViewModel>().ReverseMap();
         }
     }
 }

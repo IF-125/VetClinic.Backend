@@ -9,9 +9,6 @@ namespace VetClinic.DAL.Configurations
         public void Configure(EntityTypeBuilder<PhoneNumber> builder)
         {
             builder
-                .ToTable("PhoneNumbers", "VetClinic");
-
-            builder
                 .HasKey(p => p.Id);
 
             builder

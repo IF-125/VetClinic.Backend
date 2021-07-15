@@ -10,9 +10,8 @@ namespace VetClinic.WebApi.ViewModels
         public string Conclusion { get; set; }
         public string Details { get; set; }
         public int OrderId { get; set; }
-        public int AppointmentId { get; set; }
         public int ProcedureId { get; set; }
         public int PetId { get; set; }
-        public int EmployeeId { get; set; }
+        public string EmployeeId { get; set; }
     }
 }

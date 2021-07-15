@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using VetClinic.IdentityServer.Models;
 
 namespace VetClinic.Core.Entities
 {

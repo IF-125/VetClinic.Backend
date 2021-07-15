@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System.Security.Cryptography.X509Certificates;
 using VetClinic.Core.Entities;
 
 namespace VetClinic.DAL.Configurations
@@ -23,10 +22,6 @@ namespace VetClinic.DAL.Configurations
             builder
                 .Property(x => x.Day)
                 .IsRequired();
-
-            builder
-                .HasOne(x => x.Employee)
-                .WithMany();
         }
     }
 }

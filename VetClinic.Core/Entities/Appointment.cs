@@ -14,7 +14,7 @@ namespace VetClinic.Core.Entities
         public AppointmentStatus Status { get; set; }
         public DateTime From { get; set; }
         public DateTime To { get; set; }
-        public int OrderProcedureId { get; set; }
+        public int? OrderProcedureId { get; set; }
         public OrderProcedure OrderProcedure { get; set; }
     }
 }

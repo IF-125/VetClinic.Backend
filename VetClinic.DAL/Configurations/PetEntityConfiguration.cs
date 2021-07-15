@@ -27,6 +27,7 @@ namespace VetClinic.DAL.Configurations
             builder
                 .HasMany(x => x.OrderProcedures)
                 .WithOne()
+                .HasForeignKey(x => x.PetId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

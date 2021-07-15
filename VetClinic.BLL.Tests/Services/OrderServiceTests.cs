@@ -82,7 +82,6 @@ namespace VetClinic.BLL.Tests.Services
             {
                 Id = 11,
                 IsPaid = false,
-                OrderProcedureId = 11,
                 CreatedAt = new DateTime(2021, 6, 11)
             };
 
@@ -101,7 +100,6 @@ namespace VetClinic.BLL.Tests.Services
             {
                 Id = 11,
                 IsPaid = false,
-                OrderProcedureId = 11,
                 CreatedAt = new DateTime(2021, 6, 11)
             };
 
@@ -122,7 +120,6 @@ namespace VetClinic.BLL.Tests.Services
             {
                 Id = 11,
                 IsPaid = false,
-                OrderProcedureId = 11,
                 CreatedAt = new DateTime(2021, 6, 11)
             };
 

@@ -12,6 +12,8 @@ using static VetClinic.Core.Resources.TextMessages;
 
 namespace VetClinic.WebApi.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class SalariesController : ControllerBase
     {
         private readonly ISalaryService _salaryService;
@@ -106,7 +108,7 @@ namespace VetClinic.WebApi.Controllers
             return BadRequest(validationResult.Errors);
         }
 
-        [HttpPatch("{id:int}")]
+        [HttpPatch("{id}")]
         public async Task<IActionResult> UpdatePatch(int id, [FromBody] JsonPatchDocument<Salary> salaryToUpdate)
         {
             try

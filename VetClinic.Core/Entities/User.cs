@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace VetClinic.IdentityServer.Models
+namespace VetClinic.Core.Entities
 {
     public class User : IdentityUser
     {

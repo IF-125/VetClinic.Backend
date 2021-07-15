@@ -19,6 +19,11 @@ namespace VetClinic.DAL.Configurations
                 .HasMany(x => x.Pets)
                 .WithOne()
                 .OnDelete(DeleteBehavior.SetNull);
+
+            builder
+                .HasMany(x => x.AnimalTypesProcedures)
+                .WithOne(x => x.AnimalType)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

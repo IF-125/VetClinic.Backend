@@ -14,37 +14,13 @@ namespace VetClinic.DAL.Configurations
                 .IsRequired();
 
             builder
-                .Property(b => b.Pet)
-                .IsRequired();
-                
-            builder
-                .Property(b => b.Employee)
-                .IsRequired();
-
-            builder
-                .Property(b => b.Procedure)
-                .IsRequired();
-
-            builder
                 .Property(b => b.Details)
                 .HasMaxLength(50);
 
             builder
-                .HasOne(b => b.Pet)
-                .WithMany(b => b.OrderProcedures);
-
-            builder
-                .HasOne(b => b.Employee)
-                .WithMany(b => b.OrderProcedures);
-
-            builder
-                .HasOne(b => b.Procedure)
-                .WithMany(b => b.OrderProcedures);
-
-            builder
                 .HasOne(b => b.Appointment)
                 .WithOne(b => b.OrderProcedure)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.SetNull);
 
             builder
                 .HasOne(b => b.Order)

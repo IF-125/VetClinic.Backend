@@ -62,7 +62,7 @@ namespace VetClinic.WebApi.Controllers
             if (validationResult.IsValid)
             {
                 await _appointmentService.InsertAsync(newAppointment);
-                return CreatedAtAction("InsertAppointmentAsync", new { id = newAppointment.Id }, newAppointment);
+                return Ok(newAppointment);
             }
             return BadRequest(validationResult.Errors);
         }

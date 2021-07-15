@@ -16,7 +16,9 @@ namespace VetClinic.WebApi.Mappers
                     y => y.MapFrom(src => src.Employee.Address))
 
                 .ForMember(x => x.PositionName,
-                    y => y.MapFrom(src => src.Position.Title));
+                    y => y.MapFrom(src => src.Position.Title))
+                
+                .ReverseMap();
         }
     }
 }

@@ -20,12 +20,9 @@ namespace VetClinic.DAL.Configurations
 
             builder
                 .HasOne(x => x.Employee)
-                .WithOne()
+                .WithOne(x => x.EmployeePosition)
+                .HasForeignKey<EmployeePosition>(x => x.EmployeeId)
                 .OnDelete(DeleteBehavior.SetNull);
-
-            builder
-                .HasOne(x => x.Position)
-                .WithMany(x => x.EmployeePositions);
 
             builder
                 .HasMany(x => x.Salaries)

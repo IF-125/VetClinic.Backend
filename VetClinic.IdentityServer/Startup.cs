@@ -1,13 +1,9 @@
-using IdentityServer4.AspNetIdentity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using VetClinic.IdentityServer.Configurations;
-using VetClinic.IdentityServer.Models;
 
 namespace VetClinic.IdentityServer
 {

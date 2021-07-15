@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using VetClinic.Core.Entities;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using VetClinic.Core.Entities;
 
 namespace VetClinic.DAL.Configurations
 {
@@ -24,6 +24,7 @@ namespace VetClinic.DAL.Configurations
             builder
                 .HasMany(x => x.OrderProcedures)
                 .WithOne()
+                .HasForeignKey(x => x.ProcedureId)
                 .OnDelete(DeleteBehavior.SetNull);
         }
     }

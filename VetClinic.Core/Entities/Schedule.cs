@@ -6,8 +6,8 @@ namespace VetClinic.Core.Entities
     {
         Monday = 1,
         Tuesday,
-        Wednesday, 
-        Thursday, 
+        Wednesday,
+        Thursday,
         Friday,
         Saturday,
         Sunday
