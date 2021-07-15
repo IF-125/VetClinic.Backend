@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SendGrid.Helpers.Errors.Model;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -19,11 +20,15 @@ namespace VetClinic.WebApi.Controllers
     {
         private readonly IScheduleService _scheduleService;
         private readonly IMapper _mapper;
+        private readonly ScheduleValidator _scheduleValidator;
 
-        public ScheduleController(IScheduleService scheduleService, IMapper mapper)
+        public ScheduleController(IScheduleService scheduleService,
+            IMapper mapper,
+            ScheduleValidator scheduleValidator)
         {
             _scheduleService = scheduleService;
             _mapper = mapper;
+            _scheduleValidator = scheduleValidator;
         }
 
         [HttpGet]
@@ -35,7 +40,7 @@ namespace VetClinic.WebApi.Controllers
                 var model = _mapper.Map<IEnumerable<ScheduleViewModel>>(schedule);
                 return Ok(model);
             }
-            catch (ArgumentException ex)
+            catch (NotFoundException ex)
             {
                 return NotFound(ex.Message); 
             }
@@ -52,19 +57,18 @@ namespace VetClinic.WebApi.Controllers
 
                 return Ok(scheduleViewModel);
             }
-            catch (ArgumentException ex)
+            catch (NotFoundException ex)
             {
                 return NotFound(ex.Message);
             }
         }
 
         [HttpPost]
-        public async Task<IActionResult> InsertScheduleAsync(ScheduleViewModel model)
+        public async Task<IActionResult> InsertSchedule(ScheduleViewModel model)
         {
             var newSchedule = _mapper.Map<Schedule>(model);
 
-            var validator = new ScheduleValidator();
-            var validationResult = validator.Validate(newSchedule);
+            var validationResult = _scheduleValidator.Validate(newSchedule);
 
             if (validationResult.IsValid)
             {
@@ -79,8 +83,7 @@ namespace VetClinic.WebApi.Controllers
         {
             var schedule = _mapper.Map<Schedule>(model);
 
-            var validator = new ScheduleValidator();
-            var validationResult = validator.Validate(schedule);
+            var validationResult = _scheduleValidator.Validate(schedule);
 
             if (validationResult.IsValid)
             {
@@ -89,7 +92,7 @@ namespace VetClinic.WebApi.Controllers
                     _scheduleService.Update(id, schedule);
                     return Ok();
                 }
-                catch (ArgumentException ex)
+                catch (BadRequestException ex)
                 {
                     return BadRequest(ex.Message);
                 }
@@ -105,21 +108,21 @@ namespace VetClinic.WebApi.Controllers
                 await _scheduleService.DeleteAsync(id);
                 return Ok($"{nameof(Schedule)} {EntityHasBeenDeleted}");
             }
-            catch (ArgumentException ex)
+            catch (NotFoundException ex)
             {
                 return NotFound(ex.Message);
             }
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteListOfScheduleAsync([FromQuery(Name = "idArr")] int[] idArr)
+        public async Task<IActionResult> DeleteListOfScheduleAsync([FromQuery(Name = "listOfIds")] IList<int> listOfIds)
         {
             try
             {
-                await _scheduleService.DeleteRangeAsync(idArr);
+                await _scheduleService.DeleteRangeAsync(listOfIds);
                 return Ok();
             }
-            catch (ArgumentException ex)
+            catch (BadRequestException ex)
             {
                 return BadRequest(ex.Message);
             }

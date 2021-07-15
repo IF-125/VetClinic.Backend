@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Query;
 using Moq;
+using SendGrid.Helpers.Errors.Model;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -27,36 +28,45 @@ namespace VetClinic.BLL.Tests.Services
         [Fact]
         public async Task CanReturnAllPositions()
         {
+            //Arrange
             _positionRepository.Setup(x => x.GetAsync(null, null, null, true).Result)
                 .Returns(PositionFakeData.GetPositionFakeData());
 
-            IList<Position> testEmployees = await _positionService.GetPositionsAsync(null, null, null, asNoTracking: true);
+            int expectedCount = 4;
+            
+            //Act
+            IList<Position> testEmployees = await _positionService.GetPositionsAsync();
 
+            //Assert
             Assert.NotNull(testEmployees);
-            Assert.Equal(4, testEmployees.Count);
+            Assert.Equal(expectedCount, testEmployees.Count);
         }
 
         [Fact]
         public async Task CanReturnPositionById()
         {
+            //Arrange
             var id = 2;
 
             var positions = PositionFakeData.GetPositionFakeData().AsQueryable();
 
             _positionRepository.Setup(x => x.GetFirstOrDefaultAsync(
-                x => x.Id == id, null, true).Result)
+                x => x.Id == id, null, false).Result)
                 .Returns((Expression<Func<Position, bool>> filter,
                 Func<IQueryable<Employee>, IIncludableQueryable<Position, object>> include,
                 bool asNoTracking) => positions.FirstOrDefault(filter));
 
-            var employee = await _positionService.GetByIdAsync(id, null, true);
+            //Act
+            var employee = await _positionService.GetByIdAsync(id);
 
+            //Assert
             Assert.Equal("Anesthetist", employee.Title);
         }
 
         [Fact]
-        public void GetPositionById_ShouldReturnException()
+        public async Task GetPositionById_ShouldReturnException()
         {
+            //Arrange
             var id = 1234;
 
             var positions = PositionFakeData.GetPositionFakeData().AsQueryable();
@@ -67,7 +77,9 @@ namespace VetClinic.BLL.Tests.Services
                 Func<IQueryable<Position>, IIncludableQueryable<Position, object>> include,
                 bool asNoTracking) => positions.FirstOrDefault(filter));
 
-            Assert.Throws<AggregateException>(() => _positionService.GetByIdAsync(id).Result);
+            //Act, Assert
+            await Assert.ThrowsAsync<NotFoundException>(async () =>
+            await _positionService.GetByIdAsync(id));
 
 
         }
@@ -75,6 +87,7 @@ namespace VetClinic.BLL.Tests.Services
         [Fact]
         public async Task CanInsertPositionAsync()
         {
+            //Arrange
             var newPosition = new Position
             {
                 Id = 5,
@@ -83,40 +96,48 @@ namespace VetClinic.BLL.Tests.Services
 
             _positionRepository.Setup(x => x.InsertAsync(It.IsAny<Position>()));
 
+            //Act
             await _positionService.InsertAsync(newPosition);
 
+            //Assert
             _positionRepository.Verify(a => a.InsertAsync(newPosition));
         }
 
         [Fact]
         public void CanUpdatePosition()
         {
-            var position = PositionFakeData.GetPositionFakeData().FirstOrDefault(x => x.Id == 2);
-
+            //Arrange
             var id = 2;
+
+            var position = PositionFakeData.GetPositionFakeData().FirstOrDefault(x => x.Id == 2);
 
             _positionRepository.Setup(x => x.Update(It.IsAny<Position>()));
 
+            //Act
             _positionService.Update(id, position);
 
+            //Assert
             _positionRepository.Verify(x => x.Update(position));
         }
 
         [Fact]
         public void UpdatePosition_ThrowsException()
         {
-            var position = PositionFakeData.GetPositionFakeData().FirstOrDefault(x => x.Id == 2);
-
+            //Arrange
             var id = 12;
+
+            var position = PositionFakeData.GetPositionFakeData().FirstOrDefault(x => x.Id == 2);
 
             _positionRepository.Setup(x => x.Update(It.IsAny<Position>()));
 
-            Assert.Throws<ArgumentException>(() => _positionService.Update(id, position));
+            //Act, Assert
+            Assert.Throws<BadRequestException>(() => _positionService.Update(id, position));
         }
 
         [Fact]
         public async Task CanDeletePositionAsync()
         {
+            //Arrange
             var id = 2;
 
             _positionRepository.Setup(x => x.GetFirstOrDefaultAsync(
@@ -125,23 +146,27 @@ namespace VetClinic.BLL.Tests.Services
 
             _positionRepository.Setup(x => x.Delete(It.IsAny<Position>())).Verifiable();
 
+            //Act
             await _positionService.DeleteAsync(id);
 
+            //Assert
             _positionRepository.Verify(x => x.Delete(It.IsAny<Position>()));
 
 
         }
 
         [Fact]
-        public void DeletePosition_WhenPositionDoesNotExist()
+        public async Task DeletePosition_WhenPositionDoesNotExist()
         {
-            Assert.Throws<AggregateException>(() => _positionService.DeleteAsync(500).Wait());
+           await Assert.ThrowsAsync<NotFoundException>(async () =>
+            await _positionService.DeleteAsync(500));
         }
 
         [Fact]
         public void CanDeleteRangeAsync()
         {
-            var idArr = new int[] { 2, 3, 4 };
+            //Arrange
+            var listOfIds = new List<int> { 2, 3, 4 };
 
             var positions = PositionFakeData.GetPositionFakeData().AsQueryable();
 
@@ -153,15 +178,18 @@ namespace VetClinic.BLL.Tests.Services
 
             _positionRepository.Setup(x => x.DeleteRange(It.IsAny<IEnumerable<Position>>()));
 
-            _positionService.DeleteRangeAsync(idArr).Wait();
+            //Act
+            _positionService.DeleteRangeAsync(listOfIds).Wait();
 
+            //Assert
             _positionRepository.Verify(x => x.DeleteRange(It.IsAny<IEnumerable<Position>>()));
         }
 
         [Fact]
-        public void DeleteRangeAsync_ShouldReturnException_BecauseOneEmployeeWasNotFound()
+        public async Task DeleteRangeAsync_ShouldReturnException_BecauseOneEmployeeWasNotFound()
         {
-            var idArr = new int[] { 2, 400, 3 };
+            //Arrange
+            var listOfIds = new List<int> { 2, 400, 3 };
 
             var positions = PositionFakeData.GetPositionFakeData().AsQueryable();
 
@@ -173,7 +201,9 @@ namespace VetClinic.BLL.Tests.Services
 
             _positionRepository.Setup(x => x.DeleteRange(It.IsAny<IEnumerable<Position>>()));
 
-            Assert.Throws<AggregateException>(() => _positionService.DeleteRangeAsync(idArr).Wait());
+            //Act, Assert
+            await Assert.ThrowsAsync<BadRequestException>(async () => 
+                await _positionService.DeleteRangeAsync(listOfIds));
         }
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SendGrid.Helpers.Errors.Model;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -19,20 +20,20 @@ namespace VetClinic.WebApi.Controllers
     {
         private readonly IEmployeePositionService _employeePositionService;
         private readonly IMapper _mapper;
-        public EmployeePositionsController(IEmployeePositionService employeePositionService, IMapper mapper)
+        private readonly EmployeePositionValidator _employeePositionValidator;
+        public EmployeePositionsController(IEmployeePositionService employeePositionService,
+            IMapper mapper,
+            EmployeePositionValidator employeePositionValidator)
         {
             _employeePositionService = employeePositionService;
             _mapper = mapper;
+            _employeePositionValidator = employeePositionValidator;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllEmployeePositionsAsync()
+        public async Task<IActionResult> GetAllEmployeePositions()
         {
-            var employeePositions = await _employeePositionService.GetEmployeePositionsAsync(
-                include: x => x
-                    .Include(e => e.Employee)
-                    .Include(p => p.Position),
-                asNoTracking: true);
+            var employeePositions = await _employeePositionService.GetEmployeePositionsAsync();
 
             var employeeViewModel = _mapper.Map<IEnumerable<EmployeePositionViewModel>>(employeePositions);
 
@@ -40,7 +41,7 @@ namespace VetClinic.WebApi.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetEmployeePositionByIdAsync(int id)
+        public async Task<IActionResult> GetEmployeePosition(int id)
         {
             try
             {
@@ -50,19 +51,18 @@ namespace VetClinic.WebApi.Controllers
 
                 return Ok(model);
             }
-            catch (ArgumentException ex)
+            catch (NotFoundException ex)
             {
                 return NotFound(ex.Message);
             }
         }
 
         [HttpPost]
-        public async Task<IActionResult> AssignPositionToEmployeeAsync(EmployeePositionViewModel model)
+        public async Task<IActionResult> AssignPositionToEmployee(EmployeePositionViewModel model)
         {
             var employeePosition = _mapper.Map<EmployeePosition>(model);
 
-            var validator = new EmployeePositionValidator();
-            var validationResult = validator.Validate(employeePosition);
+            var validationResult = _employeePositionValidator.Validate(employeePosition);
 
             if (validationResult.IsValid)
             {
@@ -70,7 +70,7 @@ namespace VetClinic.WebApi.Controllers
                 {
                     await _employeePositionService.AssignPositionToEmployeeAsync(employeePosition);
                 }
-                catch (ArgumentException ex)
+                catch (BadRequestException ex)
                 {
                     return BadRequest(ex.Message);
                 }
@@ -83,8 +83,7 @@ namespace VetClinic.WebApi.Controllers
         {
             var employeePosition = _mapper.Map<EmployeePosition>(model);
 
-            var validator = new EmployeePositionValidator();
-            var validationResult = validator.Validate(employeePosition);
+            var validationResult = _employeePositionValidator.Validate(employeePosition);
 
             if (validationResult.IsValid)
             {
@@ -93,7 +92,7 @@ namespace VetClinic.WebApi.Controllers
                     _employeePositionService.Update(id, employeePosition);
                     return Ok();
                 }
-                catch (ArgumentException ex)
+                catch (BadRequestException ex)
                 {
                     return BadRequest(ex.Message);
                 }
@@ -110,35 +109,35 @@ namespace VetClinic.WebApi.Controllers
                 employeeToUpdate.ApplyTo(employeePosition, ModelState);
                 return Ok(employeePosition);
             }
-            catch (ArgumentException ex)
+            catch (NotFoundException ex)
             {
                 return NotFound(ex.Message);
             }
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEmployeePositionAsync(int id)
+        public async Task<IActionResult> DeleteEmployeePosition(int id)
         {
             try
             {
                 await _employeePositionService.DeleteAsync(id);
                 return Ok($"{nameof(EmployeePosition)} {EntityHasBeenDeleted}");
             }
-            catch (ArgumentException ex)
+            catch (NotFoundException ex)
             {
                 return NotFound(ex.Message);
             }
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteEmployeePositionsAsync([FromQuery(Name = "idArr")] int[] idArr)
+        public async Task<IActionResult> DeleteEmployeePositions([FromQuery(Name = "listOfIds")] IList<int> listOfIds)
         {
             try
             {
-                await _employeePositionService.DeleteRangeAsync(idArr);
+                await _employeePositionService.DeleteRangeAsync(listOfIds);
                 return Ok();
             }
-            catch (ArgumentException ex)
+            catch (BadRequestException ex)
             {
                 return BadRequest(ex.Message);
             }

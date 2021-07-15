@@ -1,13 +1,11 @@
-﻿using static VetClinic.Core.Resources.TextMessages;
-using Microsoft.EntityFrameworkCore.Query;
-using System;
+﻿using SendGrid.Helpers.Errors.Model;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Repositories;
 using VetClinic.Core.Interfaces.Services;
+using static VetClinic.Core.Resources.TextMessages;
 
 namespace VetClinic.BLL.Services
 {
@@ -20,25 +18,15 @@ namespace VetClinic.BLL.Services
             _positionRepository = positionRepository;
         }
 
-        public async Task<IList<Position>> GetPositionsAsync(
-            Expression<Func<Position, bool>> filter = null,
-            Func<IQueryable<Position>, IOrderedQueryable<Position>> orderBy = null,
-            Func<IQueryable<Position>, IIncludableQueryable<Position, object>> include = null,
-            bool asNoTracking = false)
+        public async Task<IList<Position>> GetPositionsAsync()
         {
-            return await _positionRepository.GetAsync(filter, orderBy, include, asNoTracking);
+            return await _positionRepository.GetAsync(asNoTracking: true);
         }
 
-        public async Task<Position> GetByIdAsync(
-            int id,
-            Func<IQueryable<Position>, IIncludableQueryable<Position, object>> include = null,
-            bool asNoTracking = false)
+        public async Task<Position> GetByIdAsync(int id)
         {
-            var position = await _positionRepository.GetFirstOrDefaultAsync(x => x.Id == id, include, asNoTracking);
-            if(position == null)
-            {
-                throw new ArgumentException($"{nameof(Position)} {EntityWasNotFound}");
-            }
+            var position = await _positionRepository.GetFirstOrDefaultAsync(x => x.Id == id) ?? 
+                throw new NotFoundException($"{nameof(Position)} {EntityWasNotFound}");
 
             return position;
         }
@@ -46,39 +34,39 @@ namespace VetClinic.BLL.Services
         public async Task InsertAsync(Position entity)
         {
             await _positionRepository.InsertAsync(entity);
+            await _positionRepository.SaveChangesAsync();
         }
 
         public void Update(int id, Position entityToUpdate)
         {
             if(id != entityToUpdate.Id)
             {
-                throw new ArgumentException($"{nameof(Position)} {IdsDoNotMatch}");
+                throw new BadRequestException($"{nameof(Position)} {IdsDoNotMatch}");
             }
 
             _positionRepository.Update(entityToUpdate);
+            _positionRepository.SaveChanges();
         }
 
         public async Task DeleteAsync(int id)
         {
-            var positionToDelete = await _positionRepository.GetFirstOrDefaultAsync(x => x.Id == id);
-
-            if (positionToDelete == null)
-            {
-                throw new ArgumentException($"{nameof(Position)} {EntityWasNotFound}");
-            }
+            var positionToDelete = await _positionRepository.GetFirstOrDefaultAsync(x => x.Id == id) ??
+                throw new NotFoundException($"{nameof(Position)} {EntityWasNotFound}");
 
             _positionRepository.Delete(positionToDelete);
+            _positionRepository.SaveChanges();
         }
 
-        public async Task DeleteRangeAsync(int[] idArr)
+        public async Task DeleteRangeAsync(IList<int> listOfIds)
         {
-            var positionsToDelete = await GetPositionsAsync(x => idArr.Contains(x.Id));
+            var positionsToDelete = await _positionRepository.GetAsync(x => listOfIds.Contains(x.Id));
 
-            if (positionsToDelete.Count() != idArr.Length)
+            if (positionsToDelete.Count() != listOfIds.Count)
             {
-                throw new ArgumentException($"{SomeEntitiesInCollectionNotFound} {nameof(Position)}s to delete");
+                throw new BadRequestException($"{SomeEntitiesInCollectionNotFound} {nameof(Position)}s to delete");
             }
             _positionRepository.DeleteRange(positionsToDelete);
+            await _positionRepository.SaveChangesAsync();
         }
     }
 }
