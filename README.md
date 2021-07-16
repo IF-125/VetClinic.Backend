@@ -4,7 +4,7 @@
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=IF-125_VetClinic.Backend&metric=security_rating)](https://sonarcloud.io/dashboard?id=IF-125_VetClinic.Backend)
 # VetClinic
 ## About
-This web application aims to provide a simple and intuitive way for customers to interact with veterinary clinic services online.
+This web application aims to provide a simple and intuitive way for customers to interact with veterinary clinic services online. Users can register their pets in the system, request appointments for procedures and view medical records of their pets.
 # Table of Contents
 1. [Technologies](#technologies)
 2. [Cloning](#cloning)
