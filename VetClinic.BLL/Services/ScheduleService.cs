@@ -74,6 +74,11 @@ namespace VetClinic.BLL.Services
         {
             var schedule = await _scheduleRepository.GetAsync(x => x.EmployeeId == emoloyeeId);
 
+            if(schedule == null || !schedule.Any())
+            {
+                throw new NotFoundException("No schedule was provided for this emplouee");
+            }
+
             return schedule;
         }
     }

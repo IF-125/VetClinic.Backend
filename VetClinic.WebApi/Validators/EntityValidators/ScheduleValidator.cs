@@ -7,12 +7,8 @@ namespace VetClinic.WebApi.Validators.EntityValidators
     {
         public ScheduleValidator()
         {
-            RuleFor(x => x.EmployeeId)
-                .NotEmpty()
-                .WithMessage("Employee id is required");
-
             RuleFor(x => x.Day)
-                .NotNull();
+                .NotEmpty();
 
             RuleFor(x => x.From)
                 .NotEmpty()

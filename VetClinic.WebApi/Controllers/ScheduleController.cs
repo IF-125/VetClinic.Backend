@@ -99,7 +99,7 @@ namespace VetClinic.WebApi.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteScheduleAsync(int id)
+        public async Task<IActionResult> DeleteSchedule(int id)
         {
             try
             {
@@ -113,7 +113,7 @@ namespace VetClinic.WebApi.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteListOfScheduleAsync([FromQuery(Name = "listOfIds")] IList<int> listOfIds)
+        public async Task<IActionResult> DeleteListOfSchedule([FromQuery(Name = "listOfIds")] IList<int> listOfIds)
         {
             try
             {
