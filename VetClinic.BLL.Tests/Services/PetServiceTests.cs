@@ -26,11 +26,13 @@ namespace VetClinic.BLL.Tests.Services
         [Fact]
         public async Task CanReturnAllPets()
         {
+            // Arrange
             _petRepository.Setup(x => x.GetAsync(null, null, null, true).Result)
                 .Returns(PetFakeData.GetPetFakeData());
-
+            // Act
             IList<Pet> tempPets = await _petServise.GetPetsAsync();
 
+            // Assert
             Assert.NotNull(tempPets);
             Assert.Equal(10,tempPets.Count);
         }
@@ -38,28 +40,31 @@ namespace VetClinic.BLL.Tests.Services
         [Fact]
         public async Task CanReturnPetById()
         {
+            // Arrange
             var id = 10;
             var pets = PetFakeData.GetPetFakeData().AsQueryable();
-       
             _petRepository.Setup(x => x.GetFirstOrDefaultAsync(x => x.Id == id, null, false).Result)
                 .Returns(pets.FirstOrDefault(x => x.Id == id));
-
+            
+            // Act
             var pet = await _petServise.GetByIdAsync(id);
 
+            // Assert
             Assert.Equal("Lord10", pet.Name);
         }
 
         [Fact]
         public void GetPetById_ShouldReturnExeption()
         {
-            //only have 10
+            // Arrange
             var id = 999;
             var pets = PetFakeData.GetPetFakeData().AsQueryable();
 
             _petRepository.Setup(x => x.GetFirstOrDefaultAsync(
                 x => x.Id == id, null, true).Result)
                 .Returns(pets.FirstOrDefault(x => x.Id == id));
-
+            
+            // Act,Assert
             Assert.Throws<AggregateException>(() => _petServise.GetByIdAsync(id).Result);
 
         }
@@ -67,6 +72,7 @@ namespace VetClinic.BLL.Tests.Services
         [Fact] 
         public async Task   CanInsertPetAsync()
         {
+            // Arrange
             var _newPet = new Pet
             {
                 Id = 11,
@@ -75,17 +81,19 @@ namespace VetClinic.BLL.Tests.Services
                 Breed = "Foo",
                 Age = 4
             };
-
             _petRepository.Setup(x => x.InsertAsync(It.IsAny<Pet>()));
 
+            // Act
             await _petServise.InsertAsync(_newPet);
 
+            // Assert
             _petRepository.Verify(x => x.InsertAsync(_newPet));
         }
 
         [Fact]
         public void CanUpdatePet()
         {
+            // Arrange
             var _newPet = new Pet
             {
                 Id = 10,
@@ -94,13 +102,15 @@ namespace VetClinic.BLL.Tests.Services
                 Breed = "Persian",
                 Age = 2
             };
-
+            
             var id = 10;
 
             _petRepository.Setup(x => x.Update(It.IsAny<Pet>()));
 
+            // Act
             _petServise.Update(id, _newPet);
 
+            // Assert
             _petRepository.Verify(x => x.Update(_newPet));
 
         }
@@ -108,6 +118,7 @@ namespace VetClinic.BLL.Tests.Services
         [Fact]
         public void UpdatePet_ThrowsExeption()
         {
+            // Arrange
             var _newPet = new Pet
             {
                 Id = 10,
@@ -116,12 +127,12 @@ namespace VetClinic.BLL.Tests.Services
                 Breed = "Persian",
                 Age = 2
             };
-
-            //Not corect identificator 
+            
             var id = 999;
 
             _petRepository.Setup(x => x.Update(It.IsAny<Pet>()));
 
+            // Act, Assert
             Assert.Throws<ArgumentException>(() => _petServise.Update(id, _newPet));
 
         }
@@ -129,6 +140,7 @@ namespace VetClinic.BLL.Tests.Services
         [Fact]
         public async Task CanDeletPetAsync()
         {
+            // Arrange
             var id = 10;
             var pets = PetFakeData.GetPetFakeData().AsQueryable();
 
@@ -137,15 +149,18 @@ namespace VetClinic.BLL.Tests.Services
 
             _petRepository.Setup(x => x.Delete(It.IsAny<Pet>())).Verifiable();
 
+            // Act
             await _petServise.DeleteAsync(id);
 
+            // Assert
             _petRepository.Verify(x => x.Delete(It.IsAny<Pet>()));
         }
 
         [Fact]
         public async Task DeletePet_ThrowExaption()
         {
-            //Not existing Id
+
+            // Arrange
             var id = 999;
             var pets = PetFakeData.GetPetFakeData().AsQueryable();
 
@@ -154,6 +169,7 @@ namespace VetClinic.BLL.Tests.Services
 
             _petRepository.Setup(x => x.Delete(It.IsAny<Pet>())).Verifiable();
 
+            // Act,Assert
             await Assert.ThrowsAsync<NullReferenceException>( () =>  _petServise.DeleteAsync(id));
 
         }
@@ -161,6 +177,7 @@ namespace VetClinic.BLL.Tests.Services
         [Fact]
         public void  CanDeleteRangeOfPetsAsync()
         {
+            // Arrange
             var listOfIds = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
             
             var pets = PetFakeData.GetPetFakeData().AsQueryable();
@@ -173,8 +190,10 @@ namespace VetClinic.BLL.Tests.Services
 
             _petRepository.Setup(x => x.DeleteRange(It.IsAny<IEnumerable<Pet>>()));
 
+            // Act
             _petServise.DeleteRangeAsync(listOfIds).Wait();
 
+            // Assert
             _petRepository.Verify(x => x.DeleteRange(It.IsAny<IEnumerable<Pet>>()));
         }
 
@@ -182,10 +201,11 @@ namespace VetClinic.BLL.Tests.Services
         [Fact]
         public void DeletePetsRangeAsync_ShouldReturnException_notValidId()
         {
-            //not valid Id
+            // Arrange
             var idArr = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 999, 1000 };
             var pets = PetFakeData.GetPetFakeData().AsQueryable();
 
+            // Act
             _petRepository.Setup(x => x.GetAsync(It.IsAny<Expression<Func<Pet, bool>>>(), null, null, false).Result)
                 .Returns((Expression<Func<Pet, bool>> filter,
                 Func<IQueryable<Pet>, IOrderedQueryable<Employee>> orderBy,
@@ -194,6 +214,7 @@ namespace VetClinic.BLL.Tests.Services
 
             _petRepository.Setup(x => x.DeleteRange(It.IsAny<IEnumerable<Pet>>()));
 
+            // Assert
             Assert.Throws<AggregateException>(() => _petServise.DeleteRangeAsync(idArr).Wait());
         }
     }
