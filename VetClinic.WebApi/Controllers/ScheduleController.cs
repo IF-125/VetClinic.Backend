@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SendGrid.Helpers.Errors.Model;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
@@ -73,7 +71,7 @@ namespace VetClinic.WebApi.Controllers
             if (validationResult.IsValid)
             {
                 await _scheduleService.InsertAsync(newSchedule);
-                return Ok();
+                return Ok(newSchedule);
             }
             return BadRequest(validationResult.Errors);
         }

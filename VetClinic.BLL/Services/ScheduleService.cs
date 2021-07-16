@@ -1,13 +1,11 @@
-﻿using static VetClinic.Core.Resources.TextMessages;
-using Microsoft.EntityFrameworkCore.Query;
-using System;
+﻿using SendGrid.Helpers.Errors.Model;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Repositories;
 using VetClinic.Core.Interfaces.Services;
-using SendGrid.Helpers.Errors.Model;
+using static VetClinic.Core.Resources.TextMessages;
 
 namespace VetClinic.BLL.Services
 {

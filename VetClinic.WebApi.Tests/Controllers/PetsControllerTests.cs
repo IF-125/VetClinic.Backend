@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Google.Rpc;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Query;
 using Moq;
@@ -197,7 +196,7 @@ namespace VetClinic.WebApi.Tests.Controllers
             _mockPetRepository.Setup(x => x.InsertAsync(It.IsAny<Pet>()));
 
             var result = _petController.InsertPet(newPetVM).Result;
-            Assert.IsType<CreatedAtActionResult>(result);
+            Assert.IsType<OkObjectResult>(result);
         }
 
         [Fact]

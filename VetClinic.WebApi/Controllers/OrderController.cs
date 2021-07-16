@@ -63,7 +63,7 @@ namespace VetClinic.WebApi.Controllers
             if (validationResult.IsValid)
             {
                 await _orderService.InsertAsync(newOrder);
-                return Ok();
+                return Ok(newOrder);
             }
             return BadRequest(validationResult.Errors);
         }

@@ -201,7 +201,7 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             var result = employeeController.InsertEmployeeAsync(employeeVM).Result;
 
-            Assert.IsType<CreatedAtActionResult>(result);
+            Assert.IsType<OkObjectResult>(result);
         }
 
         [Fact]
@@ -269,31 +269,6 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             Assert.IsType<BadRequestObjectResult>(result);
             Assert.True(badRequest.Value.GetType() == typeof(List<ValidationFailure>));
-        }
-
-        [Fact]
-        public void UpdateEmployee_ReturnsBadRequest_DueToIdsMismatch()
-        {
-            var employeeController = new EmployeesController(_employeeService, _mapper, _employeeValidator);
-
-            var employeeVM = new EmployeeViewModel
-            {
-                FirstName = "Added",
-                LastName = "User",
-                Address = "Good in here",
-                Email = "tisacq0@unesco.org"
-            };
-
-            var id = "DummyId";
-
-            _mockEmployeeRepository.Setup(x => x.Update(It.IsAny<Employee>()));
-
-            var result = employeeController.UpdateEmployee(id, employeeVM);
-
-            var badRequest = result as BadRequestObjectResult;
-
-            Assert.IsType<BadRequestObjectResult>(result);
-            Assert.Equal("Employee id and passed id did not match", badRequest.Value);
         }
 
         [Fact]

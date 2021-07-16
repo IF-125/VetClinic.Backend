@@ -62,7 +62,7 @@ namespace VetClinic.WebApi.Controllers
             if (validationResult.IsValid)
             {
                 await _procedureService.InsertAsync(newProcedure);
-                return Ok();
+                return Ok(newProcedure);
             }
             return BadRequest(validationResult.Errors);
         }
