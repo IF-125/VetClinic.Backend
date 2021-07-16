@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using VetClinic.Core.Entities;
-using VetClinic.Core.Interfaces.Services.Base;
 
 namespace VetClinic.Core.Interfaces.Services
 {

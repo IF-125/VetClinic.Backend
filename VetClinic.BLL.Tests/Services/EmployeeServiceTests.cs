@@ -144,10 +144,18 @@ namespace VetClinic.BLL.Tests.Services
 
             var id = "DummyIdentificator";
 
+            var employees = EmployeeFakeData.GetEmployeeFakeData().AsQueryable();
+
             _employeeRepository.Setup(x => x.Update(It.IsAny<Employee>()));
 
+            _employeeRepository.Setup(x => x.GetFirstOrDefaultAsync(
+                x => x.Id == id, null, false).Result)
+                .Returns((Expression<Func<Employee, bool>> filter,
+                Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>> include,
+                bool asNoTracking) => employees.FirstOrDefault(filter));
+
             //Act, Assert
-            Assert.Throws<BadRequestException>(() => _employeeService.Update(id, newEmployee));
+            Assert.Throws<NotFoundException>(() => _employeeService.Update(id, newEmployee));
         }
 
         [Fact]

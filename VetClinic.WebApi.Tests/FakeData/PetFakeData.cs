@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using VetClinic.Core.Entities;
 
-namespace VetClinic.BLL.Tests.FakeData
+namespace VetClinic.WebApi.Tests.FakeData
 {
     public static class PetFakeData
     {

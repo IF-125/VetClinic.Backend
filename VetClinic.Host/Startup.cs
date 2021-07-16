@@ -14,16 +14,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using VetClinic.BLL.Services;
+using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Repositories;
 using VetClinic.Core.Interfaces.Repositories.Base;
 using VetClinic.Core.Interfaces.Services;
 using VetClinic.DAL.Context;
 using VetClinic.DAL.Repositories;
 using VetClinic.DAL.Repositories.Base;
-using VetClinic.WebApi.Validators;
 using VetClinic.WebApi.ExceptionHandling;
+using VetClinic.WebApi.Validators;
 using VetClinic.WebApi.Validators.EntityValidators;
-using VetClinic.Core.Entities;
 
 namespace VetClinic.Host
 {

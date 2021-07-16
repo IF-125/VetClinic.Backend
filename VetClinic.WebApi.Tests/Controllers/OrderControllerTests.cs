@@ -6,12 +6,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 using VetClinic.BLL.Services;
 using VetClinic.BLL.Tests.FakeData;
 using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Repositories;
-using VetClinic.Core.Interfaces.Services;
 using VetClinic.WebApi.Controllers;
 using VetClinic.WebApi.Mappers;
 using VetClinic.WebApi.Validators.EntityValidators;
@@ -113,7 +111,7 @@ namespace VetClinic.WebApi.Tests.Controllers
             //act
             var result = orderController.InsertOrder(order).Result;
             //assert
-            Assert.IsType<CreatedAtActionResult>(result);
+            Assert.IsType<OkObjectResult>(result);
         }
 
         [Fact]

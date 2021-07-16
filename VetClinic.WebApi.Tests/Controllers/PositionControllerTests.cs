@@ -138,7 +138,7 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             var result = positionsController.InsertPosition(positionVM).Result;
 
-            Assert.IsType<CreatedAtActionResult>(result);
+            Assert.IsType<OkObjectResult>(result);
         }
 
         [Fact]

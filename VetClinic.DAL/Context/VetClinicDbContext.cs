@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using VetClinic.Core.Entities;
-using VetClinic.DAL.Configurations;
 
 namespace VetClinic.DAL.Context
 {

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using VetClinic.Core.Entities;
+﻿using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Repositories;
 using VetClinic.DAL.Context;
 using VetClinic.DAL.Repositories.Base;

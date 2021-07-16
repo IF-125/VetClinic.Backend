@@ -117,7 +117,7 @@ namespace VetClinic.WebApi.Tests.Controllers
             //act
             var result = OrderProcedureController.InsertOrderProcedure(OrderProcedure).Result;
             //assert
-            Assert.IsType<CreatedAtActionResult>(result);
+            Assert.IsType<OkObjectResult>(result);
         }
 
         [Fact]
