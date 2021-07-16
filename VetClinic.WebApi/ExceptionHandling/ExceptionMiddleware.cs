@@ -34,7 +34,7 @@ namespace VetClinic.WebApi.ExceptionHandling
             {
                 case ArgumentException _:
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                    message = "One of the arguments is invalid. TargetSite - " + exception.TargetSite;
+                    message = "One of the arguments is invalid. Message - " + exception.Message;
                     break;
                 case SecurityTokenException _:
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
