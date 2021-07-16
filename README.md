@@ -6,12 +6,13 @@
 ## About
 This web application aims to provide a simple and intuitive way for customers to interact with veterinary clinic services online.
 # Table of Contents
-1. [Requirements](#requirements)
+1. [Technologies](#technologies)
 2. [Cloning](#cloning)
 3. [Frontend repository](#frontend-repository)
-## Requirements
-- ASP.NET Core 3.1.16
-- .NET Core 3.1.16
+## Technologies
+- Backend: ASP.NET Core 3.1.16, FluentValidation, Identity Server.
+- QA: SonarCloud.
+- Testing: XUnit.
 ## Cloning
 You can clone this repository using $ git clone https://github.com/IF-125/VetClinic.Backend.git
 ## Frontend repository
