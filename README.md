@@ -11,6 +11,7 @@ This web application aims to provide a simple and intuitive way for customers to
 3. [Frontend repository](#frontend-repository)
 ## Technologies
 - Backend: ASP.NET Core 3.1.16, FluentValidation, Identity Server.
+- Database: MS SQL Server
 - QA: SonarCloud.
 - Testing: XUnit.
 ## Cloning
