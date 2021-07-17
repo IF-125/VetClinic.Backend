@@ -255,7 +255,7 @@ namespace VetClinic.BLL.Tests.Services
         public async Task CanAssignSalaryToEmployee()
         {
             //Arrange
-            var employeeId = "70efa05d-a06d-45b2-b116-af1ccb602d2e";
+            var employeeId = "f1a05cca-b479-4f72-bbda-96b8979f4afe";
             var salary = new Salary
             {
                 Id = 4,
@@ -265,16 +265,20 @@ namespace VetClinic.BLL.Tests.Services
                 EmployeePositionId = 2
             };
 
+            var employees = EmployeeFakeData.GetEmployeeFakeData().AsQueryable();
+
             _mockEmployeeRepository.Setup(x => x
             .GetFirstOrDefaultAsync(
                 x => x.Id == employeeId,
                 It.IsAny<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>(),
                 false).Result)
-                .Returns(new Employee { Id = employeeId });
+                .Returns((Expression<Func<Employee, bool>> filter,
+                Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>> include,
+                bool asNoTracking) => employees.FirstOrDefault(filter));
 
-            _mockSalaryRepository.Setup(x => x.InsertAsync(It.IsAny<Salary>())).Verifiable();
+            _mockSalaryRepository.Setup(x => x.InsertAsync(It.IsAny<Salary>()));
 
-            _mockEmployeeRepository.Setup(x => x.Update(It.IsAny<Employee>())).Verifiable();
+            _mockEmployeeRepository.Setup(x => x.Update(It.IsAny<Employee>()));
 
             //Act
             await _salaryService.AssignSalaryToEmployee(employeeId, salary);

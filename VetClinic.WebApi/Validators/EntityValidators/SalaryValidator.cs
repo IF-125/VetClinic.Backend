@@ -8,8 +8,8 @@ namespace VetClinic.WebApi.Validators.EntityValidators
         public SalaryValidator()
         {
             RuleFor(x => x.Date).NotEmpty();
-            RuleFor(x => x.Bonus).NotEmpty();
-            RuleFor(x => x.Amount).NotEmpty();
+            RuleFor(x => x.Bonus).NotEmpty().GreaterThan(0);
+            RuleFor(x => x.Amount).NotEmpty().GreaterThan(0);
         }
     }
 }

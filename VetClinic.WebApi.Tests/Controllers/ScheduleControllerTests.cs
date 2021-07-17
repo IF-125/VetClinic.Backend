@@ -252,7 +252,6 @@ namespace VetClinic.WebApi.Tests.Controllers
             Assert.IsType<BadRequestObjectResult>(result);
         }
 
-
         [Fact]
         public void CanDeleteSchedule()
         {
@@ -276,7 +275,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         }
 
         [Fact]
-        public void DeletePosition_WhenScheduleDoesNotExist()
+        public void DeleteSchedule_WhenScheduleDoesNotExist()
         {
             //Arrange
             var id = 400;
@@ -321,7 +320,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         }
 
         [Fact]
-        public void DeleteRange_WhenSomePositionWasNotFound()
+        public void DeleteRange_WhenSomeScheduleWasNotFound()
         {
             //Arrange
             var idArr = new List<int> { 1, -4, 3 };

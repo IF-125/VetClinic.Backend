@@ -35,7 +35,7 @@ namespace VetClinic.WebApi.Controllers
             try
             {
                 var salaries = await _salaryService.GetSalariesOfEmployee(employeePositionId);
-                var model = _mapper.Map<IEnumerable<SalariesController>>(salaries);
+                var model = _mapper.Map<IEnumerable<SalaryViewModel>>(salaries);
                 return Ok(model);
             }
             catch (BadRequestException ex)
@@ -124,7 +124,7 @@ namespace VetClinic.WebApi.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteSalaryAsync(int id)
+        public async Task<IActionResult> DeleteSalary(int id)
         {
             try
             {
@@ -138,7 +138,7 @@ namespace VetClinic.WebApi.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteListOfSalariesAsync([FromQuery(Name = "listOfIds")] IList<int> listOfIds)
+        public async Task<IActionResult> DeleteListOfSalaries([FromQuery(Name = "listOfIds")] IList<int> listOfIds)
         {
             try
             {
