@@ -29,6 +29,7 @@ namespace VetClinic.BLL.Tests.Services
         public async Task CanReturnAllAnimalTypes()
         {
             // Arrange
+            var numberOfAnimalTypes = 10;
             _animalTypeRepository.Setup(x => x.GetAsync(null, null, null, true).Result)
                 .Returns(AnimalTypeFakeData.GetAnimalTypeFakeData());
             // Act
@@ -36,7 +37,7 @@ namespace VetClinic.BLL.Tests.Services
 
             // Assert
             Assert.NotNull(tempAnimalTypes);
-            Assert.Equal(10, tempAnimalTypes.Count);
+            Assert.Equal(numberOfAnimalTypes, tempAnimalTypes.Count);
         }
 
         [Fact]
@@ -44,6 +45,7 @@ namespace VetClinic.BLL.Tests.Services
         {
             // Arrange
             var id = 10;
+            var type = "Dog10";
             var animalTypes = AnimalTypeFakeData.GetAnimalTypeFakeData().AsQueryable();
             _animalTypeRepository.Setup(x => x.GetFirstOrDefaultAsync(x => x.Id == id, null, false).Result)
                 .Returns(animalTypes.FirstOrDefault(x => x.Id == id));
@@ -52,7 +54,7 @@ namespace VetClinic.BLL.Tests.Services
             var animalType = await _animalTypeServise.GetByIdAsync(id);
 
             // Assert
-            Assert.Equal("Dog10", animalType.Type);
+            Assert.Equal(type, animalType.Type);
         }
 
         [Fact]

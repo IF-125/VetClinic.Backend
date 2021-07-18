@@ -28,6 +28,7 @@ namespace VetClinic.BLL.Tests.Services
         public async Task CanReturnAllPets()
         {
             // Arrange
+            var numberOfPets = 10;
             _petRepository.Setup(x => x.GetAsync(null, null, null, true).Result)
                 .Returns(PetFakeData.GetPetFakeData());
             // Act
@@ -35,7 +36,7 @@ namespace VetClinic.BLL.Tests.Services
 
             // Assert
             Assert.NotNull(tempPets);
-            Assert.Equal(10,tempPets.Count);
+            Assert.Equal(numberOfPets, tempPets.Count);
         }
 
         [Fact]
@@ -43,6 +44,7 @@ namespace VetClinic.BLL.Tests.Services
         {
             // Arrange
             var id = 10;
+            var name = "Lord10";
             var pets = PetFakeData.GetPetFakeData().AsQueryable();
             _petRepository.Setup(x => x.GetFirstOrDefaultAsync(x => x.Id == id, null, false).Result)
                 .Returns(pets.FirstOrDefault(x => x.Id == id));
@@ -51,7 +53,7 @@ namespace VetClinic.BLL.Tests.Services
             var pet = await _petServise.GetByIdAsync(id);
 
             // Assert
-            Assert.Equal("Lord10", pet.Name);
+            Assert.Equal(name, pet.Name);
         }
 
         [Fact]
