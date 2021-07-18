@@ -4,6 +4,7 @@ namespace VetClinic.WebApi.ViewModels
 {
     public class EmployeePositionViewModel
     {
+        public int Id { get; set; }
         public decimal CurrentBaseSalary { get; set; }
         public int Rate { get; set; }
         public DateTime? HierdDate { get; set; }

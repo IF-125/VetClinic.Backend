@@ -65,7 +65,7 @@ namespace VetClinic.WebApi.Controllers
             if (validationResult.IsValid)
             {
                 await _employeeService.InsertAsync(newEmployee);
-                return Ok(newEmployee);
+                return Ok(_mapper.Map<EmployeeViewModel>(newEmployee));
             }
             return BadRequest(validationResult.Errors);
         }

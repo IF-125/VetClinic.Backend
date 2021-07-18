@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Query;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using Moq;
 using SendGrid.Helpers.Errors.Model;
 using System;
@@ -120,6 +121,12 @@ namespace VetClinic.BLL.Tests.Services
 
             var id = "f1a05cca-b479-4f72-bbda-96b8979f4123";
 
+            var employees = EmployeeFakeData.GetEmployeeFakeData().AsQueryable();
+
+            _employeeRepository.Setup(x => x
+            .IsAny(It.IsAny<Expression<Func<Employee, bool>>>()))
+                .Returns(!employees.Any(x => x.Id == id));
+
             _employeeRepository.Setup(x => x.Update(It.IsAny<Employee>()));
 
             //Act
@@ -148,11 +155,9 @@ namespace VetClinic.BLL.Tests.Services
 
             _employeeRepository.Setup(x => x.Update(It.IsAny<Employee>()));
 
-            _employeeRepository.Setup(x => x.GetFirstOrDefaultAsync(
-                x => x.Id == id, null, false).Result)
-                .Returns((Expression<Func<Employee, bool>> filter,
-                Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>> include,
-                bool asNoTracking) => employees.FirstOrDefault(filter));
+            _employeeRepository.Setup(x => x
+            .IsAny(x => x.Id == id))
+                .Returns((Expression<Func<Employee, bool>> filter) => employees.Any(filter));
 
             //Act, Assert
             Assert.Throws<NotFoundException>(() => _employeeService.Update(id, newEmployee));

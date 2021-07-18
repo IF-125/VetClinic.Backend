@@ -38,8 +38,10 @@ namespace VetClinic.BLL.Services
 
         public void Update(string id, Employee employeeToUpdate)
         {
-            var employee = _employeeRepository.GetFirstOrDefaultAsync(x => x.Id == id) ??
+            if (!_employeeRepository.IsAny(x => x.Id == id))
+            {
                 throw new NotFoundException($"{nameof(Employee)} {EntityWasNotFound}");
+            }
        
             _employeeRepository.Update(employeeToUpdate);
             _employeeRepository.SaveChanges();

@@ -8,10 +8,21 @@ namespace VetClinic.WebApi.Validators.EntityValidators
     {
         public EmployeePositionValidator()
         {
-            RuleFor(x => x.CurrentBaseSalary).NotEmpty();
-            RuleFor(x => x.Rate).NotEmpty();
-            RuleFor(x => x.EmployeeId).NotEmpty().WithMessage($"Employee {IdIsRequired}");
-            RuleFor(x => x.PositionId).NotEmpty().WithMessage($"Position {IdIsRequired}");
+            RuleFor(x => x.CurrentBaseSalary)
+                .NotEmpty()
+                .GreaterThan(0);
+
+            RuleFor(x => x.Rate)
+                .NotEmpty()
+                .GreaterThan(0);
+
+            RuleFor(x => x.EmployeeId)
+                .NotEmpty()
+                .WithMessage($"Employee {IdIsRequired}");
+
+            RuleFor(x => x.PositionId)
+                .NotEmpty()
+                .WithMessage($"Position {IdIsRequired}");
         }
     }
 }

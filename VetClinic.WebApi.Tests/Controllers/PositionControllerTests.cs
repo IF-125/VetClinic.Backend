@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using VetClinic.BLL.Services;
+using VetClinic.BLL.Tests.FakeData;
 using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Repositories;
 using VetClinic.Core.Interfaces.Services;
@@ -45,65 +46,61 @@ namespace VetClinic.WebApi.Tests.Controllers
             }
         }
 
-        private List<Position> GetTestPositions()
-        {
-            return new List<Position>
-            {
-                new Position
-                {
-                    Id = 1,
-                    Title = "Doctor",
-                },
-                new Position
-                {
-                    Id = 2,
-                    Title = "Anesthetist",
-                },
-                new Position
-                {
-                    Id = 3,
-                    Title = "Accountant",
-                },
-                new Position
-                {
-                    Id = 4,
-                    Title = "Admin",
-                }
-            };
-        }
-
         [Fact]
         public void CanGetAllPositions()
         {
-            var positionsController = new PositionsController(_positionService, _mapper, _positionValidator);
+            //Arrange
+            var positionsController = new PositionsController(
+                _positionService,
+                _mapper,
+                _positionValidator);
 
-            var positions = GetTestPositions();
+            var positions = PositionFakeData.GetPositionFakeData();
 
-            _mockPositionRepository.Setup(x => x.GetAsync(null, null, null, true).Result).Returns(() => positions);
+            var expectedResult = positions.Count;
 
+            _mockPositionRepository.Setup(x => x
+            .GetAsync(null, null, null, true).Result).Returns(() => positions);
+
+            //Act
             var result = positionsController.GetAllPositions().Result;
 
+            //Assert
             var viewResult = Assert.IsType<OkObjectResult>(result);
             var model = Assert.IsAssignableFrom<IEnumerable<PositionViewModel>>(viewResult.Value);
-            Assert.Equal(GetTestPositions().Count, model.Count());
+
+            Assert.Equal(expectedResult, model.Count());
         }
 
         [Fact]
         public void CanGetPositionById()
         {
-            var positionsController = new PositionsController(_positionService, _mapper, _positionValidator);
+            //Arrange
+            var positionsController = new PositionsController(
+                _positionService,
+                _mapper,
+                _positionValidator);
 
-            var positions = GetTestPositions().AsQueryable();
+            var positions = PositionFakeData
+                .GetPositionFakeData()
+                .AsQueryable();
 
             var id = 2;
 
-            _mockPositionRepository.Setup(x => x.GetFirstOrDefaultAsync(x => x.Id == id, null, false).Result)
-                .Returns((Expression<Func<Position, bool>> filter,
+            _mockPositionRepository.Setup(x => x
+            .GetFirstOrDefaultAsync(
+                x => x.Id == id,
+                null,
+                false).Result)
+                .Returns(
+                (Expression<Func<Position, bool>> filter,
                 Func<IQueryable<Position>, IIncludableQueryable<Position, object>> include,
                 bool asNoTracking) => positions.FirstOrDefault(filter));
 
+            //Act
             var result = positionsController.GetPosition(id).Result;
 
+            //Assert
             var viewResult = Assert.IsType<OkObjectResult>(result);
             var model = Assert.IsType<PositionViewModel>(viewResult.Value);
 
@@ -114,19 +111,29 @@ namespace VetClinic.WebApi.Tests.Controllers
         [Fact]
         public void GetPositionById_ReturnsNotFound()
         {
-            var positionsController = new PositionsController(_positionService, _mapper, _positionValidator);
+            //Arrange
+            var positionsController = new PositionsController(
+                _positionService,
+                _mapper,
+                _positionValidator);
 
             var id = 500;
 
+            //Act
             var result = positionsController.GetPosition(id).Result;
 
+            //Assert
             Assert.IsType<NotFoundObjectResult>(result);
         }
 
         [Fact]
         public void CanInsertPositionAsync()
         {
-            var positionsController = new PositionsController(_positionService, _mapper, _positionValidator);
+            //Arrange
+            var positionsController = new PositionsController(
+                _positionService,
+                _mapper,
+                _positionValidator);
 
             var positionVM = new PositionViewModel
             {
@@ -136,15 +143,21 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             _mockPositionRepository.Setup(x => x.InsertAsync(It.IsAny<Position>()));
 
+            //Act
             var result = positionsController.InsertPosition(positionVM).Result;
 
+            //Assert
             Assert.IsType<OkObjectResult>(result);
         }
 
         [Fact]
         public void InsertPositionAsync_ShouldReturnValidationError()
         {
-            var positionsController = new PositionsController(_positionService, _mapper, _positionValidator);
+            //Arrange
+            var positionsController = new PositionsController(
+                _positionService,
+                _mapper,
+                _positionValidator);
 
             var positionVM = new PositionViewModel
             {
@@ -154,15 +167,21 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             _mockPositionRepository.Setup(x => x.InsertAsync(It.IsAny<Position>()));
 
+            //Act
             var result = positionsController.InsertPosition(positionVM).Result;
 
+            //Assert
             Assert.IsType<BadRequestObjectResult>(result);
         }
 
         [Fact]
         public void CanUpdatePosition()
         {
-            var positionsController = new PositionsController(_positionService, _mapper, _positionValidator);
+            //Arrange
+            var positionsController = new PositionsController(
+                _positionService,
+                _mapper,
+                _positionValidator);
 
             var positionVM = new PositionViewModel
             {
@@ -174,15 +193,21 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             _mockPositionRepository.Setup(x => x.Update(It.IsAny<Position>()));
 
+            //Act
             var result = positionsController.UpdatePosition(id, positionVM);
 
+            //Assert
             Assert.IsType<OkResult>(result);
         }
 
         [Fact]
         public void UpdatePosition_ReturnsBadRequest_DueToValidationError()
         {
-            var positionsController = new PositionsController(_positionService, _mapper, _positionValidator);
+            //Arrange
+            var positionsController = new PositionsController(
+                _positionService,
+                _mapper,
+                _positionValidator);
 
             var positionVM = new PositionViewModel
             {
@@ -194,8 +219,10 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             _mockPositionRepository.Setup(x => x.Update(It.IsAny<Position>()));
 
+            //Act
             var result = positionsController.UpdatePosition(id, positionVM);
 
+            //Assert
             var badRequest = result as BadRequestObjectResult;
 
             Assert.IsType<BadRequestObjectResult>(result);
@@ -205,7 +232,11 @@ namespace VetClinic.WebApi.Tests.Controllers
         [Fact]
         public void UpdatePosition_ReturnsBadRequest_DueToIdsMismatch()
         {
-            var positionsController = new PositionsController(_positionService, _mapper, _positionValidator);
+            //Arrange
+            var positionsController = new PositionsController(
+                _positionService,
+                _mapper,
+                _positionValidator);
 
             var positionVM = new PositionViewModel
             {
@@ -217,8 +248,10 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             _mockPositionRepository.Setup(x => x.Update(It.IsAny<Position>()));
 
+            //Act
             var result = positionsController.UpdatePosition(id, positionVM);
 
+            //Assert
             var badRequest = result as BadRequestObjectResult;
 
             Assert.IsType<BadRequestObjectResult>(result);
@@ -228,77 +261,119 @@ namespace VetClinic.WebApi.Tests.Controllers
         [Fact]
         public void CanDeletePosition()
         {
+            //Arrange
+            var positionsController = new PositionsController(
+                _positionService,
+                _mapper,
+                _positionValidator);
+
             var id = 2;
 
-            _mockPositionRepository.Setup(x => x.GetFirstOrDefaultAsync(
-                x => x.Id == id, null, false).Result)
+            _mockPositionRepository.Setup(x => x
+            .GetFirstOrDefaultAsync(
+                x => x.Id == id,
+                null,
+                false).Result)
                 .Returns(new Position() { Id = id });
 
             _mockPositionRepository.Setup(x => x.Delete(It.IsAny<Position>()));
 
-            var positionsController = new PositionsController(_positionService, _mapper, _positionValidator);
-
+            //Act
             var result = positionsController.DeletePositionAsync(id).Result;
 
+            //Assert
             Assert.IsType<OkObjectResult>(result);
-
         }
 
         [Fact]
         public void DeletePosition_WhenPositionDoesNotExist()
         {
+            //Arrange
+            var positionsController = new PositionsController(
+                _positionService,
+                _mapper,
+                _positionValidator);
+
             var id = 400;
 
-            var positionsController = new PositionsController(_positionService, _mapper, _positionValidator);
-
+            //Act
             var result = positionsController.DeletePositionAsync(id).Result;
 
+            //Assert
             Assert.IsType<NotFoundObjectResult>(result);
         }
 
         [Fact]
         public void CanDeleteRange()
         {
+            //Arrange
+            var positionsController = new PositionsController(
+                _positionService,
+                _mapper,
+                _positionValidator);
+
             var idArr = new List<int> { 1, 2, 3 };
 
-            var positions = GetTestPositions().AsQueryable();
+            var positions = PositionFakeData
+                .GetPositionFakeData()
+                .AsQueryable();
 
             _mockPositionRepository
-                .Setup(x => x.GetAsync(It.IsAny<Expression<Func<Position, bool>>>(), null, null, false).Result)
-                .Returns((Expression<Func<Position, bool>> filter,
+                .Setup(x => x
+                .GetAsync(
+                    It.IsAny<Expression<Func<Position, bool>>>(),
+                    null,
+                    null,
+                    false).Result)
+                .Returns(
+                (Expression<Func<Position, bool>> filter,
                 Func<IQueryable<Position>, IOrderedQueryable<Position>> orderBy,
                 Func<IQueryable<Position>, IIncludableQueryable<Position, object>> include,
                 bool asNoTracking) => positions.Where(filter).ToList());
 
             _mockPositionRepository.Setup(x => x.DeleteRange(It.IsAny<IEnumerable<Position>>()));
 
-            var positionsController = new PositionsController(_positionService, _mapper, _positionValidator);
-
+            //Act
             var result = positionsController.DeletePositionsAsync(idArr).Result;
 
+            //Assert
             Assert.IsType<OkResult>(result);
         }
 
         [Fact]
         public void DeleteRange_WhenSomePositionWasNotFound()
         {
+            //Arrange
+            var positionsController = new PositionsController(
+                _positionService,
+                _mapper,
+                _positionValidator);
+
             var idArr = new List<int> { 1, 500, 3 };
 
-            var positions = GetTestPositions().AsQueryable();
+            var positions = PositionFakeData
+                .GetPositionFakeData()
+                .AsQueryable();
 
             _mockPositionRepository
-                .Setup(x => x.GetAsync(It.IsAny<Expression<Func<Position, bool>>>(), null, null, false).Result)
-                .Returns((Expression<Func<Position, bool>> filter,
+                .Setup(x => x
+                .GetAsync(
+                    It.IsAny<Expression<Func<Position, bool>>>(),
+                    null,
+                    null,
+                    false).Result)
+                .Returns(
+                (Expression<Func<Position, bool>> filter,
                 Func<IQueryable<Position>, IOrderedQueryable<Position>> orderBy,
                 Func<IQueryable<Position>, IIncludableQueryable<Position, object>> include,
                 bool asNoTracking) => positions.Where(filter).ToList());
 
             _mockPositionRepository.Setup(x => x.DeleteRange(It.IsAny<IEnumerable<Position>>()));
 
-            var positionsController = new PositionsController(_positionService, _mapper, _positionValidator);
-
+            //Act
             var result = positionsController.DeletePositionsAsync(idArr).Result;
 
+            //Assert
             var badRequest = result as BadRequestObjectResult;
 
             Assert.IsType<BadRequestObjectResult>(result);

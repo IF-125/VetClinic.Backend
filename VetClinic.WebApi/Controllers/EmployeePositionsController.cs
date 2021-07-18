@@ -69,9 +69,9 @@ namespace VetClinic.WebApi.Controllers
                     await _employeePositionService.AssignPositionToEmployeeAsync(employeePosition);
                     return Ok();
                 }
-                catch (BadRequestException ex)
+                catch (NotFoundException ex)
                 {
-                    return BadRequest(ex.Message);
+                    return NotFound(ex.Message);
                 }
             }
             return BadRequest(validationResult.Errors);
