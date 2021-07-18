@@ -56,6 +56,7 @@ namespace VetClinic.Host
             //Services
             services.AddScoped<IClientService, ClientService>();
             services.AddScoped<IEmployeeService, EmployeeService>();
+            services.AddScoped<IPetService, PetServise>();
             services.AddScoped<IPositionService, PositionService>();
             services.AddScoped<IScheduleService, ScheduleService>();
             services.AddScoped<ISalaryService, SalaryService>();

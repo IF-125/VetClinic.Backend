@@ -251,7 +251,7 @@ namespace VetClinic.WebApi.Tests.Controllers
             _mockPetRepository.Setup(x => x.Update(It.IsAny<Pet>()));
 
             // Act
-            var result = _petController.Update(id, newPetVM);
+            var result = _petController.UpdatePet(id, newPetVM);
 
             // Assert
             Assert.IsType<OkResult>(result);
@@ -275,7 +275,7 @@ namespace VetClinic.WebApi.Tests.Controllers
             _mockPetRepository.Setup(x => x.Update(It.IsAny<Pet>()));
 
             // Act
-            var result = _petController.Update(id, newPetVM);
+            var result = _petController.UpdatePet(id, newPetVM);
 
             // Assert
             Assert.IsType<BadRequestObjectResult>(result);
@@ -299,7 +299,8 @@ namespace VetClinic.WebApi.Tests.Controllers
             _mockPetRepository.Setup(x => x.Update(It.IsAny<Pet>()));
 
             // Act
-            var result = _petController.Update(id, newPetVM);
+            var result = _petController.UpdatePet(id, newPetVM);
+
 
             // Assert
             Assert.IsType<BadRequestObjectResult>(result);

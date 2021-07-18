@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Query;
 using Moq;
+using SendGrid.Helpers.Errors.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -133,7 +134,7 @@ namespace VetClinic.BLL.Tests.Services
             _petRepository.Setup(x => x.Update(It.IsAny<Pet>()));
 
             // Act, Assert
-            Assert.Throws<ArgumentException>(() => _petServise.Update(id, _newPet));
+            Assert.Throws<NotFoundException>(() => _petServise.Update(id, _newPet));
 
         }
 

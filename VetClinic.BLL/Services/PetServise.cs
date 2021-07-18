@@ -45,7 +45,7 @@ namespace VetClinic.BLL.Services
         public  void Update(int id, Pet petToUpdate)
         {
             if (id != petToUpdate.Id)
-                throw new ArgumentException($"{nameof(petToUpdate)} {EntityWasNotFound}");
+                throw new NotFoundException($"{nameof(petToUpdate)} {EntityWasNotFound}");
             _petRepository.Update(petToUpdate);
             _petRepository.SaveChanges();
         }
@@ -55,7 +55,7 @@ namespace VetClinic.BLL.Services
             var petToDelete = await _petRepository.GetFirstOrDefaultAsync(x => x.Id == id);
 
             if (petToDelete==null)
-                throw  new ArgumentException($"{nameof(petToDelete)} {EntityWasNotFound}");
+                throw  new NotFoundException($"{nameof(petToDelete)} {EntityWasNotFound}");
             _petRepository.Delete(petToDelete);
             await _petRepository.SaveChangesAsync();
         }
@@ -66,7 +66,7 @@ namespace VetClinic.BLL.Services
       
             if (petsToDelete.Count() != listOfIds.Count)
             {
-                throw new ArgumentException($"{SomeEntitiesInCollectionNotFound} {nameof(Pet)}s to delete");
+                throw new BadRequestException($"{SomeEntitiesInCollectionNotFound} {nameof(Pet)}s to delete");
             }
 
             _petRepository.DeleteRange(petsToDelete);
