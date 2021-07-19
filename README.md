@@ -17,4 +17,4 @@ This web application aims to provide a simple and intuitive way for customers to
 ## Cloning
 You can clone this repository using $ git clone https://github.com/IF-125/VetClinic.Backend.git
 ## Frontend repository
-Frontend part of this project can be found here - 
+Frontend part of this project can be found here - https://github.com/IF-125/VetClinic.Frontend
