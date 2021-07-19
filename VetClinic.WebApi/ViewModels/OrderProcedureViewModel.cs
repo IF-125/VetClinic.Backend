@@ -6,7 +6,7 @@ namespace VetClinic.WebApi.ViewModels
     {
         public int Id { get; set; }
         public int Count { get; set; }
-        public TimeSpan Time { get; set; }
+        public string Time { get; set; }
         public string Conclusion { get; set; }
         public string Details { get; set; }
         public int OrderId { get; set; }

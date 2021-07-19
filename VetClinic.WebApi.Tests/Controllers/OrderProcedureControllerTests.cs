@@ -102,7 +102,7 @@ namespace VetClinic.WebApi.Tests.Controllers
             {
                 Id = 11,
                 Count = 1,
-                Time = new TimeSpan(hours: 1, minutes: 27, seconds: 0),
+                Time = new TimeSpan(hours: 1, minutes: 27, seconds: 0).ToString(),
                 Conclusion = "Procedure was conducted successfully.",
                 Details = "The patient appearts to be stable.",
                 OrderId = 11,
@@ -128,7 +128,7 @@ namespace VetClinic.WebApi.Tests.Controllers
             {
                 Id = 11,
                 Count = 1,
-                Time = new TimeSpan(hours: 1, minutes: 27, seconds: 0),
+                Time = new TimeSpan(hours: 1, minutes: 27, seconds: 0).ToString(),
                 Conclusion = "Procedure was conducted successfully.",
                 Details = "The patient appearts to be stable.",
                 OrderId = 11,
