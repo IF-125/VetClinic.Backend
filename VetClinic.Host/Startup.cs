@@ -52,6 +52,7 @@ namespace VetClinic.Host
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<IProcedureRepository, ProcedureRepository>();
             services.AddScoped<IOrderProcedureRepository, OrderProcedureRepository>();
+            services.AddScoped<IAnimalTypeRepository, AnimalTypeRepository>();
 
             //Services
             services.AddScoped<IClientService, ClientService>();
@@ -65,6 +66,7 @@ namespace VetClinic.Host
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IProcedureService, ProcedureService>();
             services.AddScoped<IOrderProcedureService, OrderProcedureService>();
+            services.AddScoped<IAnimalTypeService, AnimalTypeService>();
 
             //Validators
             services.AddScoped<AppointmentValidator>();
