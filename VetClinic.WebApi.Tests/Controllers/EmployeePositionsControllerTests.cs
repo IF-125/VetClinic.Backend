@@ -387,8 +387,8 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             var employeePositionVM = new EmployeePositionViewModel
             {
-                CurrentBaseSalary = -124,
-                Rate = -12,
+                CurrentBaseSalary = 124,
+                Rate = 12,
                 HierdDate = DateTime.Now,
                 DismissedDate = null,
                 EmployeeId = "f1a05cca-b479-4f72-bbda-96b8979f4afe",

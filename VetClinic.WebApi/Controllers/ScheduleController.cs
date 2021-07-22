@@ -19,14 +19,17 @@ namespace VetClinic.WebApi.Controllers
         private readonly IScheduleService _scheduleService;
         private readonly IMapper _mapper;
         private readonly ScheduleValidator _scheduleValidator;
+        private readonly ScheduleCollectionValidator _scheduleCollectionValidator;
 
         public ScheduleController(IScheduleService scheduleService,
             IMapper mapper,
-            ScheduleValidator scheduleValidator)
+            ScheduleValidator scheduleValidator,
+            ScheduleCollectionValidator scheduleCollectionValidator)
         {
             _scheduleService = scheduleService;
             _mapper = mapper;
             _scheduleValidator = scheduleValidator;
+            _scheduleCollectionValidator = scheduleCollectionValidator;
         }
 
         [HttpGet]
@@ -61,7 +64,7 @@ namespace VetClinic.WebApi.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpPost("InsertSchedule")]
         public async Task<IActionResult> InsertSchedule(ScheduleViewModel model)
         {
             var newSchedule = _mapper.Map<Schedule>(model);
@@ -73,6 +76,22 @@ namespace VetClinic.WebApi.Controllers
                 await _scheduleService.InsertAsync(newSchedule);
                 return Ok(newSchedule);
             }
+            return BadRequest(validationResult.Errors);
+        }
+
+        [HttpPost("InsertSchedules")]
+        public async Task<IActionResult> InsertSchedules(IEnumerable<ScheduleViewModel> schedules)
+        {
+            var schedulesToInsert = _mapper.Map<IEnumerable<Schedule>>(schedules);
+
+            var validationResult = _scheduleCollectionValidator.Validate(schedulesToInsert);
+
+            if(validationResult.IsValid)
+            {
+                await _scheduleService.InsertRangeAsync(schedulesToInsert);
+                return Ok();
+            }
+
             return BadRequest(validationResult.Errors);
         }
 
