@@ -77,6 +77,7 @@ namespace VetClinic.Host
             services.AddScoped<SalaryValidator>();
             services.AddScoped<ScheduleValidator>();
             services.AddScoped<UserValidator>();
+            services.AddScoped<ScheduleCollectionValidator>();
             #endregion
 
             services.AddDbContext<VetClinicDbContext>(options =>

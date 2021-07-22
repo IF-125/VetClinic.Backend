@@ -26,12 +26,14 @@ namespace VetClinic.WebApi.Tests.Controllers
         private readonly Mock<IScheduleRepository> _mockScheduleRepository;
         private readonly IScheduleService _scheduleService;
         private readonly ScheduleValidator _scheduleValidator;
+        private readonly ScheduleCollectionValidator _scheduleCollectionValidator;
 
         public ScheduleControllerTests()
         {
             _mockScheduleRepository = new Mock<IScheduleRepository>();
             _scheduleService = new ScheduleService(_mockScheduleRepository.Object);
             _scheduleValidator = new ScheduleValidator();
+            _scheduleCollectionValidator = new ScheduleCollectionValidator();
 
             if (_mapper == null)
             {
@@ -49,7 +51,11 @@ namespace VetClinic.WebApi.Tests.Controllers
         public void CanGetScheduleOfEmployee()
         {
             //Arrange
-            var scheduleController = new ScheduleController(_scheduleService, _mapper, _scheduleValidator);
+            var scheduleController = new ScheduleController(
+                _scheduleService,
+                _mapper,
+                _scheduleValidator,
+                _scheduleCollectionValidator);
 
             var employeeId = "f1a05cca-b479-4f72-bbda-96b8979f4afe";
 
@@ -80,7 +86,11 @@ namespace VetClinic.WebApi.Tests.Controllers
         public void GetScheduleOfEmployee_WhenEmployeeHasNone()
         {
             //Arrange
-            var scheduleController = new ScheduleController(_scheduleService, _mapper, _scheduleValidator);
+            var scheduleController = new ScheduleController(
+                _scheduleService,
+                _mapper, 
+                _scheduleValidator,
+                _scheduleCollectionValidator);
 
             //this employee has no schedule
             var employeeId = "6fca381a-40d0-4bf9-a076-706e1a995662";
@@ -114,7 +124,11 @@ namespace VetClinic.WebApi.Tests.Controllers
         public void CanGetScheduleById()
         {
             //Arrange
-            var scheduleController = new ScheduleController(_scheduleService, _mapper, _scheduleValidator);
+            var scheduleController = new ScheduleController(
+                _scheduleService,
+                _mapper,
+                _scheduleValidator,
+                _scheduleCollectionValidator);
 
             var schedules = ScheduleFakeData.GetScheduleFakeData().AsQueryable();
 
@@ -140,7 +154,11 @@ namespace VetClinic.WebApi.Tests.Controllers
         public async Task GetScheduleById_ReturnsNotFound()
         {
             //Arrange
-            var scheduleController = new ScheduleController(_scheduleService, _mapper, _scheduleValidator);
+            var scheduleController = new ScheduleController(
+                _scheduleService,
+                _mapper,
+                _scheduleValidator,
+                _scheduleCollectionValidator);
 
             var schedules = ScheduleFakeData.GetScheduleFakeData().AsQueryable();
 
@@ -162,7 +180,11 @@ namespace VetClinic.WebApi.Tests.Controllers
         public void CanInsertSchedule()
         {
             //Arrange
-            var scheduleController = new ScheduleController(_scheduleService, _mapper, _scheduleValidator);
+            var scheduleController = new ScheduleController(
+                _scheduleService,
+                _mapper,
+                _scheduleValidator,
+                _scheduleCollectionValidator);
 
             var scheduleVM = new ScheduleViewModel
             {
@@ -181,10 +203,96 @@ namespace VetClinic.WebApi.Tests.Controllers
         }
 
         [Fact]
+        public void CanInsertRange()
+        {
+            //Arrange
+            var scheduleController = new ScheduleController(
+                _scheduleService,
+                _mapper,
+                _scheduleValidator,
+                _scheduleCollectionValidator);
+
+            var schedulesListVM = new List<ScheduleViewModel>
+            {
+                new ScheduleViewModel
+                {
+                    Day = Days.Tuesday.ToString(),
+                    From = TimeSpan.FromHours(12),
+                    To = TimeSpan.FromHours(20)
+                },
+                new ScheduleViewModel
+                {
+                    Day = Days.Wednesday.ToString(),
+                    From = TimeSpan.FromHours(12),
+                    To = TimeSpan.FromHours(20)
+                },
+                new ScheduleViewModel
+                {
+                    Day = Days.Thursday.ToString(),
+                    From = TimeSpan.FromHours(12),
+                    To = TimeSpan.FromHours(20)
+                },
+            };
+
+            _mockScheduleRepository.Setup(x => x.InsertRangeAsync(It.IsAny<IEnumerable<Schedule>>()));
+
+            //Act
+            var result = scheduleController.InsertSchedules(schedulesListVM).Result;
+
+            //Assert
+            Assert.IsType<OkResult>(result);
+        }
+
+        [Fact]
+        public void InsertRange_ReturnsValidationErrors()
+        {
+            //Arrange
+            var scheduleController = new ScheduleController(
+                _scheduleService,
+                _mapper,
+                _scheduleValidator,
+                _scheduleCollectionValidator);
+
+            var schedulesListVM = new List<ScheduleViewModel>
+            {
+                new ScheduleViewModel
+                {
+                    Day = Days.Tuesday.ToString(),
+                    From = TimeSpan.FromHours(12),
+                    To = TimeSpan.FromHours(20)
+                },
+                new ScheduleViewModel
+                {
+                    Day = Days.Wednesday.ToString(),
+                    From = TimeSpan.FromHours(12),
+                    To = default
+                },
+                new ScheduleViewModel
+                {
+                    Day = Days.Thursday.ToString(),
+                    From = TimeSpan.FromHours(12),
+                    To = TimeSpan.FromHours(20)
+                },
+            };
+
+            _mockScheduleRepository.Setup(x => x.InsertRangeAsync(It.IsAny<IEnumerable<Schedule>>()));
+
+            //Act
+            var result = scheduleController.InsertSchedules(schedulesListVM).Result;
+
+            //Assert
+            Assert.IsType<BadRequestObjectResult>(result);
+        }
+
+        [Fact]
         public void InsertSchedule_ShouldReturnValidationError()
         {
             //Arrange
-            var scheduleController = new ScheduleController(_scheduleService, _mapper, _scheduleValidator);
+            var scheduleController = new ScheduleController(
+                _scheduleService,
+                _mapper, 
+                _scheduleValidator,
+                _scheduleCollectionValidator);
 
             var scheduleVM = new ScheduleViewModel
             {
@@ -206,7 +314,11 @@ namespace VetClinic.WebApi.Tests.Controllers
         public void CanUpdateSchedule()
         {
             //Arrange
-            var scheduleController = new ScheduleController(_scheduleService, _mapper, _scheduleValidator);
+            var scheduleController = new ScheduleController(
+                _scheduleService,
+                _mapper,
+                _scheduleValidator,
+                _scheduleCollectionValidator);
 
             var scheduleVM = new ScheduleViewModel
             {
@@ -231,7 +343,11 @@ namespace VetClinic.WebApi.Tests.Controllers
         public void UpdateSchedule_ReturnsBadRequest_DueToValidationError()
         {
             //Arrange
-            var scheduleController = new ScheduleController(_scheduleService, _mapper, _scheduleValidator);
+            var scheduleController = new ScheduleController(
+                _scheduleService,
+                _mapper,
+                _scheduleValidator,
+                _scheduleCollectionValidator);
 
             var scheduleVM = new ScheduleViewModel
             {
@@ -256,6 +372,12 @@ namespace VetClinic.WebApi.Tests.Controllers
         public void CanDeleteSchedule()
         {
             //Arrange
+            var scheduleController = new ScheduleController(
+                _scheduleService,
+                _mapper,
+                _scheduleValidator,
+                _scheduleCollectionValidator);
+
             var id = 2;
 
             _mockScheduleRepository.Setup(x => x.GetFirstOrDefaultAsync(
@@ -263,8 +385,6 @@ namespace VetClinic.WebApi.Tests.Controllers
                 .Returns(new Schedule() { Id = id });
 
             _mockScheduleRepository.Setup(x => x.Delete(It.IsAny<Schedule>()));
-
-            var scheduleController = new ScheduleController(_scheduleService, _mapper, _scheduleValidator);
 
             //Act
             var result = scheduleController.DeleteSchedule(id).Result;
@@ -280,7 +400,11 @@ namespace VetClinic.WebApi.Tests.Controllers
             //Arrange
             var id = 400;
 
-            var scheduleController = new ScheduleController(_scheduleService, _mapper, _scheduleValidator);
+            var scheduleController = new ScheduleController(
+                _scheduleService,
+                _mapper,
+                _scheduleValidator,
+                _scheduleCollectionValidator);
 
             //Act
             var result = scheduleController.DeleteSchedule(id).Result;
@@ -293,9 +417,17 @@ namespace VetClinic.WebApi.Tests.Controllers
         public void CanDeleteRange()
         {
             //Arrange
+            var scheduleController = new ScheduleController(
+                _scheduleService,
+                _mapper, 
+                _scheduleValidator,
+                _scheduleCollectionValidator);
+
             var idArr = new List<int> { 1, 2, 3 };
 
-            var schedules = ScheduleFakeData.GetScheduleFakeData().AsQueryable();
+            var schedules = ScheduleFakeData
+                .GetScheduleFakeData()
+                .AsQueryable();
 
             _mockScheduleRepository
                 .Setup(x => x.GetAsync(
@@ -310,8 +442,6 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             _mockScheduleRepository.Setup(x => x.DeleteRange(It.IsAny<IEnumerable<Schedule>>()));
 
-            var scheduleController = new ScheduleController(_scheduleService, _mapper, _scheduleValidator);
-
             //Act
             var result = scheduleController.DeleteListOfSchedule(idArr).Result;
 
@@ -323,6 +453,12 @@ namespace VetClinic.WebApi.Tests.Controllers
         public void DeleteRange_WhenSomeScheduleWasNotFound()
         {
             //Arrange
+            var scheduleController = new ScheduleController(
+                _scheduleService,
+                _mapper,
+                _scheduleValidator,
+                _scheduleCollectionValidator);
+
             var idArr = new List<int> { 1, -4, 3 };
 
             var schedules = ScheduleFakeData.GetScheduleFakeData().AsQueryable();
@@ -339,8 +475,6 @@ namespace VetClinic.WebApi.Tests.Controllers
                 bool asNoTracking) => schedules.Where(filter).ToList());
 
             _mockScheduleRepository.Setup(x => x.DeleteRange(It.IsAny<IEnumerable<Schedule>>()));
-
-            var scheduleController = new ScheduleController(_scheduleService, _mapper, _scheduleValidator);
 
             //Act
             var result = scheduleController.DeleteListOfSchedule(idArr).Result;
