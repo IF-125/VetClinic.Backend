@@ -181,7 +181,7 @@ namespace VetClinic.Host
 
             app.UseRouting();
 
-            //app.UseMiddleware<ExceptionMiddleware>();
+            app.UseMiddleware<ExceptionMiddleware>();
 
             app.UseAuthentication();
 
