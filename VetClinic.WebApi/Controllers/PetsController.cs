@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using SendGrid.Helpers.Errors.Model;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
@@ -70,7 +69,7 @@ namespace VetClinic.WebApi.Controllers
 
 
         [HttpPut]
-        public  IActionResult Update (int id, PetViewModel petViewModel)
+        public  IActionResult UpdatePet (int id, PetViewModel petViewModel)
         {
             var pet = _mapper.Map<Pet>(petViewModel);
 
@@ -84,7 +83,7 @@ namespace VetClinic.WebApi.Controllers
                     _petService.Update(id, pet);
                     return Ok();
                 }
-                catch (ArgumentException ex)
+                catch (NotFoundException ex)
                 {
 
                     return BadRequest(ex.Message);
@@ -104,7 +103,7 @@ namespace VetClinic.WebApi.Controllers
                 petToUpdate.ApplyTo(pet, ModelState);
                 return Ok(pet);
             }
-            catch (ArgumentException ex)
+            catch (NotFoundException ex)
             {
                 return NotFound(ex.Message);
             }
@@ -118,7 +117,7 @@ namespace VetClinic.WebApi.Controllers
                 await _petService.DeleteAsync(id);
                 return Ok($"{nameof(Pet)} {EntityHasBeenDeleted}");
             }
-            catch (ArgumentException ex)
+            catch (NotFoundException ex)
             {
                 return NotFound(ex.Message);
             }
@@ -132,7 +131,7 @@ namespace VetClinic.WebApi.Controllers
                 await _petService.DeleteRangeAsync(listOfIds);
                 return Ok();
             }
-            catch (ArgumentException ex)
+            catch (BadRequestException ex)
             {
 
                 return BadRequest(ex.Message); 
