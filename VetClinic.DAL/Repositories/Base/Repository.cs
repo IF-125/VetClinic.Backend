@@ -13,7 +13,7 @@ namespace VetClinic.DAL.Repositories.Base
     public class Repository<TEntity> : IRepository<TEntity>
         where TEntity : class
     {
-        private readonly VetClinicDbContext _context;
+        protected readonly VetClinicDbContext _context;
         public Repository(VetClinicDbContext context)
         {
             _context = context;

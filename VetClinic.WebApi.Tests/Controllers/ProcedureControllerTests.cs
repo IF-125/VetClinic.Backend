@@ -102,7 +102,7 @@ namespace VetClinic.WebApi.Tests.Controllers
                 Id = 11,
                 Title = "Procedure 11",
                 Description = "Surgical procedure.",
-                Duration = new TimeSpan(hours: 0, minutes: 45, seconds: 0),
+                Duration = new TimeSpan(hours: 0, minutes: 45, seconds: 0).ToString(),
                 Price = 1600
             };
 
@@ -124,7 +124,7 @@ namespace VetClinic.WebApi.Tests.Controllers
                 Id = 11,
                 Title = "Procedure 11",
                 Description = "Surgical procedure.",
-                Duration = new TimeSpan(hours: 0, minutes: 45, seconds: 0),
+                Duration = new TimeSpan(hours: 0, minutes: 45, seconds: 0).ToString(),
                 Price = 1600
             };
 

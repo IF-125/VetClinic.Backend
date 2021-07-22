@@ -81,19 +81,6 @@ namespace VetClinic.WebApi.Tests.Controllers
         }
 
         [Fact]
-        public void GetAppointmentByInvalidId()
-        {
-            //arrange
-            var AppointmentController = new AppointmentController(_appointmentService, _mapper, _validator);
-
-            int id = 100;
-            //act
-            var result = AppointmentController.GetAppointment(id).Result;
-            //assert
-            Assert.IsType<NotFoundObjectResult>(result);
-        }
-
-        [Fact]
         public void CanInsertAppointment()
         {
             //arrange
@@ -102,8 +89,7 @@ namespace VetClinic.WebApi.Tests.Controllers
                 Id = 11,
                 Status = AppointmentStatus.Opened,
                 From = new DateTime(2021, 8, 22),
-                To = new DateTime(2021, 8, 23),
-                OrderProcedureId = 11
+                To = new DateTime(2021, 8, 23)
             };
 
             var AppointmentController = new AppointmentController(_appointmentService, _mapper, _validator);
@@ -124,8 +110,7 @@ namespace VetClinic.WebApi.Tests.Controllers
                 Id = 11,
                 Status = AppointmentStatus.Opened,
                 From = new DateTime(2021, 8, 22),
-                To = new DateTime(2021, 8, 23),
-                OrderProcedureId = 11
+                To = new DateTime(2021, 8, 23)
             };
 
             int id = 11;

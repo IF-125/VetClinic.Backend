@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using VetClinic.Core.Entities;
 
 namespace VetClinic.BLL.Tests.FakeData
@@ -93,7 +94,18 @@ namespace VetClinic.BLL.Tests.FakeData
 
             var schedule = ScheduleFakeData.GetScheduleFakeData();
 
+            var employeePosition = EmployeePositionFakeData
+                .GetEmployeePositionFakeData()
+                .FirstOrDefault(x => x.Id == 2);
+
+            var salaries = SalaryFakeData
+                .GetFakeSalaryData()
+                .Where(x => x.EmployeePositionId == 2);
+
+            employeePosition.Salaries = salaries.ToList();
+
             employees[0].Schedule = schedule;
+            employees[0].EmployeePosition = employeePosition;
             return employees;
         }
     }

@@ -38,18 +38,11 @@ namespace VetClinic.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAppointment(int id)
         {
-            try
-            {
-                var appointment = await _appointmentService.GetByIdAsync(id);
+            var appointment = await _appointmentService.GetByIdAsync(id);
 
-                var appointmentViewModel = _mapper.Map<AppointmentViewModel>(appointment);
+            var appointmentViewModel = _mapper.Map<AppointmentViewModel>(appointment);
 
-                return Ok(appointmentViewModel);
-            }
-            catch (ArgumentException ex)
-            {
-                return NotFound(ex.Message);
-            }
+            return Ok(appointmentViewModel);
         }
 
         [HttpPost]
