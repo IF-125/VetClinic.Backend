@@ -83,6 +83,7 @@ namespace VetClinic.Host
             services.AddScoped<ScheduleCollectionValidator>();
             #endregion
 
+            services.AddCors();
             services.AddDbContext<VetClinicDbContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
@@ -100,6 +101,7 @@ namespace VetClinic.Host
 
             services.AddControllers().AddNewtonsoftJson();
 
+            #region Swagger
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo
@@ -130,6 +132,7 @@ namespace VetClinic.Host
                     }
                 });
             });
+            #endregion
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer("Bearer", options =>
@@ -181,6 +184,15 @@ namespace VetClinic.Host
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors(x => x
+            .WithOrigins(
+                "http://127.0.0.1:5500")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials()
+            );
+                
 
             app.UseMiddleware<ExceptionMiddleware>();
 
