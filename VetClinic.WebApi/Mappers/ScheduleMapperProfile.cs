@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using VetClinic.Core.Entities;
+using VetClinic.WebApi.Converters;
 using VetClinic.WebApi.ViewModels;
 
 namespace VetClinic.WebApi.Mappers
@@ -9,7 +10,11 @@ namespace VetClinic.WebApi.Mappers
         public ScheduleMapperProfile()
         {
             CreateMap<Schedule, ScheduleViewModel>()
-                .ForMember(x => x.Day, y => y.MapFrom(src => src.Day))
+
+                .ForMember(x => x.From, opt => opt.ConvertUsing(new StringToTimeSpanConverter()))
+                
+                .ForMember(x => x.To, opt => opt.ConvertUsing(new StringToTimeSpanConverter()))
+
                 .ReverseMap();
         }
     }

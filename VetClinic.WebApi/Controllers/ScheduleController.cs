@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using SendGrid.Helpers.Errors.Model;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
@@ -35,37 +34,23 @@ namespace VetClinic.WebApi.Controllers
         [HttpGet]
         public async Task<IActionResult> GetScheduleOfEmployee(string employeeId)
         {
-            try
-            {
-                var schedule = await _scheduleService.GetScheduleOfEmployee(employeeId);
-                var model = _mapper.Map<IEnumerable<ScheduleViewModel>>(schedule);
-                return Ok(model);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(ex.Message); 
-            }
+            var schedule = await _scheduleService.GetScheduleOfEmployee(employeeId);
+            var model = _mapper.Map<IEnumerable<ScheduleViewModel>>(schedule);
+            return Ok(model);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetSchedule(int id)
         {
-            try
-            {
-                var schedule = await _scheduleService.GetByIdAsync(id);
+            var schedule = await _scheduleService.GetByIdAsync(id);
 
-                var scheduleViewModel = _mapper.Map<ScheduleViewModel>(schedule);
+            var scheduleViewModel = _mapper.Map<ScheduleViewModel>(schedule);
 
-                return Ok(scheduleViewModel);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
+            return Ok(scheduleViewModel);
         }
 
-        [HttpPost("InsertSchedule")]
-        public async Task<IActionResult> InsertSchedule(ScheduleViewModel model)
+        [HttpPost("AssignScheduleToEmployee")]
+        public async Task<IActionResult> AssignScheduleToEmployee(ScheduleViewModel model, string employeeId)
         {
             var newSchedule = _mapper.Map<Schedule>(model);
 
@@ -73,14 +58,14 @@ namespace VetClinic.WebApi.Controllers
 
             if (validationResult.IsValid)
             {
-                await _scheduleService.InsertAsync(newSchedule);
-                return Ok(newSchedule);
+                await _scheduleService.AssignScheduleToEmployeeAsync(newSchedule, employeeId);
+                return Ok();
             }
             return BadRequest(validationResult.Errors);
         }
 
-        [HttpPost("InsertSchedules")]
-        public async Task<IActionResult> InsertSchedules(IEnumerable<ScheduleViewModel> schedules)
+        [HttpPost("AssignSchedulesToEmployee")]
+        public async Task<IActionResult> AssignSchedulesToEmployee(IEnumerable<ScheduleViewModel> schedules, string employeeId)
         {
             var schedulesToInsert = _mapper.Map<IEnumerable<Schedule>>(schedules);
 
@@ -88,7 +73,7 @@ namespace VetClinic.WebApi.Controllers
 
             if(validationResult.IsValid)
             {
-                await _scheduleService.InsertRangeAsync(schedulesToInsert);
+                await _scheduleService.AssignMultipleSchedulesToEmployeeAsync(schedulesToInsert, employeeId);
                 return Ok();
             }
 
@@ -104,15 +89,8 @@ namespace VetClinic.WebApi.Controllers
 
             if (validationResult.IsValid)
             {
-                try
-                {
-                    _scheduleService.Update(id, schedule);
-                    return Ok();
-                }
-                catch (BadRequestException ex)
-                {
-                    return BadRequest(ex.Message);
-                }
+                _scheduleService.Update(id, schedule);
+                return Ok();
             }
             return BadRequest(validationResult.Errors);
         }
@@ -120,29 +98,15 @@ namespace VetClinic.WebApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSchedule(int id)
         {
-            try
-            {
-                await _scheduleService.DeleteAsync(id);
-                return Ok($"{nameof(Schedule)} {EntityHasBeenDeleted}");
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
+            await _scheduleService.DeleteAsync(id);
+            return Ok($"{nameof(Schedule)} {EntityHasBeenDeleted}");
         }
 
         [HttpDelete]
         public async Task<IActionResult> DeleteListOfSchedule([FromQuery(Name = "listOfIds")] IList<int> listOfIds)
         {
-            try
-            {
-                await _scheduleService.DeleteRangeAsync(listOfIds);
-                return Ok();
-            }
-            catch (BadRequestException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            await _scheduleService.DeleteRangeAsync(listOfIds);
+            return Ok();
         }
     }
 }
