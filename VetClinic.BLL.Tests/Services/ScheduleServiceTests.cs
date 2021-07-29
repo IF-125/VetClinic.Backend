@@ -18,10 +18,13 @@ namespace VetClinic.BLL.Tests.Services
     {
         private readonly ScheduleService _scheduleService;
         private readonly Mock<IScheduleRepository> _scheduleRepository = new Mock<IScheduleRepository>();
+        private readonly Mock<IEmployeeRepository> _employeeRepository = new Mock<IEmployeeRepository>();
+
         public ScheduleServiceTests()
         {
             _scheduleService = new ScheduleService(
-                _scheduleRepository.Object);
+                _scheduleRepository.Object,
+                _employeeRepository.Object);
         }
 
         [Fact]
@@ -90,25 +93,125 @@ namespace VetClinic.BLL.Tests.Services
         }
 
         [Fact]
-        public async Task CanInsertScheduleAsync()
+        public async Task CanAssignScheduleToEmployee()
         {
             //Arrange
-            var newSchedule = new Schedule
-            {
-                Id = 12,
-                Day = Days.Saturday,
-                From = TimeSpan.FromHours(12),
-                To = TimeSpan.FromHours(14),
-                EmployeeId = "6fca381a-40d0-4bf9-a076-706e1a995662"
-            };
+            var employees = EmployeeFakeData
+                .GetEmployeeFakeData()
+                .AsQueryable();
+
+            var id = "f1a05cca-b479-4f72-bbda-96b8979f4afe";
+
+            _employeeRepository.Setup(x => x.GetFirstOrDefaultAsync(
+                x => x.Id == id,
+                It.IsAny<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>(),
+                false))
+                .ReturnsAsync((Expression<Func<Employee, bool>> filter,
+                Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>> include,
+                bool asNoTracking) => employees.FirstOrDefault(filter));
+
+            _employeeRepository.Setup(x => x.Update(It.IsAny<Employee>()));
 
             _scheduleRepository.Setup(x => x.InsertAsync(It.IsAny<Schedule>()));
 
             //Act
-            await _scheduleService.InsertAsync(newSchedule);
+            await _scheduleService.AssignScheduleToEmployeeAsync(It.IsAny<Schedule>(), id);
 
             //Assert
-            _scheduleRepository.Verify(a => a.InsertAsync(newSchedule));
+            _employeeRepository.Verify(a => a.Update(It.IsAny<Employee>()));
+
+            _scheduleRepository.Verify(a => a.InsertAsync(It.IsAny<Schedule>()));
+        }
+
+        [Fact]
+        public async Task AssignScheduleToEmployee_ReturnsNotFound_WhenEmployeeWasNotFound()
+        {
+            //Arrange
+            var employees = EmployeeFakeData
+                .GetEmployeeFakeData()
+                .AsQueryable();
+
+            var id = "idonotexist";
+
+            _employeeRepository.Setup(x => x.GetFirstOrDefaultAsync(
+                x => x.Id == id,
+                It.IsAny<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>(),
+                false))
+                .ReturnsAsync((Expression<Func<Employee, bool>> filter,
+                Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>> include,
+                bool asNoTracking) => employees.FirstOrDefault(filter));
+
+            _employeeRepository.Setup(x => x.Update(It.IsAny<Employee>()));
+
+            _scheduleRepository.Setup(x => x.InsertAsync(It.IsAny<Schedule>()));
+
+            //Act, Assert
+            await Assert.ThrowsAsync<NotFoundException>(() => 
+            _scheduleService.AssignScheduleToEmployeeAsync(It.IsAny<Schedule>(), id));
+        }
+
+        [Fact]
+        public async Task CanAssignSchedulesToEmployee()
+        {
+            //Arrange
+            var employees = EmployeeFakeData
+                .GetEmployeeFakeData()
+                .AsQueryable();
+
+            var schedules = ScheduleFakeData
+                .GetScheduleFakeData();
+
+            var id = "f1a05cca-b479-4f72-bbda-96b8979f4afe";
+
+            _employeeRepository.Setup(x => x.GetFirstOrDefaultAsync(
+                x => x.Id == id,
+                It.IsAny<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>(),
+                false))
+                .ReturnsAsync((Expression<Func<Employee, bool>> filter,
+                Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>> include,
+                bool asNoTracking) => employees.FirstOrDefault(filter));
+
+            _employeeRepository.Setup(x => x.Update(It.IsAny<Employee>()));
+
+            _scheduleRepository.Setup(x => x.InsertRangeAsync(schedules));
+
+            //Act
+            await _scheduleService.AssignMultipleSchedulesToEmployeeAsync(schedules, id);
+
+            //Assert
+            _employeeRepository.Verify(a => a.Update(It.IsAny<Employee>()));
+
+            _scheduleRepository.Verify(a => a.InsertRangeAsync(schedules));
+        }
+
+        [Fact]
+        public async Task AssignSchedulesToEmployee_ReturnsNotFound_WhenEmployeeWasNotFound()
+        {
+            //Arrange
+            var employees = EmployeeFakeData
+                .GetEmployeeFakeData()
+                .AsQueryable();
+
+            var schedules = ScheduleFakeData
+                .GetScheduleFakeData();
+
+            var id = "idonotexist";
+
+            _employeeRepository.Setup(x => x.GetFirstOrDefaultAsync(
+                x => x.Id == id,
+                It.IsAny<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>(),
+                false))
+                .ReturnsAsync((Expression<Func<Employee, bool>> filter,
+                Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>> include,
+                bool asNoTracking) => employees.FirstOrDefault(filter));
+
+            _employeeRepository.Setup(x => x.Update(It.IsAny<Employee>()));
+
+            _scheduleRepository.Setup(x => x.InsertRangeAsync(schedules));
+
+            //Act, Assert
+            await Assert.ThrowsAsync<NotFoundException>(() =>
+            _scheduleService.AssignMultipleSchedulesToEmployeeAsync(schedules, id));
         }
 
         [Fact]

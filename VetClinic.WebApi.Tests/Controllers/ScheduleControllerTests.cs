@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Query;
 using Moq;
@@ -24,6 +25,7 @@ namespace VetClinic.WebApi.Tests.Controllers
     {
         private readonly IMapper _mapper;
         private readonly Mock<IScheduleRepository> _mockScheduleRepository;
+        private readonly Mock<IEmployeeRepository> _mockEmployeeRepository;
         private readonly IScheduleService _scheduleService;
         private readonly ScheduleValidator _scheduleValidator;
         private readonly ScheduleCollectionValidator _scheduleCollectionValidator;
@@ -31,7 +33,10 @@ namespace VetClinic.WebApi.Tests.Controllers
         public ScheduleControllerTests()
         {
             _mockScheduleRepository = new Mock<IScheduleRepository>();
-            _scheduleService = new ScheduleService(_mockScheduleRepository.Object);
+            _mockEmployeeRepository = new Mock<IEmployeeRepository>();
+            _scheduleService = new ScheduleService(
+                _mockScheduleRepository.Object,
+                _mockEmployeeRepository.Object);
             _scheduleValidator = new ScheduleValidator();
             _scheduleCollectionValidator = new ScheduleCollectionValidator();
 
@@ -88,7 +93,7 @@ namespace VetClinic.WebApi.Tests.Controllers
             //Arrange
             var scheduleController = new ScheduleController(
                 _scheduleService,
-                _mapper, 
+                _mapper,
                 _scheduleValidator,
                 _scheduleCollectionValidator);
 
@@ -107,7 +112,7 @@ namespace VetClinic.WebApi.Tests.Controllers
                 Func<IQueryable<Schedule>, IIncludableQueryable<Schedule, object>> include,
                 bool asNoTracking) => schedules.Where(filter).ToList());
 
-            var expectedErrorMessage = "No schedule was provided for this emplouee";
+            var expectedErrorMessage = "No schedule was provided for this employee";
 
             //Act
             var result = scheduleController.GetScheduleOfEmployee(employeeId).Result;
@@ -117,7 +122,6 @@ namespace VetClinic.WebApi.Tests.Controllers
             //Assert
             Assert.IsType<NotFoundObjectResult>(result);
             Assert.Equal(expectedErrorMessage, notFoundResult.Value);
-            
         }
 
         [Fact]
@@ -177,7 +181,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         }
 
         [Fact]
-        public void CanInsertSchedule()
+        public void CanAssignScheduleToEmployee()
         {
             //Arrange
             var scheduleController = new ScheduleController(
@@ -189,62 +193,37 @@ namespace VetClinic.WebApi.Tests.Controllers
             var scheduleVM = new ScheduleViewModel
             {
                 Day = Days.Tuesday.ToString(),
-                From = TimeSpan.FromHours(12),
-                To = TimeSpan.FromHours(20)
+                From = "12:00",
+                To = "15:00"
             };
+
+            var employees = EmployeeFakeData
+                .GetEmployeeFakeData()
+                .AsQueryable();
+
+            var id = "f1a05cca-b479-4f72-bbda-96b8979f4afe";
+
+            _mockEmployeeRepository.Setup(x => x.GetFirstOrDefaultAsync(
+                x => x.Id == id,
+                It.IsAny<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>(),
+                false))
+                .ReturnsAsync((Expression<Func<Employee, bool>> filter,
+                Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>> include,
+                bool asNoTracking) => employees.FirstOrDefault(filter));
+
+            _mockEmployeeRepository.Setup(x => x.Update(It.IsAny<Employee>()));
 
             _mockScheduleRepository.Setup(x => x.InsertAsync(It.IsAny<Schedule>()));
 
             //Act
-            var result = scheduleController.InsertSchedule(scheduleVM).Result;
-
-            //Assert
-            Assert.IsType<OkObjectResult>(result);
-        }
-
-        [Fact]
-        public void CanInsertRange()
-        {
-            //Arrange
-            var scheduleController = new ScheduleController(
-                _scheduleService,
-                _mapper,
-                _scheduleValidator,
-                _scheduleCollectionValidator);
-
-            var schedulesListVM = new List<ScheduleViewModel>
-            {
-                new ScheduleViewModel
-                {
-                    Day = Days.Tuesday.ToString(),
-                    From = TimeSpan.FromHours(12),
-                    To = TimeSpan.FromHours(20)
-                },
-                new ScheduleViewModel
-                {
-                    Day = Days.Wednesday.ToString(),
-                    From = TimeSpan.FromHours(12),
-                    To = TimeSpan.FromHours(20)
-                },
-                new ScheduleViewModel
-                {
-                    Day = Days.Thursday.ToString(),
-                    From = TimeSpan.FromHours(12),
-                    To = TimeSpan.FromHours(20)
-                },
-            };
-
-            _mockScheduleRepository.Setup(x => x.InsertRangeAsync(It.IsAny<IEnumerable<Schedule>>()));
-
-            //Act
-            var result = scheduleController.InsertSchedules(schedulesListVM).Result;
+            var result = scheduleController.AssignScheduleToEmployee(scheduleVM, id).Result;
 
             //Assert
             Assert.IsType<OkResult>(result);
         }
 
         [Fact]
-        public void InsertRange_ReturnsValidationErrors()
+        public async Task AssignScheduleToEmployee_ReturnsNotFound_WhenEmployeeWasNotFound()
         {
             //Arrange
             var scheduleController = new ScheduleController(
@@ -253,61 +232,274 @@ namespace VetClinic.WebApi.Tests.Controllers
                 _scheduleValidator,
                 _scheduleCollectionValidator);
 
-            var schedulesListVM = new List<ScheduleViewModel>
+            var scheduleVM = new ScheduleViewModel
             {
-                new ScheduleViewModel
-                {
-                    Day = Days.Tuesday.ToString(),
-                    From = TimeSpan.FromHours(12),
-                    To = TimeSpan.FromHours(20)
-                },
-                new ScheduleViewModel
-                {
-                    Day = Days.Wednesday.ToString(),
-                    From = TimeSpan.FromHours(12),
-                    To = default
-                },
-                new ScheduleViewModel
-                {
-                    Day = Days.Thursday.ToString(),
-                    From = TimeSpan.FromHours(12),
-                    To = TimeSpan.FromHours(20)
-                },
+                Day = Days.Tuesday.ToString(),
+                From = "12:00",
+                To = "15:00"
             };
 
-            _mockScheduleRepository.Setup(x => x.InsertRangeAsync(It.IsAny<IEnumerable<Schedule>>()));
+            var employees = EmployeeFakeData
+                .GetEmployeeFakeData()
+                .AsQueryable();
+
+            var id = "idonotexist";
+
+            _mockEmployeeRepository.Setup(x => x.GetFirstOrDefaultAsync(
+                x => x.Id == id,
+                It.IsAny<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>(),
+                false))
+                .ReturnsAsync((Expression<Func<Employee, bool>> filter,
+                Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>> include,
+                bool asNoTracking) => employees.FirstOrDefault(filter));
+
+            _mockEmployeeRepository.Setup(x => x.Update(It.IsAny<Employee>()));
+
+            _mockScheduleRepository.Setup(x => x.InsertAsync(It.IsAny<Schedule>()));
 
             //Act
-            var result = scheduleController.InsertSchedules(schedulesListVM).Result;
+            var result = await scheduleController.AssignScheduleToEmployee(scheduleVM, id);
 
             //Assert
-            Assert.IsType<BadRequestObjectResult>(result);
+            Assert.IsType<NotFoundObjectResult>(result);
         }
 
         [Fact]
-        public void InsertSchedule_ShouldReturnValidationError()
+        public void AssignScheduleToEmployee_ReturnsBadRequest_DueToValidationErrors()
         {
             //Arrange
             var scheduleController = new ScheduleController(
                 _scheduleService,
-                _mapper, 
+                _mapper,
                 _scheduleValidator,
                 _scheduleCollectionValidator);
 
             var scheduleVM = new ScheduleViewModel
             {
-                Day = string.Empty,
-                From = default,
-                To = TimeSpan.FromHours(20)
+                Day = "bad input", //Wrong day
+                From = "12:00",
+                To = "15:00"
             };
+
+            var employees = EmployeeFakeData
+                .GetEmployeeFakeData()
+                .AsQueryable();
+
+            var id = "f1a05cca-b479-4f72-bbda-96b8979f4afe";
+
+            _mockEmployeeRepository.Setup(x => x.GetFirstOrDefaultAsync(
+                x => x.Id == id,
+                It.IsAny<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>(),
+                false))
+                .ReturnsAsync((Expression<Func<Employee, bool>> filter,
+                Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>> include,
+                bool asNoTracking) => employees.FirstOrDefault(filter));
+
+            _mockEmployeeRepository.Setup(x => x.Update(It.IsAny<Employee>()));
 
             _mockScheduleRepository.Setup(x => x.InsertAsync(It.IsAny<Schedule>()));
 
             //Act
-            var result = scheduleController.InsertSchedule(scheduleVM).Result;
+            var result = scheduleController.AssignScheduleToEmployee(scheduleVM, id).Result;
 
             //Assert
+            var badRequest = result as BadRequestObjectResult;
+
             Assert.IsType<BadRequestObjectResult>(result);
+            Assert.True(badRequest.Value.GetType() == typeof(List<ValidationFailure>));
+        }
+
+        [Fact]
+        public void CanAssignSchedulesToEmployee()
+        {
+            //Arrange
+            var scheduleController = new ScheduleController(
+                _scheduleService,
+                _mapper,
+                _scheduleValidator,
+                _scheduleCollectionValidator);
+
+            var schedulesVM = new List<ScheduleViewModel>
+            {
+                new ScheduleViewModel
+                {
+                    Day = Days.Tuesday.ToString(),
+                    From = "12:00",
+                    To = "15:00"
+                },
+                new ScheduleViewModel
+                {
+                    Day = Days.Tuesday.ToString(),
+                    From = "12:00",
+                    To = "15:00"
+                },
+                new ScheduleViewModel
+                {
+                    Day = Days.Tuesday.ToString(),
+                    From = "12:00",
+                    To = "15:00"
+                },
+                new ScheduleViewModel
+                {
+                    Day = Days.Tuesday.ToString(),
+                    From = "12:00",
+                    To = "15:00"
+                },
+            };
+
+            var employees = EmployeeFakeData
+                .GetEmployeeFakeData()
+                .AsQueryable();
+
+            var id = "f1a05cca-b479-4f72-bbda-96b8979f4afe";
+
+            _mockEmployeeRepository.Setup(x => x.GetFirstOrDefaultAsync(
+                x => x.Id == id,
+                It.IsAny<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>(),
+                false))
+                .ReturnsAsync((Expression<Func<Employee, bool>> filter,
+                Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>> include,
+                bool asNoTracking) => employees.FirstOrDefault(filter));
+
+            _mockEmployeeRepository.Setup(x => x.Update(It.IsAny<Employee>()));
+
+            _mockScheduleRepository.Setup(x => x.InsertRangeAsync(It.IsAny<IEnumerable<Schedule>>()));
+
+            //Act
+            var result = scheduleController.AssignSchedulesToEmployee(schedulesVM, id).Result;
+
+            //Assert
+            Assert.IsType<OkResult>(result);
+        }
+
+        [Fact]
+        public async Task AssignSchedulesToEmployee_ReturnsNotFound_WhenEmployeeWasNotFound()
+        {
+            //Arrange
+            var scheduleController = new ScheduleController(
+                _scheduleService,
+                _mapper,
+                _scheduleValidator,
+                _scheduleCollectionValidator);
+
+            var schedulesVM = new List<ScheduleViewModel>
+            {
+                new ScheduleViewModel
+                {
+                    Day = Days.Tuesday.ToString(),
+                    From = "12:00",
+                    To = "15:00"
+                },
+                new ScheduleViewModel
+                {
+                    Day = Days.Tuesday.ToString(),
+                    From = "12:00",
+                    To = "15:00"
+                },
+                new ScheduleViewModel
+                {
+                    Day = Days.Tuesday.ToString(),
+                    From = "12:00",
+                    To = "15:00"
+                },
+                new ScheduleViewModel
+                {
+                    Day = Days.Tuesday.ToString(),
+                    From = "12:00",
+                    To = "15:00"
+                },
+            };
+
+            var schedules = ScheduleFakeData
+               .GetScheduleFakeData();
+
+            var employees = EmployeeFakeData
+                .GetEmployeeFakeData()
+                .AsQueryable();
+
+            var id = "idonotexist";
+
+            _mockEmployeeRepository.Setup(x => x.GetFirstOrDefaultAsync(
+                x => x.Id == id,
+                It.IsAny<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>(),
+                false))
+                .ReturnsAsync((Expression<Func<Employee, bool>> filter,
+                Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>> include,
+                bool asNoTracking) => employees.FirstOrDefault(filter));
+
+            _mockScheduleRepository.Setup(x => x.InsertRangeAsync(schedules));
+
+            //Act
+            var result = await scheduleController.AssignSchedulesToEmployee(schedulesVM, id);
+
+            //Assert
+            Assert.IsType<NotFoundObjectResult>(result);
+        }
+
+        [Fact]
+        public async Task AssignSchedulesToEmployee_ReturnsBadRequest_DueToMapperErrors()
+        {
+            //Arrange
+            var scheduleController = new ScheduleController(
+                _scheduleService,
+                _mapper,
+                _scheduleValidator,
+                _scheduleCollectionValidator);
+
+            var schedulesVM = new List<ScheduleViewModel>
+            {
+                new ScheduleViewModel
+                {
+                    Day = "wrong day",
+                    From = "12:00",
+                    To = "15:00"
+                },
+                new ScheduleViewModel
+                {
+                    Day = Days.Tuesday.ToString(),
+                    From = "12:00",
+                    To = "15:00"
+                },
+                new ScheduleViewModel
+                {
+                    Day = Days.Tuesday.ToString(),
+                    From = "12:00",
+                    To = "15:00"
+                },
+                new ScheduleViewModel
+                {
+                    Day = Days.Tuesday.ToString(),
+                    From = "12:00",
+                    To = "15:00"
+                },
+            };
+
+            var schedules = ScheduleFakeData
+               .GetScheduleFakeData();
+
+            var employees = EmployeeFakeData
+                .GetEmployeeFakeData()
+                .AsQueryable();
+
+            var id = "f1a05cca-b479-4f72-bbda-96b8979f4afe";
+
+            _mockEmployeeRepository.Setup(x => x.GetFirstOrDefaultAsync(
+                x => x.Id == id,
+                It.IsAny<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>(),
+                false))
+                .ReturnsAsync((Expression<Func<Employee, bool>> filter,
+                Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>> include,
+                bool asNoTracking) => employees.FirstOrDefault(filter));
+
+            _mockEmployeeRepository.Setup(x => x.Update(It.IsAny<Employee>()));
+
+            _mockScheduleRepository.Setup(x => x.InsertRangeAsync(schedules));
+
+            //Act
+            var result = await scheduleController.AssignSchedulesToEmployee(schedulesVM, id);
+
+            //Assert
+             Assert.IsType<BadRequestObjectResult>(result);
         }
 
         [Fact]
@@ -324,8 +516,8 @@ namespace VetClinic.WebApi.Tests.Controllers
             {
                 Id = 2,
                 Day = Days.Tuesday.ToString(),
-                From = TimeSpan.FromHours(12),
-                To = TimeSpan.FromHours(20)
+                From = "12:00",
+                To = "15:00"
             };
 
             var id = 2;
@@ -353,7 +545,7 @@ namespace VetClinic.WebApi.Tests.Controllers
             {
                 Id = 2,
                 Day = Days.Tuesday.ToString(),
-                From = TimeSpan.FromHours(12),
+                From = "12:00",
                 To = default
             };
 
@@ -419,7 +611,7 @@ namespace VetClinic.WebApi.Tests.Controllers
             //Arrange
             var scheduleController = new ScheduleController(
                 _scheduleService,
-                _mapper, 
+                _mapper,
                 _scheduleValidator,
                 _scheduleCollectionValidator);
 

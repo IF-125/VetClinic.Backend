@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
+using SendGrid.Helpers.Errors.Model;
 using System;
 using System.Net;
 using System.Threading.Tasks;
@@ -39,6 +41,18 @@ namespace VetClinic.WebApi.ExceptionHandling
                 case SecurityTokenException _:
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     message = "Security token is invalid.";
+                    break;
+                case AutoMapperMappingException ex:
+                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    message = $"Some passed values were not in correct format. {ex.Message}";
+                    break;
+                case NotFoundException ex:
+                    context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                    message = ex.Message;
+                    break;
+                case BadRequestException ex:
+                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    message = ex.Message;
                     break;
                 default:
                     context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;

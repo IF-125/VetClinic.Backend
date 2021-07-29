@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
+﻿using Microsoft.EntityFrameworkCore.Query;
 using Moq;
 using SendGrid.Helpers.Errors.Model;
 using System;
@@ -19,6 +18,7 @@ namespace VetClinic.BLL.Tests.Services
     {
         private readonly EmployeeService _employeeService;
         private readonly Mock<IEmployeeRepository> _employeeRepository = new Mock<IEmployeeRepository>();
+
         public EmployeeServiceTests()
         {
             _employeeService = new EmployeeService(

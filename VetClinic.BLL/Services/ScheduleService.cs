@@ -1,4 +1,5 @@
-﻿using SendGrid.Helpers.Errors.Model;
+﻿using Microsoft.EntityFrameworkCore;
+using SendGrid.Helpers.Errors.Model;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,10 +13,13 @@ namespace VetClinic.BLL.Services
     public class ScheduleService : IScheduleService
     {
         private readonly IScheduleRepository _scheduleRepository;
+        private readonly IEmployeeRepository _employeeRepository;
 
-        public ScheduleService(IScheduleRepository scheduleRepository)
+        public ScheduleService(IScheduleRepository scheduleRepository, 
+            IEmployeeRepository employeeRepository)
         {
             _scheduleRepository = scheduleRepository;
+            _employeeRepository = employeeRepository;
         }
 
         public async Task<Schedule> GetByIdAsync(int id)
@@ -76,10 +80,41 @@ namespace VetClinic.BLL.Services
 
             if(schedule == null || !schedule.Any())
             {
-                throw new NotFoundException("No schedule was provided for this emplouee");
+                throw new NotFoundException("No schedule was provided for this employee");
             }
 
             return schedule;
+        }
+
+        public async Task AssignScheduleToEmployeeAsync(Schedule schedule, string employeeId)
+        {
+            var employee = await GetEmployeeAsync(employeeId);
+
+            await _scheduleRepository.InsertAsync(schedule);
+
+            employee.Schedule.Add(schedule);
+
+            _employeeRepository.Update(employee);
+            await _scheduleRepository.SaveChangesAsync();
+        }
+
+        public async Task AssignMultipleSchedulesToEmployeeAsync(IEnumerable<Schedule> schedule, string employeeId)
+        {
+            var employee = await GetEmployeeAsync(employeeId);
+
+            await _scheduleRepository.InsertRangeAsync(schedule);
+
+            employee.Schedule = schedule.ToList();
+
+            _employeeRepository.Update(employee);
+            await _scheduleRepository.SaveChangesAsync();
+        }
+
+        private async Task<Employee> GetEmployeeAsync(string employeeId)
+        {
+            return await _employeeRepository.GetFirstOrDefaultAsync(x => x.Id == employeeId, include: x => x
+            .Include(s => s.Schedule)) ??
+                throw new NotFoundException($"{nameof(Employee)} {EntityWasNotFound}");
         }
     }
 }
