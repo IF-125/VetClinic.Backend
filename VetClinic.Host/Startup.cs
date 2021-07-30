@@ -130,14 +130,24 @@ namespace VetClinic.Host
                             
                         }
                     }
+                    
                 });
             });
             #endregion
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                 .AddCookie(options =>
+                 {
+                     options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+                     options.Cookie.Name = "Bearer";
+                     options.Cookie.HttpOnly = true;
+                 })
             .AddJwtBearer("Bearer", options =>
             {
                 options.Authority = "https://localhost:5101";
+             
+                options.SaveToken = true;
+
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateAudience = false,
