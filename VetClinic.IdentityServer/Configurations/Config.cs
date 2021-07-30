@@ -24,12 +24,6 @@ namespace VetClinic.IdentityServer.Configurations
                 }
            };
 
-        public static IEnumerable<ApiScope> ApiScopes =>
-            new List<ApiScope>
-            {
-                new ApiScope("api1", "My API"),
-            };
-
         public static IEnumerable<ApiResource> ApiResources =>
             new[]
             {
@@ -37,7 +31,7 @@ namespace VetClinic.IdentityServer.Configurations
                 {
                     Name = "api1",
                     DisplayName = "API #1",
-                    Scopes = {"api1"},
+                    Scopes = {new Scope("api1")},
                     UserClaims =
                     {
                         JwtClaimTypes.Role
@@ -70,7 +64,7 @@ namespace VetClinic.IdentityServer.Configurations
                     
                     RequireClientSecret = false,
 
-                    AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
+                    AllowedGrantTypes = GrantTypes.ClientCredentials,
 
                     ClientSecrets =
                     {
@@ -78,7 +72,7 @@ namespace VetClinic.IdentityServer.Configurations
                     },
                     AllowedCorsOrigins =
                     {
-                        "https://localhost:5001",
+                        "https://localhost:5101",
                         "https://localhost:44350"
                     },
 
