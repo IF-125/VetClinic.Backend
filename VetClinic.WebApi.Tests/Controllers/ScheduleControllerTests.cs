@@ -3,6 +3,7 @@ using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Query;
 using Moq;
+using SendGrid.Helpers.Errors.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -257,56 +258,9 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             _mockScheduleRepository.Setup(x => x.InsertAsync(It.IsAny<Schedule>()));
 
-            //Act
-            var result = await scheduleController.AssignScheduleToEmployee(scheduleVM, id);
-
-            //Assert
-            Assert.IsType<NotFoundObjectResult>(result);
-        }
-
-        [Fact]
-        public void AssignScheduleToEmployee_ReturnsBadRequest_DueToValidationErrors()
-        {
-            //Arrange
-            var scheduleController = new ScheduleController(
-                _scheduleService,
-                _mapper,
-                _scheduleValidator,
-                _scheduleCollectionValidator);
-
-            var scheduleVM = new ScheduleViewModel
-            {
-                Day = "bad input", //Wrong day
-                From = "12:00",
-                To = "15:00"
-            };
-
-            var employees = EmployeeFakeData
-                .GetEmployeeFakeData()
-                .AsQueryable();
-
-            var id = "f1a05cca-b479-4f72-bbda-96b8979f4afe";
-
-            _mockEmployeeRepository.Setup(x => x.GetFirstOrDefaultAsync(
-                x => x.Id == id,
-                It.IsAny<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>(),
-                false))
-                .ReturnsAsync((Expression<Func<Employee, bool>> filter,
-                Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>> include,
-                bool asNoTracking) => employees.FirstOrDefault(filter));
-
-            _mockEmployeeRepository.Setup(x => x.Update(It.IsAny<Employee>()));
-
-            _mockScheduleRepository.Setup(x => x.InsertAsync(It.IsAny<Schedule>()));
-
-            //Act
-            var result = scheduleController.AssignScheduleToEmployee(scheduleVM, id).Result;
-
-            //Assert
-            var badRequest = result as BadRequestObjectResult;
-
-            Assert.IsType<BadRequestObjectResult>(result);
-            Assert.True(badRequest.Value.GetType() == typeof(List<ValidationFailure>));
+            //Act, Assert
+            await Assert.ThrowsAsync<NotFoundException>(async () =>
+                await scheduleController.AssignScheduleToEmployee(scheduleVM, id));
         }
 
         [Fact]
@@ -429,11 +383,9 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             _mockScheduleRepository.Setup(x => x.InsertRangeAsync(schedules));
 
-            //Act
-            var result = await scheduleController.AssignSchedulesToEmployee(schedulesVM, id);
-
-            //Assert
-            Assert.IsType<NotFoundObjectResult>(result);
+            //Act, Assert
+            await Assert.ThrowsAsync<NotFoundException>(async () =>
+                await scheduleController.AssignSchedulesToEmployee(schedulesVM, id));
         }
 
         [Fact]
@@ -495,11 +447,9 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             _mockScheduleRepository.Setup(x => x.InsertRangeAsync(schedules));
 
-            //Act
-            var result = await scheduleController.AssignSchedulesToEmployee(schedulesVM, id);
-
-            //Assert
-             Assert.IsType<BadRequestObjectResult>(result);
+            //Act, Assert
+            await Assert.ThrowsAsync<AutoMapperMappingException>(async () =>
+                await scheduleController.AssignSchedulesToEmployee(schedulesVM, id));
         }
 
         [Fact]
