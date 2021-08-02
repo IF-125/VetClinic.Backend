@@ -1,8 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Query;
-using System;
+﻿using SendGrid.Helpers.Errors.Model;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Repositories;
@@ -19,22 +17,17 @@ namespace VetClinic.BLL.Services
             _appointmentRepository = appointmentRepository;
         }
 
-        public async Task<IList<Appointment>> GetAppointmentsAsync(
-            Expression<Func<Appointment, bool>> filter = null,
-            Func<IQueryable<Appointment>, IOrderedQueryable<Appointment>> orderBy = null,
-            Func<IQueryable<Appointment>, IIncludableQueryable<Appointment, object>> include = null,
-            bool asNoTracking = false)
+        public async Task<IList<Appointment>> GetAppointmentsAsync()
         {
-            return await _appointmentRepository.GetAsync(filter, orderBy, include, asNoTracking);
+            return await _appointmentRepository.GetAsync(asNoTracking: true);
         }
 
         public async Task<Appointment> GetByIdAsync(int id)
         {
-            var appointment = await _appointmentRepository.GetFirstOrDefaultAsync(x => x.Id == id);
-            if (appointment == null)
-            {
-                throw new ArgumentException($"{nameof(Appointment)} {EntityWasNotFound}");
-            }
+            var appointment = await _appointmentRepository
+                .GetFirstOrDefaultAsync(x => x.Id == id) ??
+                    throw new NotFoundException($"{nameof(Appointment)} {EntityWasNotFound}");
+            
             return appointment;
         }
 
@@ -48,7 +41,7 @@ namespace VetClinic.BLL.Services
         {
             if (id != appointmentToUpdate.Id)
             {
-                throw new ArgumentException($"{nameof(Appointment)} {IdsDoNotMatch}");
+                throw new BadRequestException($"{nameof(Appointment)} {IdsDoNotMatch}");
             }
             _appointmentRepository.Update(appointmentToUpdate);
             _appointmentRepository.SaveChanges();
@@ -57,23 +50,21 @@ namespace VetClinic.BLL.Services
 
         public async Task DeleteAsync(int id)
         {
-            var appointmentToDelete = await _appointmentRepository.GetFirstOrDefaultAsync(x => x.Id == id);
-
-            if (appointmentToDelete == null)
-            {
-                throw new ArgumentException($"{nameof(Appointment)} {EntityWasNotFound}");
-            }
+            var appointmentToDelete = await _appointmentRepository
+                .GetFirstOrDefaultAsync(x => x.Id == id) ??
+                    throw new NotFoundException($"{nameof(Appointment)} {EntityWasNotFound}");
+            
             _appointmentRepository.Delete(appointmentToDelete);
             await _appointmentRepository.SaveChangesAsync();
         }
 
         public async Task DeleteRangeAsync(IList<int> listOfIds)
         {
-            var appointmentsToDelete = await GetAppointmentsAsync(x => listOfIds.Contains(x.Id));
+            var appointmentsToDelete = await _appointmentRepository.GetAsync(x => listOfIds.Contains(x.Id));
 
             if (appointmentsToDelete.Count() != listOfIds.Count)
             {
-                throw new ArgumentException($"{SomeEntitiesInCollectionNotFound} {nameof(Appointment)}s to delete");
+                throw new BadRequestException($"{SomeEntitiesInCollectionNotFound} {nameof(Appointment)}s to delete");
             }
             _appointmentRepository.DeleteRange(appointmentsToDelete);
             await _appointmentRepository.SaveChangesAsync();
