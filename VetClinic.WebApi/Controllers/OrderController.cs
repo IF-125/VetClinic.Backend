@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
@@ -29,7 +28,7 @@ namespace VetClinic.WebApi.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllOrders()
         {
-            var orders = await _orderService.GetOrdersAsync(asNoTracking: true);
+            var orders = await _orderService.GetOrdersAsync();
 
             var orderViewModel = _mapper.Map<IEnumerable<OrderViewModel>>(orders);
 
@@ -39,18 +38,11 @@ namespace VetClinic.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetOrder(int id)
         {
-            try
-            {
-                var order = await _orderService.GetByIdAsync(id);
+            var order = await _orderService.GetByIdAsync(id);
 
-                var orderViewModel = _mapper.Map<OrderViewModel>(order);
+            var orderViewModel = _mapper.Map<OrderViewModel>(order);
 
-                return Ok(orderViewModel);
-            }
-            catch (ArgumentException ex)
-            {
-                return NotFound(ex.Message);
-            }
+            return Ok(orderViewModel);
         }
 
         [HttpPost]
@@ -77,15 +69,8 @@ namespace VetClinic.WebApi.Controllers
 
             if (validationResult.IsValid)
             {
-                try
-                {
-                    _orderService.Update(id, order);
-                    return Ok();
-                }
-                catch (ArgumentException ex)
-                {
-                    return BadRequest(ex.Message);
-                }
+                _orderService.Update(id, order);
+                return Ok();
             }
             return BadRequest(validationResult.Errors);
         }
@@ -93,29 +78,15 @@ namespace VetClinic.WebApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteOrder(int id)
         {
-            try
-            {
-                await _orderService.DeleteAsync(id);
-                return Ok($"{nameof(Order)} {EntityHasBeenDeleted}");
-            }
-            catch (ArgumentException ex)
-            {
-                return NotFound(ex.Message);
-            }
+            await _orderService.DeleteAsync(id);
+            return Ok($"{nameof(Order)} {EntityHasBeenDeleted}");
         }
 
         [HttpDelete]
         public async Task<IActionResult> DeleteOrders([FromQuery(Name = "ids")] IList<int> ids)
         {
-            try
-            {
-                await _orderService.DeleteRangeAsync(ids);
-                return Ok();
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            await _orderService.DeleteRangeAsync(ids);
+            return Ok();
         }
     }
 }

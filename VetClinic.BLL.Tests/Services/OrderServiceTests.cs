@@ -30,7 +30,7 @@ namespace VetClinic.BLL.Tests.Services
             _orderRepository.Setup(b => b.GetAsync(null, null, null, true).Result)
                 .Returns(OrderFakeData.GetOrderFakeData());
             //act
-            IList<Order> orders = await _orderService.GetOrdersAsync(null, null, null, asNoTracking: true);
+            IList<Order> orders = await _orderService.GetOrdersAsync();
             //assert
             Assert.NotNull(orders);
             Assert.Equal(10, orders.Count);

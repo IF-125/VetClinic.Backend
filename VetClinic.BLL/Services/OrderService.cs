@@ -1,8 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Query;
-using System;
+﻿using SendGrid.Helpers.Errors.Model;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Repositories;
@@ -19,22 +17,17 @@ namespace VetClinic.BLL.Services
             _orderRepository = orderRepository;
         }
 
-        public async Task<IList<Order>> GetOrdersAsync(
-            Expression<Func<Order, bool>> filter = null,
-            Func<IQueryable<Order>, IOrderedQueryable<Order>> orderBy = null,
-            Func<IQueryable<Order>, IIncludableQueryable<Order, object>> include = null,
-            bool asNoTracking = false)
+        public async Task<IList<Order>> GetOrdersAsync()
         {
-            return await _orderRepository.GetAsync(filter, orderBy, include, asNoTracking);
+            return await _orderRepository.GetAsync(asNoTracking: true);
         }
 
         public async Task<Order> GetByIdAsync(int id)
         {
-            var order = await _orderRepository.GetFirstOrDefaultAsync(x => x.Id == id);
-            if (order == null)
-            {
-                throw new ArgumentException($"{nameof(Order)} {EntityWasNotFound}");
-            }
+            var order = await _orderRepository
+                .GetFirstOrDefaultAsync(x => x.Id == id) ??
+                    throw new NotFoundException($"{nameof(Order)} {EntityWasNotFound}");
+
             return order;
         }
 
@@ -48,7 +41,7 @@ namespace VetClinic.BLL.Services
         {
             if (id != orderToUpdate.Id)
             {
-                throw new ArgumentException($"{nameof(Order)} {IdsDoNotMatch}");
+                throw new BadRequestException($"{nameof(Order)} {IdsDoNotMatch}");
             }
             _orderRepository.Update(orderToUpdate);
             _orderRepository.SaveChanges();
@@ -57,23 +50,21 @@ namespace VetClinic.BLL.Services
 
         public async Task DeleteAsync(int id)
         {
-            var orderToDelete = await _orderRepository.GetFirstOrDefaultAsync(x => x.Id == id);
-
-            if (orderToDelete == null)
-            {
-                throw new ArgumentException($"{nameof(Order)} {EntityWasNotFound}");
-            }
+            var orderToDelete = await _orderRepository
+                .GetFirstOrDefaultAsync(x => x.Id == id) ??
+                    throw new NotFoundException($"{nameof(Order)} {EntityWasNotFound}");
+            
             _orderRepository.Delete(orderToDelete);
             await _orderRepository.SaveChangesAsync();
         }
 
         public async Task DeleteRangeAsync(IList<int> listOfIds)
         {
-            var ordersToDelete = await GetOrdersAsync(x => listOfIds.Contains(x.Id));
+            var ordersToDelete = await _orderRepository.GetAsync(x => listOfIds.Contains(x.Id));
 
             if (ordersToDelete.Count() != listOfIds.Count)
             {
-                throw new ArgumentException($"{SomeEntitiesInCollectionNotFound} {nameof(Order)}s to delete");
+                throw new BadRequestException($"{SomeEntitiesInCollectionNotFound} {nameof(Order)}s to delete");
             }
             _orderRepository.DeleteRange(ordersToDelete);
             await _orderRepository.SaveChangesAsync();

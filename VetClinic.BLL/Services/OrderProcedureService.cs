@@ -1,8 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Query;
-using System;
+﻿using SendGrid.Helpers.Errors.Model;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Repositories;
@@ -19,22 +17,18 @@ namespace VetClinic.BLL.Services
             _orderProcedureRepository = orderProcedureRepository;
         }
 
-        public async Task<IList<OrderProcedure>> GetOrderProceduresAsync(
-            Expression<Func<OrderProcedure, bool>> filter = null,
-            Func<IQueryable<OrderProcedure>, IOrderedQueryable<OrderProcedure>> orderBy = null,
-            Func<IQueryable<OrderProcedure>, IIncludableQueryable<OrderProcedure, object>> include = null,
-            bool asNoTracking = false)
+        public async Task<IList<OrderProcedure>> GetOrderProceduresAsync()
         {
-            return await _orderProcedureRepository.GetAsync(filter, orderBy, include, asNoTracking);
+            return await _orderProcedureRepository
+                .GetAsync(asNoTracking: true);
         }
 
         public async Task<OrderProcedure> GetByIdAsync(int id)
         {
-            var orderProcedure = await _orderProcedureRepository.GetFirstOrDefaultAsync(x => x.Id == id);
-            if (orderProcedure == null)
-            {
-                throw new ArgumentException($"{nameof(OrderProcedure)} {EntityWasNotFound}");
-            }
+            var orderProcedure = await _orderProcedureRepository
+                .GetFirstOrDefaultAsync(x => x.Id == id) ??
+                    throw new NotFoundException($"{nameof(OrderProcedure)} {EntityWasNotFound}");
+           
             return orderProcedure;
         }
 
@@ -48,7 +42,7 @@ namespace VetClinic.BLL.Services
         {
             if (id != orderProcedureToUpdate.Id)
             {
-                throw new ArgumentException($"{nameof(OrderProcedure)} {IdsDoNotMatch}");
+                throw new BadRequestException($"{nameof(OrderProcedure)} {IdsDoNotMatch}");
             }
             _orderProcedureRepository.Update(orderProcedureToUpdate);
             _orderProcedureRepository.SaveChanges();
@@ -57,23 +51,21 @@ namespace VetClinic.BLL.Services
 
         public async Task DeleteAsync(int id)
         {
-            var orderProcedureToDelete = await _orderProcedureRepository.GetFirstOrDefaultAsync(x => x.Id == id);
+            var orderProcedureToDelete = await _orderProcedureRepository
+                .GetFirstOrDefaultAsync(x => x.Id == id) ??
+                throw new NotFoundException($"{nameof(OrderProcedure)} {EntityWasNotFound}");
 
-            if (orderProcedureToDelete == null)
-            {
-                throw new ArgumentException($"{nameof(OrderProcedure)} {EntityWasNotFound}");
-            }
             _orderProcedureRepository.Delete(orderProcedureToDelete);
             await _orderProcedureRepository.SaveChangesAsync();
         }
 
         public async Task DeleteRangeAsync(IList<int> listOfIds)
         {
-            var orderProceduresToDelete = await GetOrderProceduresAsync(x => listOfIds.Contains(x.Id));
+            var orderProceduresToDelete = await _orderProcedureRepository.GetAsync(x => listOfIds.Contains(x.Id));
 
             if (orderProceduresToDelete.Count() != listOfIds.Count)
             {
-                throw new ArgumentException($"{SomeEntitiesInCollectionNotFound} {nameof(OrderProcedure)}s to delete");
+                throw new BadRequestException($"{SomeEntitiesInCollectionNotFound} {nameof(OrderProcedure)}s to delete");
             }
             _orderProcedureRepository.DeleteRange(orderProceduresToDelete);
             await _orderProcedureRepository.SaveChangesAsync();

@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
@@ -28,7 +27,7 @@ namespace VetClinic.WebApi.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllProcedures()
         {
-            var procedures = await _procedureService.GetProceduresAsync(asNoTracking: true);
+            var procedures = await _procedureService.GetProceduresAsync();
 
             var procedureViewModel = _mapper.Map<IEnumerable<ProcedureViewModel>>(procedures);
 
@@ -38,18 +37,11 @@ namespace VetClinic.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetProcedure(int id)
         {
-            try
-            {
-                var procedure = await _procedureService.GetByIdAsync(id);
+            var procedure = await _procedureService.GetByIdAsync(id);
 
-                var procedureViewModel = _mapper.Map<ProcedureViewModel>(procedure);
+            var procedureViewModel = _mapper.Map<ProcedureViewModel>(procedure);
 
-                return Ok(procedureViewModel);
-            }
-            catch (ArgumentException ex)
-            {
-                return NotFound(ex.Message);
-            }
+            return Ok(procedureViewModel);
         }
 
         [HttpPost]
@@ -76,15 +68,8 @@ namespace VetClinic.WebApi.Controllers
 
             if (validationResult.IsValid)
             {
-                try
-                {
-                    _procedureService.Update(id, procedure);
-                    return Ok();
-                }
-                catch (ArgumentException ex)
-                {
-                    return BadRequest(ex.Message);
-                }
+                _procedureService.Update(id, procedure);
+                return Ok();
             }
             return BadRequest(validationResult.Errors);
         }
@@ -92,29 +77,15 @@ namespace VetClinic.WebApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProcedure(int id)
         {
-            try
-            {
-                await _procedureService.DeleteAsync(id);
-                return Ok($"{nameof(Procedure)} {EntityHasBeenDeleted}");
-            }
-            catch (ArgumentException ex)
-            {
-                return NotFound(ex.Message);
-            }
+            await _procedureService.DeleteAsync(id);
+            return Ok($"{nameof(Procedure)} {EntityHasBeenDeleted}");
         }
 
         [HttpDelete]
         public async Task<IActionResult> DeleteProcedures([FromQuery(Name = "ids")] IList<int> ids)
         {
-            try
-            {
-                await _procedureService.DeleteRangeAsync(ids);
-                return Ok();
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            await _procedureService.DeleteRangeAsync(ids);
+            return Ok();
         }
     }
 }

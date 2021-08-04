@@ -89,7 +89,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         }
 
         [Fact]
-        public void GetScheduleOfEmployee_WhenEmployeeHasNone()
+        public async Task GetScheduleOfEmployee_WhenEmployeeHasNone()
         {
             //Arrange
             var scheduleController = new ScheduleController(
@@ -113,16 +113,9 @@ namespace VetClinic.WebApi.Tests.Controllers
                 Func<IQueryable<Schedule>, IIncludableQueryable<Schedule, object>> include,
                 bool asNoTracking) => schedules.Where(filter).ToList());
 
-            var expectedErrorMessage = "No schedule was provided for this employee";
-
-            //Act
-            var result = scheduleController.GetScheduleOfEmployee(employeeId).Result;
-
-            var notFoundResult = result as NotFoundObjectResult;
-
-            //Assert
-            Assert.IsType<NotFoundObjectResult>(result);
-            Assert.Equal(expectedErrorMessage, notFoundResult.Value);
+            //Act, Assert
+            await Assert.ThrowsAsync<NotFoundException>(async () =>
+                await scheduleController.GetScheduleOfEmployee(employeeId));
         }
 
         [Fact]
@@ -174,11 +167,9 @@ namespace VetClinic.WebApi.Tests.Controllers
                 Func<IQueryable<Schedule>, IIncludableQueryable<Schedule, object>> include,
                 bool asNoTracking) => schedules.FirstOrDefault(filter));
 
-            //Act
-            var result = await scheduleController.GetSchedule(id);
-
-            //Assert
-            Assert.IsType<NotFoundObjectResult>(result);
+            //Act Assert
+            await Assert.ThrowsAsync<NotFoundException>(async () =>
+                await scheduleController.GetSchedule(id));
         }
 
         [Fact]
@@ -537,7 +528,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         }
 
         [Fact]
-        public void DeleteSchedule_WhenScheduleDoesNotExist()
+        public async Task DeleteSchedule_WhenScheduleDoesNotExist()
         {
             //Arrange
             var id = 400;
@@ -548,11 +539,9 @@ namespace VetClinic.WebApi.Tests.Controllers
                 _scheduleValidator,
                 _scheduleCollectionValidator);
 
-            //Act
-            var result = scheduleController.DeleteSchedule(id).Result;
-
-            //Assert
-            Assert.IsType<NotFoundObjectResult>(result);
+            //Act, Assert
+            await Assert.ThrowsAsync<NotFoundException>(async () =>
+                await scheduleController.DeleteSchedule(id));
         }
 
         [Fact]
@@ -592,7 +581,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         }
 
         [Fact]
-        public void DeleteRange_WhenSomeScheduleWasNotFound()
+        public async Task DeleteRange_WhenSomeScheduleWasNotFound()
         {
             //Arrange
             var scheduleController = new ScheduleController(
@@ -618,11 +607,9 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             _mockScheduleRepository.Setup(x => x.DeleteRange(It.IsAny<IEnumerable<Schedule>>()));
 
-            //Act
-            var result = scheduleController.DeleteListOfSchedule(idArr).Result;
-
-            //Assert
-            Assert.IsType<BadRequestObjectResult>(result);
+            //Act, Assert
+            await Assert.ThrowsAsync<BadRequestException>(async () =>
+                await scheduleController.DeleteListOfSchedule(idArr));
         }
     }
 }

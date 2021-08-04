@@ -30,7 +30,7 @@ namespace VetClinic.BLL.Tests.Services
             _appointmentRepository.Setup(b => b.GetAsync(null, null, null, true).Result)
                 .Returns(AppointmentFakeData.GetAppointmentFakeData());
             //act
-            IList<Appointment> Appointments = await _AppointmentService.GetAppointmentsAsync(null, null, null, asNoTracking: true);
+            IList<Appointment> Appointments = await _AppointmentService.GetAppointmentsAsync();
             //assert
             Assert.NotNull(Appointments);
             Assert.Equal(10, Appointments.Count);
