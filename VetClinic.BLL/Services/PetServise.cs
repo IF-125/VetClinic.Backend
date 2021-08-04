@@ -22,9 +22,9 @@ namespace VetClinic.BLL.Services
 
         public async Task<IList<Pet>> GetPetsAsync()
         {
-            return await _petRepository.GetAsync(include:x=>x
-                .Include(y=>y.AnimalType),
-                asNoTracking: true);
+            return await _petRepository.GetAsync(include: x => x
+            .Include(y => y.AnimalType),
+            asNoTracking: true);
         }
 
         public async Task<Pet> GetByIdAsync(int id)

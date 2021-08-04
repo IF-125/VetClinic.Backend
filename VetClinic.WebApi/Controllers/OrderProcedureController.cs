@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
@@ -29,7 +28,7 @@ namespace VetClinic.WebApi.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllOrderProcedures()
         {
-            var orderProcedures = await _orderProcedureService.GetOrderProceduresAsync(asNoTracking: true);
+            var orderProcedures = await _orderProcedureService.GetOrderProceduresAsync();
 
             var orderProcedureViewModel = _mapper.Map<IEnumerable<OrderProcedureViewModel>>(orderProcedures);
 
@@ -39,18 +38,11 @@ namespace VetClinic.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetOrderProcedure(int id)
         {
-            try
-            {
-                var orderProcedure = await _orderProcedureService.GetByIdAsync(id);
+            var orderProcedure = await _orderProcedureService.GetByIdAsync(id);
 
-                var orderProcedureViewModel = _mapper.Map<OrderProcedureViewModel>(orderProcedure);
+            var orderProcedureViewModel = _mapper.Map<OrderProcedureViewModel>(orderProcedure);
 
-                return Ok(orderProcedureViewModel);
-            }
-            catch (ArgumentException ex)
-            {
-                return NotFound(ex.Message);
-            }
+            return Ok(orderProcedureViewModel);
         }
 
         [HttpPost]
@@ -77,15 +69,8 @@ namespace VetClinic.WebApi.Controllers
 
             if (validationResult.IsValid)
             {
-                try
-                {
-                    _orderProcedureService.Update(id, orderProcedure);
-                    return Ok();
-                }
-                catch (ArgumentException ex)
-                {
-                    return BadRequest(ex.Message);
-                }
+                _orderProcedureService.Update(id, orderProcedure);
+                return Ok();
             }
             return BadRequest(validationResult.Errors);
         }
@@ -93,29 +78,15 @@ namespace VetClinic.WebApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteOrderProcedure(int id)
         {
-            try
-            {
-                await _orderProcedureService.DeleteAsync(id);
-                return Ok($"{nameof(OrderProcedure)} {EntityHasBeenDeleted}");
-            }
-            catch (ArgumentException ex)
-            {
-                return NotFound(ex.Message);
-            }
+            await _orderProcedureService.DeleteAsync(id);
+            return Ok($"{nameof(OrderProcedure)} {EntityHasBeenDeleted}");
         }
 
         [HttpDelete]
         public async Task<IActionResult> DeleteOrderProcedures([FromQuery(Name = "ids")] IList<int> ids)
         {
-            try
-            {
-                await _orderProcedureService.DeleteRangeAsync(ids);
-                return Ok();
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            await _orderProcedureService.DeleteRangeAsync(ids);
+            return Ok();
         }
     }
 }

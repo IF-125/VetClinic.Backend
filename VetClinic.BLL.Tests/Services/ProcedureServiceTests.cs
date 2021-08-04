@@ -30,7 +30,7 @@ namespace VetClinic.BLL.Tests.Services
             _procedureRepository.Setup(b => b.GetAsync(null, null, null, true).Result)
                 .Returns(ProcedureFakeData.GetProcedureFakeData());
             //act
-            IList<Procedure> Procedures = await _procedureService.GetProceduresAsync(null, null, null, asNoTracking: true);
+            IList<Procedure> Procedures = await _procedureService.GetProceduresAsync();
             //assert
             Assert.NotNull(Procedures);
             Assert.Equal(10, Procedures.Count);

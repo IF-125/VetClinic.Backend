@@ -3,6 +3,7 @@ using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Query;
 using Moq;
+using SendGrid.Helpers.Errors.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -88,7 +89,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         }
 
         [Fact]
-        public void GetScheduleOfEmployee_WhenEmployeeHasNone()
+        public async Task GetScheduleOfEmployee_WhenEmployeeHasNone()
         {
             //Arrange
             var scheduleController = new ScheduleController(
@@ -112,16 +113,9 @@ namespace VetClinic.WebApi.Tests.Controllers
                 Func<IQueryable<Schedule>, IIncludableQueryable<Schedule, object>> include,
                 bool asNoTracking) => schedules.Where(filter).ToList());
 
-            var expectedErrorMessage = "No schedule was provided for this employee";
-
-            //Act
-            var result = scheduleController.GetScheduleOfEmployee(employeeId).Result;
-
-            var notFoundResult = result as NotFoundObjectResult;
-
-            //Assert
-            Assert.IsType<NotFoundObjectResult>(result);
-            Assert.Equal(expectedErrorMessage, notFoundResult.Value);
+            //Act, Assert
+            await Assert.ThrowsAsync<NotFoundException>(async () =>
+                await scheduleController.GetScheduleOfEmployee(employeeId));
         }
 
         [Fact]
@@ -173,11 +167,9 @@ namespace VetClinic.WebApi.Tests.Controllers
                 Func<IQueryable<Schedule>, IIncludableQueryable<Schedule, object>> include,
                 bool asNoTracking) => schedules.FirstOrDefault(filter));
 
-            //Act
-            var result = await scheduleController.GetSchedule(id);
-
-            //Assert
-            Assert.IsType<NotFoundObjectResult>(result);
+            //Act Assert
+            await Assert.ThrowsAsync<NotFoundException>(async () =>
+                await scheduleController.GetSchedule(id));
         }
 
         [Fact]
@@ -257,56 +249,9 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             _mockScheduleRepository.Setup(x => x.InsertAsync(It.IsAny<Schedule>()));
 
-            //Act
-            var result = await scheduleController.AssignScheduleToEmployee(scheduleVM, id);
-
-            //Assert
-            Assert.IsType<NotFoundObjectResult>(result);
-        }
-
-        [Fact]
-        public void AssignScheduleToEmployee_ReturnsBadRequest_DueToValidationErrors()
-        {
-            //Arrange
-            var scheduleController = new ScheduleController(
-                _scheduleService,
-                _mapper,
-                _scheduleValidator,
-                _scheduleCollectionValidator);
-
-            var scheduleVM = new ScheduleViewModel
-            {
-                Day = "bad input", //Wrong day
-                From = "12:00",
-                To = "15:00"
-            };
-
-            var employees = EmployeeFakeData
-                .GetEmployeeFakeData()
-                .AsQueryable();
-
-            var id = "f1a05cca-b479-4f72-bbda-96b8979f4afe";
-
-            _mockEmployeeRepository.Setup(x => x.GetFirstOrDefaultAsync(
-                x => x.Id == id,
-                It.IsAny<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>(),
-                false))
-                .ReturnsAsync((Expression<Func<Employee, bool>> filter,
-                Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>> include,
-                bool asNoTracking) => employees.FirstOrDefault(filter));
-
-            _mockEmployeeRepository.Setup(x => x.Update(It.IsAny<Employee>()));
-
-            _mockScheduleRepository.Setup(x => x.InsertAsync(It.IsAny<Schedule>()));
-
-            //Act
-            var result = scheduleController.AssignScheduleToEmployee(scheduleVM, id).Result;
-
-            //Assert
-            var badRequest = result as BadRequestObjectResult;
-
-            Assert.IsType<BadRequestObjectResult>(result);
-            Assert.True(badRequest.Value.GetType() == typeof(List<ValidationFailure>));
+            //Act, Assert
+            await Assert.ThrowsAsync<NotFoundException>(async () =>
+                await scheduleController.AssignScheduleToEmployee(scheduleVM, id));
         }
 
         [Fact]
@@ -429,11 +374,9 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             _mockScheduleRepository.Setup(x => x.InsertRangeAsync(schedules));
 
-            //Act
-            var result = await scheduleController.AssignSchedulesToEmployee(schedulesVM, id);
-
-            //Assert
-            Assert.IsType<NotFoundObjectResult>(result);
+            //Act, Assert
+            await Assert.ThrowsAsync<NotFoundException>(async () =>
+                await scheduleController.AssignSchedulesToEmployee(schedulesVM, id));
         }
 
         [Fact]
@@ -495,11 +438,9 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             _mockScheduleRepository.Setup(x => x.InsertRangeAsync(schedules));
 
-            //Act
-            var result = await scheduleController.AssignSchedulesToEmployee(schedulesVM, id);
-
-            //Assert
-             Assert.IsType<BadRequestObjectResult>(result);
+            //Act, Assert
+            await Assert.ThrowsAsync<AutoMapperMappingException>(async () =>
+                await scheduleController.AssignSchedulesToEmployee(schedulesVM, id));
         }
 
         [Fact]
@@ -587,7 +528,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         }
 
         [Fact]
-        public void DeleteSchedule_WhenScheduleDoesNotExist()
+        public async Task DeleteSchedule_WhenScheduleDoesNotExist()
         {
             //Arrange
             var id = 400;
@@ -598,11 +539,9 @@ namespace VetClinic.WebApi.Tests.Controllers
                 _scheduleValidator,
                 _scheduleCollectionValidator);
 
-            //Act
-            var result = scheduleController.DeleteSchedule(id).Result;
-
-            //Assert
-            Assert.IsType<NotFoundObjectResult>(result);
+            //Act, Assert
+            await Assert.ThrowsAsync<NotFoundException>(async () =>
+                await scheduleController.DeleteSchedule(id));
         }
 
         [Fact]
@@ -642,7 +581,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         }
 
         [Fact]
-        public void DeleteRange_WhenSomeScheduleWasNotFound()
+        public async Task DeleteRange_WhenSomeScheduleWasNotFound()
         {
             //Arrange
             var scheduleController = new ScheduleController(
@@ -668,11 +607,9 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             _mockScheduleRepository.Setup(x => x.DeleteRange(It.IsAny<IEnumerable<Schedule>>()));
 
-            //Act
-            var result = scheduleController.DeleteListOfSchedule(idArr).Result;
-
-            //Assert
-            Assert.IsType<BadRequestObjectResult>(result);
+            //Act, Assert
+            await Assert.ThrowsAsync<BadRequestException>(async () =>
+                await scheduleController.DeleteListOfSchedule(idArr));
         }
     }
 }

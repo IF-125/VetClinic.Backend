@@ -1,8 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Query;
-using System;
+﻿using SendGrid.Helpers.Errors.Model;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Repositories;
@@ -19,22 +17,17 @@ namespace VetClinic.BLL.Services
             _procedureRepository = procedureRepository;
         }
 
-        public async Task<IList<Procedure>> GetProceduresAsync(
-            Expression<Func<Procedure, bool>> filter = null,
-            Func<IQueryable<Procedure>, IOrderedQueryable<Procedure>> orderBy = null,
-            Func<IQueryable<Procedure>, IIncludableQueryable<Procedure, object>> include = null,
-            bool asNoTracking = false)
+        public async Task<IList<Procedure>> GetProceduresAsync()
         {
-            return await _procedureRepository.GetAsync(filter, orderBy, include, asNoTracking);
+            return await _procedureRepository.GetAsync(asNoTracking: true);
         }
 
         public async Task<Procedure> GetByIdAsync(int id)
         {
-            var procedure = await _procedureRepository.GetFirstOrDefaultAsync(x => x.Id == id);
-            if (procedure == null)
-            {
-                throw new ArgumentException($"{nameof(Procedure)} {EntityWasNotFound}");
-            }
+            var procedure = await _procedureRepository
+                .GetFirstOrDefaultAsync(x => x.Id == id) ??
+                    throw new NotFoundException($"{nameof(Procedure)} {EntityWasNotFound}");
+
             return procedure;
         }
 
@@ -48,7 +41,7 @@ namespace VetClinic.BLL.Services
         {
             if (id != procedureToUpdate.Id)
             {
-                throw new ArgumentException($"{nameof(Procedure)} {IdsDoNotMatch}");
+                throw new BadRequestException($"{nameof(Procedure)} {IdsDoNotMatch}");
             }
             _procedureRepository.Update(procedureToUpdate);
             _procedureRepository.SaveChanges();
@@ -57,23 +50,21 @@ namespace VetClinic.BLL.Services
 
         public async Task DeleteAsync(int id)
         {
-            var procedureToDelete = await _procedureRepository.GetFirstOrDefaultAsync(x => x.Id == id);
+            var procedureToDelete = await _procedureRepository
+                .GetFirstOrDefaultAsync(x => x.Id == id) ??
+                    throw new NotFoundException($"{nameof(Procedure)} {EntityWasNotFound}");
 
-            if (procedureToDelete == null)
-            {
-                throw new ArgumentException($"{nameof(Procedure)} {EntityWasNotFound}");
-            }
             _procedureRepository.Delete(procedureToDelete);
             await _procedureRepository.SaveChangesAsync();
         }
 
         public async Task DeleteRangeAsync(IList<int> listOfIds)
         {
-            var proceduresToDelete = await GetProceduresAsync(x => listOfIds.Contains(x.Id));
+            var proceduresToDelete = await _procedureRepository.GetAsync(x => listOfIds.Contains(x.Id));
 
             if (proceduresToDelete.Count() != listOfIds.Count)
             {
-                throw new ArgumentException($"{SomeEntitiesInCollectionNotFound} {nameof(Procedure)}s to delete");
+                throw new BadRequestException($"{SomeEntitiesInCollectionNotFound} {nameof(Procedure)}s to delete");
             }
             _procedureRepository.DeleteRange(proceduresToDelete);
             await _procedureRepository.SaveChangesAsync();

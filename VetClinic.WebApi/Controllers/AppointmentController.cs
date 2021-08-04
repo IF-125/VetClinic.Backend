@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
@@ -28,7 +27,7 @@ namespace VetClinic.WebApi.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllAppointments()
         {
-            var appointments = await _appointmentService.GetAppointmentsAsync(asNoTracking: true);
+            var appointments = await _appointmentService.GetAppointmentsAsync();
 
             var appointmentViewModel = _mapper.Map<IEnumerable<AppointmentViewModel>>(appointments);
 
@@ -69,15 +68,8 @@ namespace VetClinic.WebApi.Controllers
 
             if (validationResult.IsValid)
             {
-                try
-                {
-                    _appointmentService.Update(id, appointment);
-                    return Ok();
-                }
-                catch (ArgumentException ex)
-                {
-                    return BadRequest(ex.Message);
-                }
+                _appointmentService.Update(id, appointment);
+                return Ok();
             }
             return BadRequest(validationResult.Errors);
         }
@@ -85,29 +77,15 @@ namespace VetClinic.WebApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAppointment(int id)
         {
-            try
-            {
-                await _appointmentService.DeleteAsync(id);
-                return Ok($"{nameof(Appointment)} {EntityHasBeenDeleted}");
-            }
-            catch (ArgumentException ex)
-            {
-                return NotFound(ex.Message);
-            }
+            await _appointmentService.DeleteAsync(id);
+            return Ok($"{nameof(Appointment)} {EntityHasBeenDeleted}");
         }
 
         [HttpDelete]
         public async Task<IActionResult> DeleteAppointments([FromQuery(Name = "ids")] IList<int> ids)
         {
-            try
-            {
-                await _appointmentService.DeleteRangeAsync(ids);
-                return Ok();
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            await _appointmentService.DeleteRangeAsync(ids);
+            return Ok();
         }
     }
 }

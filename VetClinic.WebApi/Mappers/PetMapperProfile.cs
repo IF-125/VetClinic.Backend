@@ -9,7 +9,9 @@ namespace VetClinic.WebApi.Mappers
         public PetMapperProfile()
         {
             CreateMap<Pet, PetViewModel>()
-                .ForMember(x=>x.AnimalType,y=>y.MapFrom(src=>src.AnimalType.Type))
+                
+                .ForMember(x => x.AnimalType, y => y.MapFrom(src => src.AnimalType.Type))
+                
                 .ReverseMap();
         }
     }
