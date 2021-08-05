@@ -8,5 +8,7 @@ namespace VetClinic.Core.Interfaces.Services
     public interface IOrderProcedureService : IBaseService<OrderProcedure, int>
     {
         public Task<IList<OrderProcedure>> GetOrderProceduresAsync();
+
+        public Task<IEnumerable<OrderProcedure>> GetOrderProceduresOfDoctorAsync(string doctorId);
     }
 }
