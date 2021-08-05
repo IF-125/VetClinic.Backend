@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
+using VetClinic.Core.Interfaces.Services;
 using VetClinic.WebApi.ViewModels;
 
 namespace VetClinic.WebApi.Controllers
@@ -15,14 +16,16 @@ namespace VetClinic.WebApi.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
+        private readonly IJWTTokenGenerator _token;
 
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager)
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, IJWTTokenGenerator token)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _token = token;
         }
   
-        [HttpPost]
+        [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterViewModel model)
         {
             if (!ModelState.IsValid)
@@ -53,39 +56,33 @@ namespace VetClinic.WebApi.Controllers
         public async Task<IActionResult> Login([FromBody] LoginViewModel model)
         {
 
+            var user = await _userManager.FindByEmailAsync(model.Email);
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
             
-            var result = await _signInManager.PasswordSignInAsync(model.Email,
-                                                                      model.Password,
-                                                                      model.RememberMe,
-                                                                      false);
-            if (result.Succeeded)
+            var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
+
+            if (!result.Succeeded)
             {
-                    if (!string.IsNullOrEmpty(model.ReturnUrl))
-                    {
-                        return Redirect(model.ReturnUrl);
-                    }
-                    else
-                    {
-                        return RedirectToAction("Index", "Home");
-                    }
+                return BadRequest();
             }
-            else
+
+            return Ok(new
             {
-                ModelState.AddModelError("", "Wrong login or password");
-            }
-            
-            return Ok(model);
-        }
+                result = result,
+                email = model.Email,
+                token = _token.GenerateToken(user)
+            }) ;
+    }
 
         [HttpPost("Logout")]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-            return Redirect("api/Home");
+            return Redirect("/");
         }
     }
 }
