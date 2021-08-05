@@ -78,7 +78,8 @@ namespace VetClinic.BLL.Services
                 filter: x => x.EmployeeId == doctorId,
                 include: y => y
                     .Include(p => p.Procedure)
-                    .Include(p => p.Pet),
+                    .Include(p => p.Pet)
+                    .ThenInclude(a => a.AnimalType),
                 asNoTracking: true);
         }
     }

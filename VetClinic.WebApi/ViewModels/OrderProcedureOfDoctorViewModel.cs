@@ -16,5 +16,6 @@
         public string PetInformation { get; set; }
         public string PetBreed { get; set; }
         public int PetAge { get; set; }
+        public string AnimalType { get; set; }
     }
 }

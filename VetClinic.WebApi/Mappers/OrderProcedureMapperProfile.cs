@@ -28,6 +28,8 @@ namespace VetClinic.WebApi.Mappers
 
                 .ForMember(x => x.Time, opt => opt.ConvertUsing(new StringToTimeSpanConverter()))
 
+                .ForMember(x => x.AnimalType, y => y.MapFrom(src => src.Pet.AnimalType.Type))
+
                 .ReverseMap();
         }
     }
