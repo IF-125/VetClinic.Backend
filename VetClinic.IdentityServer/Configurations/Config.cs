@@ -64,7 +64,7 @@ namespace VetClinic.IdentityServer.Configurations
                     
                     RequireClientSecret = false,
 
-                    AllowedGrantTypes = GrantTypes.ClientCredentials,
+                    AllowedGrantTypes = GrantTypes.ResourceOwnerPasswordAndClientCredentials,
 
                     ClientSecrets =
                     {

@@ -7,14 +7,14 @@ namespace VetClinic.WebApi.ViewModels
 {
     public class RegisterViewModel
     {
-        [Required]
-        [Display(Name = "First Name")]
+        //[Required]
+        //[Display(Name = "First Name")]
         public string FirstName { get; set; }
 
-        [Required]
-        [Display(Name = "Last Name")]
+        //[Required]
+        //[Display(Name = "Last Name")]
         public string LastName { get; set; }
-        [Required]
+        //[Required]
         [Display(Name = "Email")]
         public string Email { get; set; }
 

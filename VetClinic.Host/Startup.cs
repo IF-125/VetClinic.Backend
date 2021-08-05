@@ -101,6 +101,8 @@ namespace VetClinic.Host
 
             services.AddControllers().AddNewtonsoftJson();
 
+            services.AddHttpClient();
+
             #region Swagger
             services.AddSwaggerGen(c =>
             {

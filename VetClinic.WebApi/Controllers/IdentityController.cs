@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
+﻿using IdentityModel.Client;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Net.Http;
@@ -8,13 +8,18 @@ using System.Threading.Tasks;
 
 namespace VetClinic.WebApi.Controllers
 {
-    
+
     [Route("api/[controller]")]
     [ApiController]
     public class IdentityController : ControllerBase
     {
 
-        private static readonly HttpClient HttpClient = new HttpClient();
+        private readonly IHttpClientFactory _httpClientFactory;
+
+        public IdentityController(IHttpClientFactory httpClientFactory)
+        {
+            _httpClientFactory = httpClientFactory;
+        }
 
         [HttpGet]
         public async Task<IActionResult> Index()
@@ -29,23 +34,52 @@ namespace VetClinic.WebApi.Controllers
         }
 
 
-        //[Route("/callapi")]
+        //[Route("/")]
         [HttpGet("callapi")]
         public async Task<IActionResult> CallApi()
         {
-            string accessToken = await HttpContext.GetTokenAsync("access_token");
-            var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:5101/connect/token");
 
-            
-            request.Headers.Authorization = new AuthenticationHeaderValue("bearer", accessToken);
-            HttpResponseMessage response = await HttpClient.SendAsync(request);
+            var serverClient = _httpClientFactory.CreateClient();
+            var disco = await serverClient.GetDiscoveryDocumentAsync("https://localhost:5101");
 
-            if (response.StatusCode != HttpStatusCode.OK)
+            var tokenResponse = await serverClient.RequestClientCredentialsTokenAsync(
+                new ClientCredentialsTokenRequest
+                {
+                    Address = disco.TokenEndpoint,
+                    
+                    ClientId = "swagger",
+                    ClientSecret = "secret",
+
+                    Scope = "api1"
+
+                });
+
+            var apiClient = _httpClientFactory.CreateClient();
+            apiClient.SetBearerToken(tokenResponse.AccessToken);
+            var response = await apiClient.GetAsync("https://localhost:44350");
+
+            var content = await response.Content.ReadAsStringAsync();
+
+            return Ok(new
             {
-                return Content(response.ToString());
-            }
+                access_token = tokenResponse.AccessToken,
+                message = content
+            });
 
-            return Content($"{await response.Content.ReadAsStringAsync()}");
+
+            //string accessToken = await HttpContext.GetTokenAsync("access_token");
+            //var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:5101/connect/token");
+
+
+            //request.Headers.Authorization = new AuthenticationHeaderValue("bearer", accessToken);
+            //HttpResponseMessage response = await HttpClient.SendAsync(request);
+
+            //if (response.StatusCode != HttpStatusCode.OK)
+            //{
+            //    return Content(response.ToString());
+            //}
+
+            //return Content($"{await response.Content.ReadAsStringAsync()}");
         }
     }
 }
