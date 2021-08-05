@@ -7,7 +7,7 @@ namespace VetClinic.WebApi.Validators.EntityValidators
     {
         public OrderValidator()
         {
-            RuleFor(b => b.CreatedAt).NotEmpty().WithMessage("Order creation date is required!");
+            RuleFor(b => b.IsPaid).NotEmpty().WithMessage("Payment option must be selected");
         }
     }
 }

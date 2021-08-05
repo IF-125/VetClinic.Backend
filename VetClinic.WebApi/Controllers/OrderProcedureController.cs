@@ -45,6 +45,16 @@ namespace VetClinic.WebApi.Controllers
             return Ok(orderProcedureViewModel);
         }
 
+        [HttpGet("GetOrderedProceduresOfDoctor")]
+        public async Task<IActionResult> GetOrderedProceduresOfDoctor(string doctorId)
+        {
+            var orderedProceduresOfDoctor = await _orderProcedureService.GetOrderProceduresOfDoctorAsync(doctorId);
+
+            var orderedProceduresOfDoctorViewModel = _mapper.Map<IEnumerable<OrderProcedureOfDoctorViewModel>>(orderedProceduresOfDoctor);
+
+            return Ok(orderedProceduresOfDoctorViewModel);
+        }
+
         [HttpPost]
         public async Task<IActionResult> InsertOrderProcedure(OrderProcedureViewModel model)
         {
@@ -55,7 +65,7 @@ namespace VetClinic.WebApi.Controllers
             if (validationResult.IsValid)
             {
                 await _orderProcedureService.InsertAsync(newOrderProcedure);
-                return Ok(newOrderProcedure);
+                return Ok(model);
             }
             return BadRequest(validationResult.Errors);
         }
