@@ -26,6 +26,13 @@ namespace VetClinic.BLL.Services
             .Include(y => y.AnimalType),
             asNoTracking: true);
         }
+        public async Task<IList<Pet>> GetPetsByClientId(string clientId)
+        {
+            return await _petRepository.GetAsync(x => x.ClientId == clientId,
+                include: x => x
+            .Include(y => y.AnimalType),
+            asNoTracking: true);
+        }
 
         public async Task<Pet> GetByIdAsync(int id)
         {

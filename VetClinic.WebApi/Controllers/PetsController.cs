@@ -34,6 +34,15 @@ namespace VetClinic.WebApi.Controllers
             return Ok(petViewModel);
         }
 
+        [HttpGet("GetByClientId/{clientId}")]
+        public async Task<IActionResult> GetPetsByClientId(string clientId)
+        {
+            var pets = await _petService.GetPetsByClientId(clientId);
+            var petViewModel = _mapper.Map<IEnumerable<PetViewModel>>(pets);
+
+            return Ok(petViewModel);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPet(int id)
         {
@@ -49,6 +58,7 @@ namespace VetClinic.WebApi.Controllers
                 return NotFound(ex.Message);
             }                     
         }
+
         
         [HttpPost]
         public async Task<IActionResult> InsertPet(PetViewModel petViewModel)
