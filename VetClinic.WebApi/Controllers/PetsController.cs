@@ -39,7 +39,7 @@ namespace VetClinic.WebApi.Controllers
         public async Task<IActionResult> GetPetsByClientId(string clientId)
         {
             var pets = await _petService.GetPetsByClientId(clientId);
-            var petViewModel = _mapper.Map<IEnumerable<PetViewModel>>(pets);
+            var petViewModel = _mapper.Map<IEnumerable<PetResponseViewModel>>(pets);
 
             return Ok(petViewModel);
         }
