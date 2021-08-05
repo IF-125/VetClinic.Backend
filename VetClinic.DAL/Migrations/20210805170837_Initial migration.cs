@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace VetClinic.DAL.Migrations
 {
-    public partial class InitialMigration : Migration
+    public partial class Initialmigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -70,7 +70,7 @@ namespace VetClinic.DAL.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CreatedAt = table.Column<DateTime>(nullable: false, defaultValue: new DateTime(2021, 7, 16, 2, 26, 50, 46, DateTimeKind.Local).AddTicks(3355)),
+                    CreatedAt = table.Column<DateTime>(nullable: false, defaultValue: new DateTime(2021, 8, 5, 20, 8, 37, 498, DateTimeKind.Local).AddTicks(8622)),
                     IsPaid = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
@@ -98,7 +98,7 @@ namespace VetClinic.DAL.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(maxLength: 50, nullable: false),
-                    Description = table.Column<string>(maxLength: 50, nullable: true),
+                    Description = table.Column<string>(maxLength: 1000, nullable: true),
                     Duration = table.Column<TimeSpan>(nullable: false),
                     Price = table.Column<decimal>(nullable: false)
                 },
@@ -370,12 +370,6 @@ namespace VetClinic.DAL.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_OrderProcedures_Pets_PetId",
-                        column: x => x.PetId,
-                        principalTable: "Pets",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
-                    table.ForeignKey(
                         name: "FK_OrderProcedures_Procedures_ProcedureId",
                         column: x => x.ProcedureId,
                         principalTable: "Procedures",
@@ -409,7 +403,7 @@ namespace VetClinic.DAL.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Date = table.Column<DateTime>(nullable: false, defaultValue: new DateTime(2021, 7, 16, 2, 26, 50, 73, DateTimeKind.Local).AddTicks(5596)),
+                    Date = table.Column<DateTime>(nullable: false, defaultValue: new DateTime(2021, 8, 5, 20, 8, 37, 521, DateTimeKind.Local).AddTicks(7223)),
                     Amount = table.Column<decimal>(nullable: false),
                     Bonus = table.Column<decimal>(nullable: false),
                     EmployeePositionId = table.Column<int>(nullable: false)
