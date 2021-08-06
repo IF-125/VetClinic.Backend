@@ -2,6 +2,7 @@
 using SendGrid.Helpers.Errors.Model;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Repositories;
@@ -13,10 +14,14 @@ namespace VetClinic.BLL.Services
     public class PetServise : IPetService
     {
         private readonly IPetRepository _petRepository;
+        private readonly IOrderProcedureRepository _orderProcedureRepository;
 
-        public PetServise(IPetRepository petRepository)
+        public PetServise(IPetRepository petRepository,
+            IOrderProcedureRepository orderProcedureRepository
+            )
         {
             _petRepository = petRepository;
+            _orderProcedureRepository = orderProcedureRepository;
         }
 
         public async Task<IList<Pet>> GetPetsAsync()
@@ -24,6 +29,7 @@ namespace VetClinic.BLL.Services
             return await _petRepository.GetAsync(include: x => x.Include(y => y.AnimalType),
             asNoTracking: true);
         }
+
         public async Task<IList<Pet>> GetPetsByClientId(string clientId)
         {
             return await _petRepository.GetAsync(x => x.ClientId == clientId,
@@ -48,7 +54,6 @@ namespace VetClinic.BLL.Services
             await _petRepository.InsertAsync(entity);
             await _petRepository.SaveChangesAsync();
         }
-
 
         public  void Update(int id, Pet petToUpdate)
         {

@@ -9,11 +9,13 @@ namespace VetClinic.WebApi.Mappers
     {
         public OrderProcedureMapperProfile()
         {
+            #region OrderProcedureViewModel mapping
             CreateMap<OrderProcedure, OrderProcedureViewModel>()
                 
                 .ReverseMap();
+            #endregion
 
-
+            #region OrderProcedureOfDoctorViewModel mapping
             CreateMap<OrderProcedure, OrderProcedureOfDoctorViewModel>()
 
                 .ForMember(x => x.ProcedureTitle, y => y.MapFrom(src => src.Procedure.Title))
@@ -31,6 +33,19 @@ namespace VetClinic.WebApi.Mappers
                 .ForMember(x => x.AnimalType, y => y.MapFrom(src => src.Pet.AnimalType.Type))
 
                 .ReverseMap();
+            #endregion
+
+            #region MedicalCardViewModel mapping
+            CreateMap<OrderProcedure, MedicalCardViewModel>()
+
+                .ForMember(x => x.TotalDuration, y => y.MapFrom(src => src.Time))
+
+                .ForMember(x => x.OrderDate, y => y.MapFrom(src => src.Order.CreatedAt))
+
+                .ForMember(x => x.ProcedureTitle, y => y.MapFrom(src => src.Procedure.Title))
+
+                .ReverseMap();
+            #endregion
         }
     }
 }

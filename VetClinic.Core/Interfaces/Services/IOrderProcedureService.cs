@@ -10,5 +10,7 @@ namespace VetClinic.Core.Interfaces.Services
         public Task<IList<OrderProcedure>> GetOrderProceduresAsync();
 
         public Task<IEnumerable<OrderProcedure>> GetOrderProceduresOfDoctorAsync(string doctorId);
+
+        public Task<IList<OrderProcedure>> GetMedicalCardOfPetAsync(int petId);
     }
 }
