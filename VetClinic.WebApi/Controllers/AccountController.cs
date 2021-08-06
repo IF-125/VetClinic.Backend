@@ -25,7 +25,7 @@ namespace VetClinic.WebApi.Controllers
             _token = token;
         }
   
-        [HttpPost("register")]
+        [HttpPost("Register")]
         public async Task<IActionResult> Register([FromBody] RegisterViewModel model)
         {
             if (!ModelState.IsValid)
@@ -41,18 +41,11 @@ namespace VetClinic.WebApi.Controllers
             if (!result.Succeeded) return BadRequest(result.Errors);
 
             await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("Role", "Client"));
+
             return Ok();
         }
-
-        [Route("Login")]
-        [HttpGet]
-        public IActionResult Login(string returnUrl = null)
-        {
-            var res = returnUrl;
-            return Content(res);
-        }
         
-        [HttpPost("validate")]
+        [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] LoginViewModel model)
         {
 
@@ -63,7 +56,10 @@ namespace VetClinic.WebApi.Controllers
                 return BadRequest(ModelState);
             }
             
-            var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
+            var result = await _signInManager.PasswordSignInAsync(model.Email, 
+                                                                  model.Password, 
+                                                                  model.RememberMe, 
+                                                                  false);
 
             if (!result.Succeeded)
             {
@@ -75,7 +71,7 @@ namespace VetClinic.WebApi.Controllers
                 result = result,
                 email = model.Email,
                 token = _token.GenerateToken(user)
-            }) ;
+            });
     }
 
         [HttpPost("Logout")]
