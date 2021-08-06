@@ -24,7 +24,6 @@ namespace VetClinic.IdentityServer
                 .AddInMemoryClients(Config.Clients)
                 .AddInMemoryApiResources(Config.ApiResources)
                 .AddInMemoryIdentityResources(Config.IdentityResources)
-                .AddInMemoryApiScopes(Config.ApiScopes)
                 .AddProfileService<ProfileService>();
             
             services.AddControllers();

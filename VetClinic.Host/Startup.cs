@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Text;
 using VetClinic.BLL.Services;
 using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Repositories;
@@ -67,6 +68,7 @@ namespace VetClinic.Host
             services.AddScoped<IProcedureService, ProcedureService>();
             services.AddScoped<IOrderProcedureService, OrderProcedureService>();
             services.AddScoped<IAnimalTypeService, AnimalTypeService>();
+            services.AddScoped<IJWTTokenGenerator, JWTTokenGenerator>();
 
             //Validators
             services.AddScoped<AppointmentValidator>();
@@ -81,6 +83,8 @@ namespace VetClinic.Host
             services.AddScoped<ScheduleValidator>();
             services.AddScoped<UserValidator>();
             services.AddScoped<ScheduleCollectionValidator>();
+            services.AddScoped<LoginValidator>();
+            services.AddScoped<RegisterValidator>();
             #endregion
 
             services.AddCors();
@@ -100,6 +104,8 @@ namespace VetClinic.Host
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             services.AddControllers().AddNewtonsoftJson();
+
+            services.AddHttpClient();
 
             #region Swagger
             services.AddSwaggerGen(c =>
@@ -130,17 +136,32 @@ namespace VetClinic.Host
                             
                         }
                     }
+                    
                 });
             });
             #endregion
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                 .AddCookie(options =>
+                 {
+                     options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+                     options.Cookie.Name = "Bearer";
+                     options.Cookie.HttpOnly = true;
+                 })
             .AddJwtBearer("Bearer", options =>
             {
                 options.Authority = "https://localhost:5101";
+             
+                options.SaveToken = true;
+
+                options.RequireHttpsMetadata = false;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Token:Key"])),
+                    ValidIssuer = Configuration["Token:Issuer"],
                     ValidateAudience = false,
+                    ValidateIssuer = true,
                     NameClaimType = "name",
                     RoleClaimType = "role"
                 };
