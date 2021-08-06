@@ -55,6 +55,16 @@ namespace VetClinic.WebApi.Controllers
             return Ok(orderedProceduresOfDoctorViewModel);
         }
 
+        [HttpGet("GetMedicalCard")]
+        public async Task<IActionResult> GetMedicalCardOfPetAsync(int petId)
+        {
+            var medicalCard = await _orderProcedureService.GetMedicalCardOfPetAsync(petId);
+
+            var medicalCardModel = _mapper.Map<IEnumerable<MedicalCardViewModel>>(medicalCard);
+
+            return Ok(medicalCardModel);
+        }
+
         [HttpPost]
         public async Task<IActionResult> InsertOrderProcedure(OrderProcedureViewModel model)
         {
@@ -98,5 +108,7 @@ namespace VetClinic.WebApi.Controllers
             await _orderProcedureService.DeleteRangeAsync(ids);
             return Ok();
         }
+
+
     }
 }

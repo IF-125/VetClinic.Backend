@@ -82,5 +82,16 @@ namespace VetClinic.BLL.Services
                     .ThenInclude(a => a.AnimalType),
                 asNoTracking: true);
         }
+
+        public async Task<IList<OrderProcedure>> GetMedicalCardOfPetAsync(int petId)
+        {
+            return await _orderProcedureRepository.GetAsync(
+                filter: x => x.PetId == petId,
+                include: i => i
+                    .Include(p => p.Procedure)
+                    .Include(o => o.Order),
+                asNoTracking: true
+                );
+        }
     }
 }
