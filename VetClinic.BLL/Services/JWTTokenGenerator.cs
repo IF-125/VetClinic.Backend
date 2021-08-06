@@ -42,8 +42,7 @@ namespace VetClinic.BLL.Services
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
-            var res = tokenHandler.WriteToken(token);
-            return res;//tokenHandler.WriteToken(token);
+            return tokenHandler.WriteToken(token);
         }
     }
 }
