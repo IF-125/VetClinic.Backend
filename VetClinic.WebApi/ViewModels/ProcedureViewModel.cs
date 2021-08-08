@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 
 namespace VetClinic.WebApi.ViewModels
 {
@@ -9,5 +9,6 @@ namespace VetClinic.WebApi.ViewModels
         public string Description { get; set; }
         public string Duration { get; set; }
         public decimal Price { get; set; }
+        public IList<int> AnimalTypesIds { get; set; }
     }
 }

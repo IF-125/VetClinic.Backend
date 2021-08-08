@@ -11,6 +11,6 @@ namespace VetClinic.Core.Entities
         public TimeSpan Duration { get; set; }
         public decimal Price { get; set; }
         public ICollection<OrderProcedure> OrderProcedures { get; set; }
-        public ICollection<AnimalTypeProcedure> AnimalTypesProcedures { get; set; }
+        public ICollection<AnimalTypeProcedure> AnimalTypesProcedures { get; set; } = new List<AnimalTypeProcedure>();
     }
 }

@@ -15,11 +15,16 @@ namespace VetClinic.WebApi.Controllers
     public class ProcedureController : ControllerBase
     {
         private readonly IProcedureService _procedureService;
+        private readonly IAnimalTypeProcedureService _animalTypeProcedureService;
         private readonly IMapper _mapper;
         private readonly ProcedureValidator _validator;
-        public ProcedureController(IProcedureService procedureService, IMapper mapper, ProcedureValidator validator)
+        public ProcedureController(IProcedureService procedureService,
+            IAnimalTypeProcedureService animalTypeProcedureService,
+            IMapper mapper,
+            ProcedureValidator validator)
         {
             _procedureService = procedureService;
+            _animalTypeProcedureService = animalTypeProcedureService;
             _mapper = mapper;
             _validator = validator;
         }
@@ -53,7 +58,7 @@ namespace VetClinic.WebApi.Controllers
 
             if (validationResult.IsValid)
             {
-                await _procedureService.InsertAsync(newProcedure);
+                await _animalTypeProcedureService.InsertAsync(newProcedure, model.AnimalTypesIds);
                 return Ok(newProcedure);
             }
             return BadRequest(validationResult.Errors);
