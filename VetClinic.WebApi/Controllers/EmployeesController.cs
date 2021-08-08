@@ -124,15 +124,8 @@ namespace VetClinic.WebApi.Controllers
         [HttpDelete]
         public async Task<IActionResult> DeleteEmployeesAsync([FromQuery(Name = "listOfIds")] IList<string> listOfIds)
         {
-            try
-            {
-                await _employeeService.DeleteRangeAsync(listOfIds);
-                return Ok();
-            }
-            catch(BadRequestException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            await _employeeService.DeleteRangeAsync(listOfIds);
+            return Ok();
         }
     }
 }
