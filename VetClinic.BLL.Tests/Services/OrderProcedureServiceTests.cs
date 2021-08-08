@@ -9,6 +9,7 @@ using VetClinic.BLL.Services;
 using VetClinic.BLL.Tests.FakeData;
 using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Repositories;
+using VetClinic.Core.Interfaces.Services;
 using Xunit;
 
 namespace VetClinic.BLL.Tests.Services
@@ -16,18 +17,24 @@ namespace VetClinic.BLL.Tests.Services
     public class OrderProcedureServiceTests
     {
         private readonly OrderProcedureService _orderProcedureService;
-        private readonly Mock<IOrderProcedureRepository> _orderProcedureRepository = new Mock<IOrderProcedureRepository>();
+        private readonly Mock<IPetService> _mockPetService = new Mock<IPetService>();
+        private readonly Mock<IProcedureService> _mockProcedureService = new Mock<IProcedureService>();
+        private readonly Mock<IOrderRepository> _mockOrderRepository = new Mock<IOrderRepository>();
+        private readonly Mock<IOrderProcedureRepository> _mockOrderProcedureRepository = new Mock<IOrderProcedureRepository>();
         public OrderProcedureServiceTests()
         {
             _orderProcedureService = new OrderProcedureService(
-                _orderProcedureRepository.Object);
+                _mockOrderProcedureRepository.Object,
+                _mockPetService.Object,
+                _mockProcedureService.Object,
+                _mockOrderRepository.Object);
         }
 
         [Fact]
         public async Task CanReturnAllOrderProcedures()
         {
             //arrange
-            _orderProcedureRepository.Setup(b => b.GetAsync(null, null, null, true).Result)
+            _mockOrderProcedureRepository.Setup(b => b.GetAsync(null, null, null, true).Result)
                 .Returns(OrderProcedureFakeData.GetOrderProcedureFakeData());
             //act
             IList<OrderProcedure> OrderProcedures = await _orderProcedureService.GetOrderProceduresAsync();
@@ -44,7 +51,7 @@ namespace VetClinic.BLL.Tests.Services
 
             var OrderProcedures = OrderProcedureFakeData.GetOrderProcedureFakeData().AsQueryable();
 
-            _orderProcedureRepository.Setup(b => b.GetFirstOrDefaultAsync(
+            _mockOrderProcedureRepository.Setup(b => b.GetFirstOrDefaultAsync(
                 b => b.Id == id, null, false).Result)
                 .Returns((Expression<Func<OrderProcedure, bool>> filter,
                 Func<IQueryable<OrderProcedure>, IIncludableQueryable<OrderProcedure, object>> include,
@@ -63,7 +70,7 @@ namespace VetClinic.BLL.Tests.Services
 
             var OrderProcedures = OrderProcedureFakeData.GetOrderProcedureFakeData().AsQueryable();
 
-            _orderProcedureRepository.Setup(b => b.GetFirstOrDefaultAsync(
+            _mockOrderProcedureRepository.Setup(b => b.GetFirstOrDefaultAsync(
                 b => b.Id == id, null, true).Result)
                 .Returns((Expression<Func<OrderProcedure, bool>> filter,
                 Func<IQueryable<OrderProcedure>, IIncludableQueryable<OrderProcedure, object>> include,
@@ -81,8 +88,6 @@ namespace VetClinic.BLL.Tests.Services
             OrderProcedure OrderProcedureToInsert = new OrderProcedure
             {
                 Id = 11,
-                Count = 1,
-                Time = new TimeSpan(hours: 1, minutes: 27, seconds: 0),
                 Conclusion = "Procedure was conducted successfully.",
                 Details = "The patient appearts to be stable.",
                 OrderId = 11,
@@ -91,11 +96,11 @@ namespace VetClinic.BLL.Tests.Services
                 EmployeeId = "f1a05cca-b479-4f72-bbda-96b8979f4afe"
             };
 
-            _orderProcedureRepository.Setup(b => b.InsertAsync(It.IsAny<OrderProcedure>()));
+            _mockOrderProcedureRepository.Setup(b => b.InsertAsync(It.IsAny<OrderProcedure>()));
             //act
             await _orderProcedureService.InsertAsync(OrderProcedureToInsert);
             //assert
-            _orderProcedureRepository.Verify(b => b.InsertAsync(OrderProcedureToInsert));
+            _mockOrderProcedureRepository.Verify(b => b.InsertAsync(OrderProcedureToInsert));
         }
 
         [Fact]
@@ -105,8 +110,6 @@ namespace VetClinic.BLL.Tests.Services
             OrderProcedure OrderProcedureToUpdate = new OrderProcedure
             {
                 Id = 11,
-                Count = 1,
-                Time = new TimeSpan(hours: 1, minutes: 27, seconds: 0),
                 Conclusion = "Procedure was conducted successfully.",
                 Details = "The patient appearts to be stable.",
                 OrderId = 11,
@@ -117,11 +120,11 @@ namespace VetClinic.BLL.Tests.Services
 
             int id = 11;
 
-            _orderProcedureRepository.Setup(b => b.Update(It.IsAny<OrderProcedure>()));
+            _mockOrderProcedureRepository.Setup(b => b.Update(It.IsAny<OrderProcedure>()));
             //act
             _orderProcedureService.Update(id, OrderProcedureToUpdate);
             //assert
-            _orderProcedureRepository.Verify(b => b.Update(OrderProcedureToUpdate));
+            _mockOrderProcedureRepository.Verify(b => b.Update(OrderProcedureToUpdate));
         }
 
         [Fact]
@@ -131,8 +134,6 @@ namespace VetClinic.BLL.Tests.Services
             OrderProcedure OrderProcedureToUpdate = new OrderProcedure
             {
                 Id = 11,
-                Count = 1,
-                Time = new TimeSpan(hours: 1, minutes: 27, seconds: 0),
                 Conclusion = "Procedure was conducted successfully.",
                 Details = "The patient appearts to be stable.",
                 OrderId = 11,
@@ -143,7 +144,7 @@ namespace VetClinic.BLL.Tests.Services
 
             int id = 10;
 
-            _orderProcedureRepository.Setup(b => b.Update(It.IsAny<OrderProcedure>()));
+            _mockOrderProcedureRepository.Setup(b => b.Update(It.IsAny<OrderProcedure>()));
             //assert
             Assert.Throws<ArgumentException>(() => _orderProcedureService.Update(id, OrderProcedureToUpdate));
         }
@@ -154,15 +155,15 @@ namespace VetClinic.BLL.Tests.Services
             //arrange
             var id = 10;
 
-            _orderProcedureRepository.Setup(b => b.GetFirstOrDefaultAsync(
+            _mockOrderProcedureRepository.Setup(b => b.GetFirstOrDefaultAsync(
                 b => b.Id == id, null, false).Result)
                 .Returns(new OrderProcedure() { Id = id });
 
-            _orderProcedureRepository.Setup(b => b.Delete(It.IsAny<OrderProcedure>())).Verifiable();
+            _mockOrderProcedureRepository.Setup(b => b.Delete(It.IsAny<OrderProcedure>())).Verifiable();
             //act
             await _orderProcedureService.DeleteAsync(id);
             //assert
-            _orderProcedureRepository.Verify(b => b.Delete(It.IsAny<OrderProcedure>()));
+            _mockOrderProcedureRepository.Verify(b => b.Delete(It.IsAny<OrderProcedure>()));
         }
 
         [Fact]
@@ -180,17 +181,17 @@ namespace VetClinic.BLL.Tests.Services
 
             var OrderProcedures = OrderProcedureFakeData.GetOrderProcedureFakeData().AsQueryable();
 
-            _orderProcedureRepository.Setup(b => b.GetAsync(It.IsAny<Expression<Func<OrderProcedure, bool>>>(), null, null, false).Result)
+            _mockOrderProcedureRepository.Setup(b => b.GetAsync(It.IsAny<Expression<Func<OrderProcedure, bool>>>(), null, null, false).Result)
                 .Returns((Expression<Func<OrderProcedure, bool>> filter,
                 Func<IQueryable<OrderProcedure>, IOrderedQueryable<OrderProcedure>> OrderProcedureBy,
                 Func<IQueryable<OrderProcedure>, IIncludableQueryable<Employee, object>> include,
                 bool asNoTracking) => OrderProcedures.Where(filter).ToList());
 
-            _orderProcedureRepository.Setup(b => b.DeleteRange(It.IsAny<IEnumerable<OrderProcedure>>()));
+            _mockOrderProcedureRepository.Setup(b => b.DeleteRange(It.IsAny<IEnumerable<OrderProcedure>>()));
             //act
             _orderProcedureService.DeleteRangeAsync(ids).Wait();
             //assert
-            _orderProcedureRepository.Verify(b => b.DeleteRange(It.IsAny<IEnumerable<OrderProcedure>>()));
+            _mockOrderProcedureRepository.Verify(b => b.DeleteRange(It.IsAny<IEnumerable<OrderProcedure>>()));
         }
 
         [Fact]
@@ -201,13 +202,13 @@ namespace VetClinic.BLL.Tests.Services
 
             var OrderProcedures = OrderProcedureFakeData.GetOrderProcedureFakeData().AsQueryable();
 
-            _orderProcedureRepository.Setup(b => b.GetAsync(It.IsAny<Expression<Func<OrderProcedure, bool>>>(), null, null, false).Result)
+            _mockOrderProcedureRepository.Setup(b => b.GetAsync(It.IsAny<Expression<Func<OrderProcedure, bool>>>(), null, null, false).Result)
                 .Returns((Expression<Func<OrderProcedure, bool>> filter,
                 Func<IQueryable<OrderProcedure>, IOrderedQueryable<OrderProcedure>> OrderProcedureBy,
                 Func<IQueryable<OrderProcedure>, IIncludableQueryable<Employee, object>> include,
                 bool asNoTracking) => OrderProcedures.Where(filter).ToList());
 
-            _orderProcedureRepository.Setup(b => b.DeleteRange(It.IsAny<IEnumerable<OrderProcedure>>()));
+            _mockOrderProcedureRepository.Setup(b => b.DeleteRange(It.IsAny<IEnumerable<OrderProcedure>>()));
             //assert
             Assert.Throws<AggregateException>(() => _orderProcedureService.DeleteRangeAsync(ids).Wait());
         }

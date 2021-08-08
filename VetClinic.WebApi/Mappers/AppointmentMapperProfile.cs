@@ -8,6 +8,7 @@ namespace VetClinic.WebApi.Mappers
     {
         public AppointmentMapperProfile()
         {
+            #region AppointmentViewModel mapping
             CreateMap<Appointment, AppointmentViewModel>()
 
                 .ForMember(x => x.Date, y => y.MapFrom(src => src.From.ToString("d")))
@@ -17,6 +18,11 @@ namespace VetClinic.WebApi.Mappers
                 .ForMember(x => x.To, y => y.MapFrom(src => src.To.ToString("HH:mm")))
                 
                 .ReverseMap();
+            #endregion
+
+            #region AppointmentToCreateViewModel mapping
+            CreateMap<Appointment, AppointmentToCreateViewModel>().ReverseMap();
+            #endregion
         }
     }
 }

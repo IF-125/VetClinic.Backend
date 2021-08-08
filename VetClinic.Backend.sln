@@ -9,17 +9,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VetClinic.Core", "VetClinic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VetClinic.Host", "VetClinic.Host\VetClinic.Host.csproj", "{91082328-C196-41AD-8499-1A4A1B5F125A}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{C7E1D585-DB00-465E-96AF-F614C5BA39BC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VetClinic.BLL", "VetClinic.BLL\VetClinic.BLL.csproj", "{0080C268-9954-46E1-A626-ADC9EC65EC29}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VetClinic.WebApi.Tests", "VetClinic.WebApi.Tests\VetClinic.WebApi.Tests.csproj", "{C75348A5-01F6-4826-9D53-F4776FE70335}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VetClinic.WebApi", "VetClinic.WebApi\VetClinic.WebApi.csproj", "{90A33B8C-EB37-4E39-BB04-AA24054CF1BB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VetClinic.BLL.Tests", "VetClinic.BLL.Tests\VetClinic.BLL.Tests.csproj", "{DFEE0C55-5470-40ED-8676-EDFB1F85D1E0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VetClinic.IdentityServer", "VetClinic.IdentityServer\VetClinic.IdentityServer.csproj", "{647CF80A-63C4-4827-A4AE-07D651F0976D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VetClinic.BLL", "VetClinic.BLL\VetClinic.BLL.csproj", "{0080C268-9954-46E1-A626-ADC9EC65EC29}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{0291A1AE-8F4D-4D85-BC18-8655530F108D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VetClinic.WebApi", "VetClinic.WebApi\VetClinic.WebApi.csproj", "{90A33B8C-EB37-4E39-BB04-AA24054CF1BB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VetClinic.BLL.Tests", "VetClinic.BLL.Tests\VetClinic.BLL.Tests.csproj", "{8F1894D2-F103-452C-AC96-28CEA017069C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VetClinic.IdentityServer", "VetClinic.IdentityServer\VetClinic.IdentityServer.csproj", "{647CF80A-63C4-4827-A4AE-07D651F0976D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VetClinic.WebApi.Tests", "VetClinic.WebApi.Tests\VetClinic.WebApi.Tests.csproj", "{5E3C9609-782C-4615-AA48-6A5E00DB403B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,14 +39,6 @@ Global
 		{91082328-C196-41AD-8499-1A4A1B5F125A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{91082328-C196-41AD-8499-1A4A1B5F125A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{91082328-C196-41AD-8499-1A4A1B5F125A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C75348A5-01F6-4826-9D53-F4776FE70335}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C75348A5-01F6-4826-9D53-F4776FE70335}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C75348A5-01F6-4826-9D53-F4776FE70335}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C75348A5-01F6-4826-9D53-F4776FE70335}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DFEE0C55-5470-40ED-8676-EDFB1F85D1E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DFEE0C55-5470-40ED-8676-EDFB1F85D1E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DFEE0C55-5470-40ED-8676-EDFB1F85D1E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DFEE0C55-5470-40ED-8676-EDFB1F85D1E0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0080C268-9954-46E1-A626-ADC9EC65EC29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0080C268-9954-46E1-A626-ADC9EC65EC29}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0080C268-9954-46E1-A626-ADC9EC65EC29}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -59,13 +51,21 @@ Global
 		{647CF80A-63C4-4827-A4AE-07D651F0976D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{647CF80A-63C4-4827-A4AE-07D651F0976D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{647CF80A-63C4-4827-A4AE-07D651F0976D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F1894D2-F103-452C-AC96-28CEA017069C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F1894D2-F103-452C-AC96-28CEA017069C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F1894D2-F103-452C-AC96-28CEA017069C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F1894D2-F103-452C-AC96-28CEA017069C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E3C9609-782C-4615-AA48-6A5E00DB403B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E3C9609-782C-4615-AA48-6A5E00DB403B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E3C9609-782C-4615-AA48-6A5E00DB403B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E3C9609-782C-4615-AA48-6A5E00DB403B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{C75348A5-01F6-4826-9D53-F4776FE70335} = {C7E1D585-DB00-465E-96AF-F614C5BA39BC}
-		{DFEE0C55-5470-40ED-8676-EDFB1F85D1E0} = {C7E1D585-DB00-465E-96AF-F614C5BA39BC}
+		{8F1894D2-F103-452C-AC96-28CEA017069C} = {0291A1AE-8F4D-4D85-BC18-8655530F108D}
+		{5E3C9609-782C-4615-AA48-6A5E00DB403B} = {0291A1AE-8F4D-4D85-BC18-8655530F108D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BB69DFAD-4D35-4699-8234-94BE2A635AC9}

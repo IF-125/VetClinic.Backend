@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VetClinic.DAL.Context;
 
 namespace VetClinic.DAL.Migrations
 {
     [DbContext(typeof(VetClinicDbContext))]
-    partial class VetClinicDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210808171917_Changed OrderProcedure entity and configuration")]
+    partial class ChangedOrderProcedureentityandconfiguration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

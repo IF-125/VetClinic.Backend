@@ -1,8 +1,4 @@
-﻿using System;
-
-using VetClinic.Core.Entities;
-
-namespace VetClinic.WebApi.ViewModels
+﻿namespace VetClinic.WebApi.ViewModels
 {
     public class AppointmentViewModel
     {
