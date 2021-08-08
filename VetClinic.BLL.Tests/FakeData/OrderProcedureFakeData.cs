@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using VetClinic.Core.Entities;
 namespace VetClinic.BLL.Tests.FakeData
 {
@@ -11,8 +10,6 @@ namespace VetClinic.BLL.Tests.FakeData
                 new OrderProcedure
                 {
                     Id = 1,
-                    Count = 1,
-                    Time = new TimeSpan(hours:1, minutes:12, seconds:0),
                     Conclusion = "Procedure was conducted successfully.",
                     Details = "The patient appearts to be stable.",
                     OrderId = 1,
@@ -23,8 +20,6 @@ namespace VetClinic.BLL.Tests.FakeData
                 new OrderProcedure
                 {
                     Id = 2,
-                    Count = 1,
-                    Time = new TimeSpan(hours:0, minutes:48, seconds:0),
                     Conclusion = "Procedure was unsuccessful.",
                     Details = "The patient is in critical condition.",
                     OrderId = 2,
@@ -35,8 +30,6 @@ namespace VetClinic.BLL.Tests.FakeData
                 new OrderProcedure
                 {
                     Id = 3,
-                    Count = 1,
-                    Time = new TimeSpan(hours:0, minutes:20, seconds:0),
                     Conclusion = "Procedure was unsuccessful.",
                     Details = "The patient is in critical condition.",
                     OrderId = 3,
@@ -47,8 +40,6 @@ namespace VetClinic.BLL.Tests.FakeData
                 new OrderProcedure
                 {
                     Id = 4,
-                    Count = 1,
-                    Time = new TimeSpan(hours:0, minutes:55, seconds:0),
                     Conclusion = "Procedure was conducted successfully.",
                     Details = "The patient appearts to be stable.",
                     OrderId = 4,
@@ -59,8 +50,6 @@ namespace VetClinic.BLL.Tests.FakeData
                 new OrderProcedure
                 {
                     Id = 5,
-                    Count = 1,
-                    Time = new TimeSpan(hours:1, minutes:20, seconds:0),
                     Conclusion = "Procedure was conducted successfully.",
                     Details = "The patient appearts to be stable.",
                     OrderId = 5,
@@ -71,8 +60,6 @@ namespace VetClinic.BLL.Tests.FakeData
                 new OrderProcedure
                 {
                     Id = 6,
-                    Count = 1,
-                    Time = new TimeSpan(hours:1, minutes:23, seconds:0),
                     Conclusion = "Procedure was conducted successfully.",
                     Details = "The patient appearts to be stable.",
                     OrderId = 6,
@@ -83,8 +70,6 @@ namespace VetClinic.BLL.Tests.FakeData
                 new OrderProcedure
                 {
                     Id = 7,
-                    Count = 1,
-                    Time = new TimeSpan(hours:1, minutes:1, seconds:0),
                     Conclusion = "Procedure was conducted successfully.",
                     Details = "The patient appearts to be stable.",
                     OrderId = 7,
@@ -95,8 +80,6 @@ namespace VetClinic.BLL.Tests.FakeData
                 new OrderProcedure
                 {
                     Id = 8,
-                    Count = 1,
-                    Time = new TimeSpan(hours:1, minutes:32, seconds:0),
                     Conclusion = "Procedure was conducted successfully.",
                     Details = "The patient appearts to be stable.",
                     OrderId = 8,
@@ -107,8 +90,6 @@ namespace VetClinic.BLL.Tests.FakeData
                 new OrderProcedure
                 {
                     Id = 9,
-                    Count = 1,
-                    Time = new TimeSpan(hours:0, minutes:10, seconds:0),
                     Conclusion = "Procedure was unsuccessful.",
                     Details = "The patient is in critical condition.",
                     OrderId = 9,
@@ -119,8 +100,6 @@ namespace VetClinic.BLL.Tests.FakeData
                 new OrderProcedure
                 {
                     Id = 10,
-                    Count = 1,
-                    Time = new TimeSpan(hours:1, minutes:11, seconds:0),
                     Conclusion = "Procedure was conducted successfully.",
                     Details = "The patient appearts to be stable.",
                     OrderId = 10,

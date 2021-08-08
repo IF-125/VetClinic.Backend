@@ -17,11 +17,12 @@ namespace VetClinic.BLL.Tests.Services
     public class PetServiceTests
     {
         private readonly PetServise _petServise;
-        private readonly Mock<IPetRepository> _petRepository = new Mock<IPetRepository>();
+        private readonly Mock<IPetRepository> _mockPetRepository = new Mock<IPetRepository>();
+        private readonly Mock<IOrderProcedureRepository> _mockOrderProcedureRepository = new Mock<IOrderProcedureRepository>();
 
         public PetServiceTests()
         {
-            _petServise = new PetServise(_petRepository.Object);
+            _petServise = new PetServise(_mockPetRepository.Object, _mockOrderProcedureRepository.Object);
         }
 
         [Fact]
@@ -29,7 +30,7 @@ namespace VetClinic.BLL.Tests.Services
         {
             // Arrange
             var numberOfPets = 10;
-            _petRepository.Setup(x => x.GetAsync(null, null, null, true).Result)
+            _mockPetRepository.Setup(x => x.GetAsync(null, null, null, true).Result)
                 .Returns(PetFakeData.GetPetFakeData());
             // Act
             IList<Pet> tempPets = await _petServise.GetPetsAsync();
@@ -46,7 +47,7 @@ namespace VetClinic.BLL.Tests.Services
             var id = 10;
             var name = "Lord10";
             var pets = PetFakeData.GetPetFakeData().AsQueryable();
-            _petRepository.Setup(x => x.GetFirstOrDefaultAsync(x => x.Id == id, null, false).Result)
+            _mockPetRepository.Setup(x => x.GetFirstOrDefaultAsync(x => x.Id == id, null, false).Result)
                 .Returns(pets.FirstOrDefault(x => x.Id == id));
             
             // Act
@@ -63,7 +64,7 @@ namespace VetClinic.BLL.Tests.Services
             var id = 999;
             var pets = PetFakeData.GetPetFakeData().AsQueryable();
 
-            _petRepository.Setup(x => x.GetFirstOrDefaultAsync(
+            _mockPetRepository.Setup(x => x.GetFirstOrDefaultAsync(
                 x => x.Id == id, null, true).Result)
                 .Returns(pets.FirstOrDefault(x => x.Id == id));
             
@@ -84,13 +85,13 @@ namespace VetClinic.BLL.Tests.Services
                 Breed = "Foo",
                 Age = 4
             };
-            _petRepository.Setup(x => x.InsertAsync(It.IsAny<Pet>()));
+            _mockPetRepository.Setup(x => x.InsertAsync(It.IsAny<Pet>()));
 
             // Act
             await _petServise.InsertAsync(_newPet);
 
             // Assert
-            _petRepository.Verify(x => x.InsertAsync(_newPet));
+            _mockPetRepository.Verify(x => x.InsertAsync(_newPet));
         }
 
         [Fact]
@@ -108,13 +109,13 @@ namespace VetClinic.BLL.Tests.Services
             
             var id = 10;
 
-            _petRepository.Setup(x => x.Update(It.IsAny<Pet>()));
+            _mockPetRepository.Setup(x => x.Update(It.IsAny<Pet>()));
 
             // Act
             _petServise.Update(id, _newPet);
 
             // Assert
-            _petRepository.Verify(x => x.Update(_newPet));
+            _mockPetRepository.Verify(x => x.Update(_newPet));
 
         }
 
@@ -133,7 +134,7 @@ namespace VetClinic.BLL.Tests.Services
             
             var id = 999;
 
-            _petRepository.Setup(x => x.Update(It.IsAny<Pet>()));
+            _mockPetRepository.Setup(x => x.Update(It.IsAny<Pet>()));
 
             // Act, Assert
             Assert.Throws<NotFoundException>(() => _petServise.Update(id, _newPet));
@@ -147,16 +148,16 @@ namespace VetClinic.BLL.Tests.Services
             var id = 10;
             var pets = PetFakeData.GetPetFakeData().AsQueryable();
 
-            _petRepository.Setup(x => x.GetFirstOrDefaultAsync(x => x.Id == id, null, false).Result)
+            _mockPetRepository.Setup(x => x.GetFirstOrDefaultAsync(x => x.Id == id, null, false).Result)
                 .Returns(pets.FirstOrDefault(x => x.Id == id));
 
-            _petRepository.Setup(x => x.Delete(It.IsAny<Pet>())).Verifiable();
+            _mockPetRepository.Setup(x => x.Delete(It.IsAny<Pet>())).Verifiable();
 
             // Act
             await _petServise.DeleteAsync(id);
 
             // Assert
-            _petRepository.Verify(x => x.Delete(It.IsAny<Pet>()));
+            _mockPetRepository.Verify(x => x.Delete(It.IsAny<Pet>()));
         }
 
         [Fact]
@@ -167,10 +168,10 @@ namespace VetClinic.BLL.Tests.Services
             var id = 999;
             var pets = PetFakeData.GetPetFakeData().AsQueryable();
 
-            _petRepository.Setup(x => x.GetFirstOrDefaultAsync(x => x.Id == id, null, false).Result)
+            _mockPetRepository.Setup(x => x.GetFirstOrDefaultAsync(x => x.Id == id, null, false).Result)
                 .Returns(pets.FirstOrDefault(x => x.Id == id));
 
-            _petRepository.Setup(x => x.Delete(It.IsAny<Pet>())).Verifiable();
+            _mockPetRepository.Setup(x => x.Delete(It.IsAny<Pet>())).Verifiable();
 
             // Act,Assert
             await Assert.ThrowsAsync<NullReferenceException>( () =>  _petServise.DeleteAsync(id));
@@ -185,19 +186,19 @@ namespace VetClinic.BLL.Tests.Services
             
             var pets = PetFakeData.GetPetFakeData().AsQueryable();
 
-            _petRepository.Setup(x => x.GetAsync(It.IsAny<Expression<Func<Pet, bool>>>(), null, null, false).Result)
+            _mockPetRepository.Setup(x => x.GetAsync(It.IsAny<Expression<Func<Pet, bool>>>(), null, null, false).Result)
                 .Returns((Expression<Func<Pet, bool>> filter,
                 Func<IQueryable<Pet>, IOrderedQueryable<Employee>> orderBy,
                 Func<IQueryable<Pet>, IIncludableQueryable<Employee, object>> include,
                 bool asNoTracking) => pets.Where(filter).ToList());
 
-            _petRepository.Setup(x => x.DeleteRange(It.IsAny<IEnumerable<Pet>>()));
+            _mockPetRepository.Setup(x => x.DeleteRange(It.IsAny<IEnumerable<Pet>>()));
 
             // Act
             _petServise.DeleteRangeAsync(listOfIds).Wait();
 
             // Assert
-            _petRepository.Verify(x => x.DeleteRange(It.IsAny<IEnumerable<Pet>>()));
+            _mockPetRepository.Verify(x => x.DeleteRange(It.IsAny<IEnumerable<Pet>>()));
         }
 
 
@@ -209,13 +210,13 @@ namespace VetClinic.BLL.Tests.Services
             var pets = PetFakeData.GetPetFakeData().AsQueryable();
 
             // Act
-            _petRepository.Setup(x => x.GetAsync(It.IsAny<Expression<Func<Pet, bool>>>(), null, null, false).Result)
+            _mockPetRepository.Setup(x => x.GetAsync(It.IsAny<Expression<Func<Pet, bool>>>(), null, null, false).Result)
                 .Returns((Expression<Func<Pet, bool>> filter,
                 Func<IQueryable<Pet>, IOrderedQueryable<Employee>> orderBy,
                 Func<IQueryable<Pet>, IIncludableQueryable<Employee, object>> include,
                 bool asNoTracking) => pets.Where(filter).ToList());
 
-            _petRepository.Setup(x => x.DeleteRange(It.IsAny<IEnumerable<Pet>>()));
+            _mockPetRepository.Setup(x => x.DeleteRange(It.IsAny<IEnumerable<Pet>>()));
 
             // Assert
             Assert.Throws<AggregateException>(() => _petServise.DeleteRangeAsync(idArr).Wait());

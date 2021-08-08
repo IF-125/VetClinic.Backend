@@ -8,8 +8,8 @@ namespace VetClinic.WebApi.Validators.EntityValidators
         public AppointmentValidator()
         {
             RuleFor(b => b.Status).NotEmpty().WithMessage("Appointment status is required!");
-            RuleFor(b => b.From).NotEmpty().WithMessage("Appointment starting date is required!");
-            RuleFor(b => b.To).NotEmpty().WithMessage("Appointment ending date is required!");
+            RuleFor(b => b.From).NotEmpty().WithMessage("Appointment starting time is required!");
+            RuleFor(b => b.To).NotEmpty().WithMessage("Appointment ending time is required!");
         }
     }
 }

@@ -38,7 +38,7 @@ namespace VetClinic.WebApi.Mappers
             #region MedicalCardViewModel mapping
             CreateMap<OrderProcedure, MedicalCardViewModel>()
 
-                .ForMember(x => x.TotalDuration, y => y.MapFrom(src => src.Time))
+                .ForMember(x => x.TotalDuration, y => y.MapFrom(src => src.Procedure.Duration))
 
                 .ForMember(x => x.OrderDate, y => y.MapFrom(src => src.Order.CreatedAt))
 

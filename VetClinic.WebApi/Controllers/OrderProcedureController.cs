@@ -17,6 +17,7 @@ namespace VetClinic.WebApi.Controllers
         private readonly IOrderProcedureService _orderProcedureService;
         private readonly IMapper _mapper;
         private readonly OrderProcedureValidator _validator;
+
         public OrderProcedureController(IOrderProcedureService orderProcedureService, IMapper mapper, 
             OrderProcedureValidator validator)
         {
@@ -66,18 +67,19 @@ namespace VetClinic.WebApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> InsertOrderProcedure(OrderProcedureViewModel model)
+        public async Task<IActionResult> InsertOrderProcedure(int petId, int procedureId, OrderToCreateViewModel model)
         {
-            var newOrderProcedure = _mapper.Map<OrderProcedure>(model);
+            var orderProcedure = await _orderProcedureService.GenerateOrderProcedureAsync(petId, procedureId, model.IsPaid);
+            await _orderProcedureService.InsertAsync(orderProcedure);
+            return Ok();
+        }
 
-            var validationResult = _validator.Validate(newOrderProcedure);
-
-            if (validationResult.IsValid)
-            {
-                await _orderProcedureService.InsertAsync(newOrderProcedure);
-                return Ok(model);
-            }
-            return BadRequest(validationResult.Errors);
+        [HttpPost("AddAppointmentAndEmployeeToOrderProcedure")]
+        public async Task<IActionResult> AddAppointmentAndDoctorToOrderProcedure(int orderProcedureId, string employeeId, AppointmentToCreateViewModel appointmentViewModel)
+        {
+            var appointment = _mapper.Map<Appointment>(appointmentViewModel);
+            await _orderProcedureService.AddAppointmentAndDoctorToOrderProcedureAsync(orderProcedureId, employeeId, appointment);
+            return Ok();
         }
 
         [HttpPut]
@@ -108,7 +110,5 @@ namespace VetClinic.WebApi.Controllers
             await _orderProcedureService.DeleteRangeAsync(ids);
             return Ok();
         }
-
-
     }
 }

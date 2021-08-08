@@ -10,12 +10,11 @@ namespace VetClinic.DAL.Configurations
         {
             builder
                 .Property(b => b.Conclusion)
-                .HasMaxLength(50)
-                .IsRequired();
+                .HasMaxLength(1000);
 
             builder
                 .Property(b => b.Details)
-                .HasMaxLength(50);
+                .HasMaxLength(1000);
 
             builder
                 .HasOne(b => b.Appointment)

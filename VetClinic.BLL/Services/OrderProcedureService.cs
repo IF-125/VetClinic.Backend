@@ -13,9 +13,25 @@ namespace VetClinic.BLL.Services
     public class OrderProcedureService : IOrderProcedureService
     {
         private readonly IOrderProcedureRepository _orderProcedureRepository;
-        public OrderProcedureService(IOrderProcedureRepository orderProcedureRepository)
+        private readonly IOrderRepository _orderRepository;
+        private readonly IAppointmentRepository _appointmentRepository;
+        private readonly IPetService _petService;
+        private readonly IProcedureService _procedureService;
+        private readonly IEmployeeService _employeeService;
+
+        public OrderProcedureService(IOrderProcedureRepository orderProcedureRepository,
+            IOrderRepository orderRepository,
+            IAppointmentRepository appointmentRepository,
+            IPetService petService,
+            IProcedureService procedureService,
+            IEmployeeService employeeService)
         {
             _orderProcedureRepository = orderProcedureRepository;
+            _petService = petService;
+            _procedureService = procedureService;
+            _orderRepository = orderRepository;
+            _appointmentRepository = appointmentRepository;
+            _employeeService = employeeService;
         }
 
         public async Task<IList<OrderProcedure>> GetOrderProceduresAsync()
@@ -92,6 +108,40 @@ namespace VetClinic.BLL.Services
                     .Include(o => o.Order),
                 asNoTracking: true
                 );
+        }
+
+        public async Task<OrderProcedure> GenerateOrderProcedureAsync(int petId, int procedureId, bool isPaid)
+        {
+            var pet = await _petService.GetByIdAsync(petId);
+            var procedure = await _procedureService.GetByIdAsync(procedureId);
+
+            Order order = new Order
+            {
+                IsPaid = isPaid
+            };
+
+            await _orderRepository.InsertAsync(order);
+
+            return new OrderProcedure
+            {
+                Status = OrderProcedureStatus.NotAssigned,
+                Pet = pet,
+                Procedure = procedure,
+                Order = order
+            };
+        }
+
+        public async Task AddAppointmentAndDoctorToOrderProcedureAsync(int orderProcedureId, string employeeId, Appointment appointment)
+        {
+            var orderProcedure = await GetByIdAsync(orderProcedureId);
+            var employee = await _employeeService.GetByIdAsync(employeeId);
+
+            await _appointmentRepository.InsertAsync(appointment);
+
+            orderProcedure.Appointment = appointment;
+            orderProcedure.Employee = employee;
+
+            Update(orderProcedureId, orderProcedure);
         }
     }
 }
