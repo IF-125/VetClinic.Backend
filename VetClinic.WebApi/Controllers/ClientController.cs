@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Services;
@@ -21,52 +22,50 @@ namespace VetClinic.WebApi.Controllers
             _mapper = mapper;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetByIdAsync(string id)
+        {
+            var client = await _clientService.GetByIdAsync(id);
+
+            var clientViewModel = _mapper.Map<ClientViewModel>(client);
+
+            return Ok(clientViewModel);
+        }
+
         [HttpPost]
         public async Task<IActionResult> AddAsync(ClientViewModel model)
         {
             var client = _mapper.Map<Client>(model);
-            client = await _clientService.AddAsync(client);
+
+            await _clientService.InsertAsync(client);
 
             return Ok(client);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetByIdAsync(string id)
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> Update(string id, [FromBody] JsonPatchDocument<Client> clientToUpdate)
         {
-
             var client = await _clientService.GetByIdAsync(id);
 
-            if (client != null)
-                return Ok(client);
-            else
-                return NotFound();
-        }
-
-
-        [HttpPut]
-        public IActionResult Update(string id, Client model)
-        {
-            var client = _mapper.Map<Client>(model);
-
+            clientToUpdate.ApplyTo(client, ModelState);
             _clientService.Update(id, client);
-            return Ok();
 
+            var clientViewModel = _mapper.Map<ClientViewModel>(client);
+            return Ok(clientViewModel);
         }
-
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteClient(string id)
         {
-            try
-            {
-                await _clientService.DeleteAsync(id);
-                return Ok($"{nameof(Client)} has been deleted");
-            }
-            catch (ArgumentException ex)
-            {
-                return NotFound(ex.Message);
-            }
+            await _clientService.DeleteAsync(id);
+            return Ok($"{nameof(Client)} has been deleted");
         }
 
+        [HttpDelete]
+        public async Task<IActionResult> DeleteClients(IList<string> listOfIds)
+        {
+            await _clientService.DeleteRangeAsync(listOfIds);
+            return Ok();
+        }
     }
 }

@@ -8,7 +8,7 @@ namespace VetClinic.WebApi.Mappers
     {
         public ClientMapperProfile()
         {
-            CreateMap<Client, ClientViewModel>().ReverseMap();
+                 CreateMap<Client, ClientViewModel>().ReverseMap();
         }
     }
 }
