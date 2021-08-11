@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using VetClinic.Core.Entities;
 using VetClinic.WebApi.Converters;
-using VetClinic.WebApi.ViewModels;
+using VetClinic.WebApi.ViewModels.OrderProcedureViewModels;
 
 namespace VetClinic.WebApi.Mappers
 {

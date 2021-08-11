@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace VetClinic.WebApi.ViewModels
+﻿namespace VetClinic.WebApi.ViewModels.ClientViewModels
 {
     public class ClientViewModel
     {

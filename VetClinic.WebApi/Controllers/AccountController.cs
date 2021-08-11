@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Services;
-using VetClinic.WebApi.ViewModels;
+using VetClinic.WebApi.ViewModels.AuthViewModels;
 
 namespace VetClinic.WebApi.Controllers
 {

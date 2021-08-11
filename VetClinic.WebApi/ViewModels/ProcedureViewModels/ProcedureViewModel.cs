@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace VetClinic.WebApi.ViewModels
+namespace VetClinic.WebApi.ViewModels.ProcedureViewModels
 {
     public class ProcedureViewModel
     {

@@ -1,11 +1,7 @@
-﻿namespace VetClinic.Core.Entities
+﻿using VetClinic.Core.Entities.Enums;
+
+namespace VetClinic.Core.Entities
 {
-    public enum OrderProcedureStatus
-    {
-        NotAssigned = 1,
-        Assigned,
-        Completed
-    }
     public class OrderProcedure
     {
         public int Id { get; set; }

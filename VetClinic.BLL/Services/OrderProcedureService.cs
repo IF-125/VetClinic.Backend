@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
+using VetClinic.Core.Entities.Enums;
 using VetClinic.Core.Interfaces.Repositories;
 using VetClinic.Core.Interfaces.Services;
 using static VetClinic.Core.Resources.TextMessages;
@@ -110,17 +111,15 @@ namespace VetClinic.BLL.Services
                 );
         }
 
-        public async Task<OrderProcedure> GenerateOrderProcedureAsync(int petId, int procedureId, bool isPaid)
+        public async Task<OrderProcedure> GenerateOrderProcedureAsync(int petId, int procedureId, PaymentOption paymentOption)
         {
             var pet = await _petService.GetByIdAsync(petId);
             var procedure = await _procedureService.GetByIdAsync(procedureId);
 
             Order order = new Order
             {
-                IsPaid = isPaid
+                PaymentOption = paymentOption
             };
-
-            await _orderRepository.InsertAsync(order);
 
             return new OrderProcedure
             {

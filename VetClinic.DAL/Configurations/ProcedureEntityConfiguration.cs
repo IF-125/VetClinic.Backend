@@ -20,12 +20,6 @@ namespace VetClinic.DAL.Configurations
             builder
                 .Property(b => b.Price)
                 .IsRequired();
-
-            //builder
-            //    .HasMany(x => x.OrderProcedures)
-            //    .WithOne()
-            //    .HasForeignKey(x => x.ProcedureId)
-            //    .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

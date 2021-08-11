@@ -1,4 +1,4 @@
-﻿namespace VetClinic.WebApi.ViewModels
+﻿namespace VetClinic.WebApi.ViewModels.AppointmentViewModels
 {
     public class AppointmentViewModel
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VetClinic.WebApi.ViewModels
+namespace VetClinic.WebApi.ViewModels.SalaryViewModels
 {
     public class SalaryViewModel
     {

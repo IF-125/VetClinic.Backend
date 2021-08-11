@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Services;
 using VetClinic.WebApi.Validators.EntityValidators;
-using VetClinic.WebApi.ViewModels;
+using VetClinic.WebApi.ViewModels.PetViewModels;
 using static VetClinic.Core.Resources.TextMessages;
 
 namespace VetClinic.WebApi.Controllers
@@ -98,7 +98,7 @@ namespace VetClinic.WebApi.Controllers
             return Ok(pet);
         }
 
-        [HttpDelete("id")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePet (int id)
         {
             await _petService.DeleteAsync(id);

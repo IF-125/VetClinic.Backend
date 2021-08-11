@@ -1,18 +1,8 @@
 ﻿using System;
+using VetClinic.Core.Entities.Enums;
 
 namespace VetClinic.Core.Entities
 {
-    public enum Days
-    {
-        Monday = 1,
-        Tuesday,
-        Wednesday,
-        Thursday,
-        Friday,
-        Saturday,
-        Sunday
-    }
-
     public class Schedule
     {
         public int Id { get; set; }
