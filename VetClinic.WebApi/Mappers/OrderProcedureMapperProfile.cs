@@ -28,7 +28,7 @@ namespace VetClinic.WebApi.Mappers
 
                 .ForMember(x => x.PetAge, y => y.MapFrom(src => src.Pet.Age))
 
-                .ForMember(x => x.Time, opt => opt.ConvertUsing(new StringToTimeSpanConverter()))
+                .ForMember(x => x.Duration, opt => opt.ConvertUsing(new StringToTimeSpanConverter(), src => src.Procedure.Duration))
 
                 .ForMember(x => x.AnimalType, y => y.MapFrom(src => src.Pet.AnimalType.Type))
 
