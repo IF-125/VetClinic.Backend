@@ -14,7 +14,6 @@ namespace VetClinic.BLL.Services
     public class OrderProcedureService : IOrderProcedureService
     {
         private readonly IOrderProcedureRepository _orderProcedureRepository;
-        private readonly IOrderRepository _orderRepository;
         private readonly IAppointmentRepository _appointmentRepository;
         private readonly IPetService _petService;
         private readonly IProcedureService _procedureService;
