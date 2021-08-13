@@ -29,7 +29,6 @@ namespace VetClinic.BLL.Services
             _orderProcedureRepository = orderProcedureRepository;
             _petService = petService;
             _procedureService = procedureService;
-            _orderRepository = orderRepository;
             _appointmentRepository = appointmentRepository;
             _employeeService = employeeService;
         }
