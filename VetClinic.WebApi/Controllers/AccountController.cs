@@ -38,6 +38,7 @@ namespace VetClinic.WebApi.Controllers
             if (!result.Succeeded) return BadRequest(result.Errors);
 
             await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("Role", "Client"));
+            await _userManager.AddToRoleAsync(user, "Client");
 
             return Ok();
         }
@@ -63,9 +64,11 @@ namespace VetClinic.WebApi.Controllers
                 return BadRequest();
             }
 
+            var roles = await _userManager.GetRolesAsync(user);
+            var role = roles[0];
             var token = _token.GenerateToken(user);
 
-            return Ok(new AuthResponseViewModel { IsAuthSuccessful = true, Token = token });
+            return Ok(new AuthResponseViewModel { IsAuthSuccessful = true, Token = token, Role = role });
     }
 
         [HttpPost("Logout")]
