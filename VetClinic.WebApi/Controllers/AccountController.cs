@@ -63,12 +63,9 @@ namespace VetClinic.WebApi.Controllers
                 return BadRequest();
             }
 
-            return Ok(new
-            {
-                result = result,
-                email = model.Email,
-                token = _token.GenerateToken(user)
-            });
+            var token = _token.GenerateToken(user);
+
+            return Ok(new AuthResponseViewModel { IsAuthSuccessful = true, Token = token });
     }
 
         [HttpPost("Logout")]
