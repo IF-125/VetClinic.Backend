@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using SendGrid.Helpers.Errors.Model;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
@@ -19,6 +18,8 @@ namespace VetClinic.WebApi.Controllers
         private readonly IPetService _petService;
         private readonly IMapper _mapper;
 
+        //TODO: provide validator via DI
+
         public PetsController(IPetService petService, IMapper mapper)
         {
             _petService = petService;
@@ -29,7 +30,7 @@ namespace VetClinic.WebApi.Controllers
         public async Task<IActionResult> GetAllPets()
         {
             var pets = await _petService.GetPetsAsync();
-            var petViewModel = _mapper.Map<IEnumerable<PetViewModel>>(pets);
+            var petViewModel = _mapper.Map<IEnumerable<PetResponseViewModel>>(pets);
 
             return Ok(petViewModel);
         }
@@ -38,7 +39,7 @@ namespace VetClinic.WebApi.Controllers
         public async Task<IActionResult> GetPetsByClientId(string clientId)
         {
             var pets = await _petService.GetPetsByClientId(clientId);
-            var petViewModel = _mapper.Map<IEnumerable<PetViewModel>>(pets);
+            var petViewModel = _mapper.Map<IEnumerable<PetResponseViewModel>>(pets);
 
             return Ok(petViewModel);
         }
@@ -46,17 +47,10 @@ namespace VetClinic.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPet(int id)
         {
-            try
-            {
-                var pet = await _petService.GetByIdAsync(id);
-                var petViewModel = _mapper.Map<PetViewModel>(pet);
+            var pet = await _petService.GetByIdAsync(id);
+            var petViewModel = _mapper.Map<PetResponseViewModel>(pet);
                
-                return Ok(petViewModel);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }                     
+            return Ok(petViewModel);                   
         }
 
         
@@ -88,16 +82,8 @@ namespace VetClinic.WebApi.Controllers
 
             if (validationResult.IsValid)
             {
-                try
-                {
-                    _petService.Update(id, pet);
-                    return Ok();
-                }
-                catch (NotFoundException ex)
-                {
-
-                    return BadRequest(ex.Message);
-                }
+                _petService.Update(id, pet);
+                return Ok();
             }
 
             return BadRequest(validationResult.Errors);
@@ -107,46 +93,23 @@ namespace VetClinic.WebApi.Controllers
         [HttpPatch("{id}")]
         public async Task<IActionResult> UpdatePatch(int id, [FromBody] JsonPatchDocument<Pet> petToUpdate)
         {
-            try
-            {
-                var pet = await _petService.GetByIdAsync(id);
-                petToUpdate.ApplyTo(pet, ModelState);
-                return Ok(pet);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
+            var pet = await _petService.GetByIdAsync(id);
+            petToUpdate.ApplyTo(pet, ModelState);
+            return Ok(pet);
         }
 
         [HttpDelete("id")]
         public async Task<IActionResult> DeletePet (int id)
         {
-            try
-            {
-                await _petService.DeleteAsync(id);
-                return Ok($"{nameof(Pet)} {EntityHasBeenDeleted}");
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
+            await _petService.DeleteAsync(id);
+            return Ok($"{nameof(Pet)} {EntityHasBeenDeleted}");
         }
 
         [HttpDelete]
         public async Task<IActionResult> DeletePets([FromQuery(Name = "listOfIds")] List<int> listOfIds)
         {
-            try
-            {
-                await _petService.DeleteRangeAsync(listOfIds);
-                return Ok();
-            }
-            catch (BadRequestException ex)
-            {
-
-                return BadRequest(ex.Message); 
-            }
-
+            await _petService.DeleteRangeAsync(listOfIds);
+            return Ok();
         }
     }
 }

@@ -10,8 +10,8 @@ using VetClinic.DAL.Context;
 namespace VetClinic.DAL.Migrations
 {
     [DbContext(typeof(VetClinicDbContext))]
-    [Migration("20210715232650_Initial Migration")]
-    partial class InitialMigration
+    [Migration("20210805170837_Initial migration")]
+    partial class Initialmigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -257,7 +257,7 @@ namespace VetClinic.DAL.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 7, 16, 2, 26, 50, 46, DateTimeKind.Local).AddTicks(3355));
+                        .HasDefaultValue(new DateTime(2021, 8, 5, 20, 8, 37, 498, DateTimeKind.Local).AddTicks(8622));
 
                     b.Property<bool>("IsPaid")
                         .HasColumnType("bit");
@@ -295,13 +295,7 @@ namespace VetClinic.DAL.Migrations
                     b.Property<int>("PetId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("PetId1")
-                        .HasColumnType("int");
-
                     b.Property<int?>("ProcedureId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ProcedureId1")
                         .HasColumnType("int");
 
                     b.Property<TimeSpan>("Time")
@@ -316,11 +310,7 @@ namespace VetClinic.DAL.Migrations
 
                     b.HasIndex("PetId");
 
-                    b.HasIndex("PetId1");
-
                     b.HasIndex("ProcedureId");
-
-                    b.HasIndex("ProcedureId1");
 
                     b.ToTable("OrderProcedures");
                 });
@@ -426,8 +416,8 @@ namespace VetClinic.DAL.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
+                        .HasColumnType("nvarchar(1000)")
+                        .HasMaxLength(1000);
 
                     b.Property<TimeSpan>("Duration")
                         .HasColumnType("time");
@@ -461,7 +451,7 @@ namespace VetClinic.DAL.Migrations
                     b.Property<DateTime>("Date")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 7, 16, 2, 26, 50, 73, DateTimeKind.Local).AddTicks(5596));
+                        .HasDefaultValue(new DateTime(2021, 8, 5, 20, 8, 37, 521, DateTimeKind.Local).AddTicks(7223));
 
                     b.Property<int>("EmployeePositionId")
                         .HasColumnType("int");
@@ -697,24 +687,16 @@ namespace VetClinic.DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("VetClinic.Core.Entities.Pet", null)
+                    b.HasOne("VetClinic.Core.Entities.Pet", "Pet")
                         .WithMany("OrderProcedures")
                         .HasForeignKey("PetId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("VetClinic.Core.Entities.Pet", "Pet")
-                        .WithMany()
-                        .HasForeignKey("PetId1");
-
-                    b.HasOne("VetClinic.Core.Entities.Procedure", null)
+                    b.HasOne("VetClinic.Core.Entities.Procedure", "Procedure")
                         .WithMany("OrderProcedures")
                         .HasForeignKey("ProcedureId")
                         .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("VetClinic.Core.Entities.Procedure", "Procedure")
-                        .WithMany()
-                        .HasForeignKey("ProcedureId1");
                 });
 
             modelBuilder.Entity("VetClinic.Core.Entities.Pet", b =>

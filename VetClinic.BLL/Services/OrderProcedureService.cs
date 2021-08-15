@@ -1,4 +1,5 @@
-﻿using SendGrid.Helpers.Errors.Model;
+﻿using Microsoft.EntityFrameworkCore;
+using SendGrid.Helpers.Errors.Model;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -69,6 +70,16 @@ namespace VetClinic.BLL.Services
             }
             _orderProcedureRepository.DeleteRange(orderProceduresToDelete);
             await _orderProcedureRepository.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<OrderProcedure>> GetOrderProceduresOfDoctorAsync(string doctorId)
+        {
+            return await _orderProcedureRepository.GetAsync(
+                filter: x => x.EmployeeId == doctorId,
+                include: y => y
+                    .Include(p => p.Procedure)
+                    .Include(p => p.Pet),
+                asNoTracking: true);
         }
     }
 }

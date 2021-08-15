@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SendGrid.Helpers.Errors.Model;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,8 +21,7 @@ namespace VetClinic.BLL.Services
 
         public async Task<IList<Pet>> GetPetsAsync()
         {
-            return await _petRepository.GetAsync(include: x => x
-            .Include(y => y.AnimalType),
+            return await _petRepository.GetAsync(include: x => x.Include(y => y.AnimalType),
             asNoTracking: true);
         }
         public async Task<IList<Pet>> GetPetsByClientId(string clientId)
