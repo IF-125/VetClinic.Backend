@@ -9,7 +9,7 @@ using static VetClinic.Core.Resources.TextMessages;
 
 namespace VetClinic.BLL.Services
 {
-    class PetImageService:IPetImageService
+    public class PetImageService:IPetImageService
     {
         private readonly IPetImageRepository _petImageRepository;
 
@@ -43,6 +43,13 @@ namespace VetClinic.BLL.Services
         {
             await _petImageRepository.InsertAsync(entity);
             await _petImageRepository.SaveChangesAsync();
+        }
+
+        public async Task<PetImage> InsertAsyncWithId(PetImage entity)
+        {
+            await _petImageRepository.InsertAsync(entity);
+            await _petImageRepository.SaveChangesAsync();
+            return entity;
         }
 
         public void Update(int id, PetImage petImageToUpdate)

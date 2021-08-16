@@ -1,10 +1,11 @@
-﻿using VetClinic.Core.Entities;
+﻿using System.Threading.Tasks;
+using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Services.Base;
 
 namespace VetClinic.Core.Interfaces.Services
 {
     public interface IPetImageService:IBaseService<PetImage,int>
     {
-
+        public Task<PetImage> InsertAsyncWithId(PetImage entity);
     }
 }
