@@ -253,12 +253,10 @@ namespace VetClinic.DAL.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 8, 8, 20, 19, 17, 62, DateTimeKind.Local).AddTicks(711));
+                        .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsPaid")
-                        .HasColumnType("bit");
+                    b.Property<int>("PaymentOption")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -443,9 +441,7 @@ namespace VetClinic.DAL.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("Date")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 8, 8, 20, 19, 17, 81, DateTimeKind.Local).AddTicks(8746));
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("EmployeePositionId")
                         .HasColumnType("int");
@@ -702,8 +698,7 @@ namespace VetClinic.DAL.Migrations
 
                     b.HasOne("VetClinic.Core.Entities.Client", "Client")
                         .WithMany("Pets")
-                        .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("ClientId");
                 });
 
             modelBuilder.Entity("VetClinic.Core.Entities.PetImage", b =>

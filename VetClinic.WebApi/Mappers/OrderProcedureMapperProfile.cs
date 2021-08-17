@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using VetClinic.Core.Entities;
 using VetClinic.WebApi.Converters;
-using VetClinic.WebApi.ViewModels;
+using VetClinic.WebApi.ViewModels.OrderProcedureViewModels;
 
 namespace VetClinic.WebApi.Mappers
 {
@@ -28,7 +28,7 @@ namespace VetClinic.WebApi.Mappers
 
                 .ForMember(x => x.PetAge, y => y.MapFrom(src => src.Pet.Age))
 
-                .ForMember(x => x.Time, opt => opt.ConvertUsing(new StringToTimeSpanConverter()))
+                .ForMember(x => x.Duration, opt => opt.ConvertUsing(new StringToTimeSpanConverter(), src => src.Procedure.Duration))
 
                 .ForMember(x => x.AnimalType, y => y.MapFrom(src => src.Pet.AnimalType.Type))
 

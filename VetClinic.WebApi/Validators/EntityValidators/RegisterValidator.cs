@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using VetClinic.WebApi.ViewModels;
+using VetClinic.WebApi.ViewModels.AuthViewModels;
 
 namespace VetClinic.WebApi.Validators.EntityValidators
 {

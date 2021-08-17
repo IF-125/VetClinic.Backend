@@ -10,7 +10,7 @@ using VetClinic.DAL.Context;
 namespace VetClinic.DAL.Migrations
 {
     [DbContext(typeof(VetClinicDbContext))]
-    [Migration("20210805170837_Initial migration")]
+    [Migration("20210811090722_Initial migration")]
     partial class Initialmigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -255,12 +255,10 @@ namespace VetClinic.DAL.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 8, 5, 20, 8, 37, 498, DateTimeKind.Local).AddTicks(8622));
+                        .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsPaid")
-                        .HasColumnType("bit");
+                    b.Property<int>("PaymentOption")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -275,16 +273,12 @@ namespace VetClinic.DAL.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Conclusion")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
-
-                    b.Property<int>("Count")
-                        .HasColumnType("int");
+                        .HasColumnType("nvarchar(1000)")
+                        .HasMaxLength(1000);
 
                     b.Property<string>("Details")
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
+                        .HasColumnType("nvarchar(1000)")
+                        .HasMaxLength(1000);
 
                     b.Property<string>("EmployeeId")
                         .HasColumnType("nvarchar(450)");
@@ -298,8 +292,8 @@ namespace VetClinic.DAL.Migrations
                     b.Property<int?>("ProcedureId")
                         .HasColumnType("int");
 
-                    b.Property<TimeSpan>("Time")
-                        .HasColumnType("time");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -449,9 +443,7 @@ namespace VetClinic.DAL.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("Date")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 8, 5, 20, 8, 37, 521, DateTimeKind.Local).AddTicks(7223));
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("EmployeePositionId")
                         .HasColumnType("int");
@@ -708,8 +700,7 @@ namespace VetClinic.DAL.Migrations
 
                     b.HasOne("VetClinic.Core.Entities.Client", "Client")
                         .WithMany("Pets")
-                        .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("ClientId");
                 });
 
             modelBuilder.Entity("VetClinic.Core.Entities.PetImage", b =>

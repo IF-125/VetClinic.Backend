@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Security.Cryptography.X509Certificates;
 using VetClinic.Core.Entities;
 
 namespace VetClinic.DAL.Configurations
@@ -24,11 +25,11 @@ namespace VetClinic.DAL.Configurations
                 .WithOne(x => x.Pet)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            //builder
-            //    .HasMany(x => x.OrderProcedures)
-            //    .WithOne()
-            //    .HasForeignKey(x => x.PetId)
-            //    .OnDelete(DeleteBehavior.Cascade);
+            builder
+                .HasMany(x => x.OrderProcedures)
+                .WithOne(x => x.Pet)
+                .HasForeignKey(x => x.PetId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

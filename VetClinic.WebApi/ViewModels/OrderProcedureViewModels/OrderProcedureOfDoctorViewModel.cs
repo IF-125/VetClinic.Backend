@@ -1,10 +1,9 @@
-﻿namespace VetClinic.WebApi.ViewModels
+﻿namespace VetClinic.WebApi.ViewModels.OrderProcedureViewModels
 {
     public class OrderProcedureOfDoctorViewModel
     {
         public int Id { get; set; }
-        public int Count { get; set; }
-        public string Time { get; set; }
+        public string Duration { get; set; }
         public string Conclusion { get; set; }
         public string Details { get; set; }
         public int OrderId { get; set; }

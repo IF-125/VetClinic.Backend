@@ -27,12 +27,6 @@ namespace VetClinic.DAL.Configurations
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder
-                .HasOne(x => x.Pet)
-                .WithMany(o => o.OrderProcedures)
-                .HasForeignKey(x => x.PetId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            builder
                 .HasOne(o => o.Employee)
                 .WithMany(o => o.OrderProcedures)
                 .HasForeignKey(x => x.EmployeeId)

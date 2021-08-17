@@ -70,8 +70,8 @@ namespace VetClinic.DAL.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CreatedAt = table.Column<DateTime>(nullable: false, defaultValue: new DateTime(2021, 8, 5, 20, 8, 37, 498, DateTimeKind.Local).AddTicks(8622)),
-                    IsPaid = table.Column<bool>(nullable: false)
+                    CreatedAt = table.Column<DateTime>(nullable: false),
+                    PaymentOption = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -240,7 +240,7 @@ namespace VetClinic.DAL.Migrations
                         column: x => x.ClientId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -345,10 +345,9 @@ namespace VetClinic.DAL.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Count = table.Column<int>(nullable: false),
-                    Time = table.Column<TimeSpan>(nullable: false),
-                    Conclusion = table.Column<string>(maxLength: 50, nullable: false),
-                    Details = table.Column<string>(maxLength: 50, nullable: true),
+                    Conclusion = table.Column<string>(maxLength: 1000, nullable: true),
+                    Details = table.Column<string>(maxLength: 1000, nullable: true),
+                    Status = table.Column<int>(nullable: false),
                     OrderId = table.Column<int>(nullable: false),
                     ProcedureId = table.Column<int>(nullable: true),
                     PetId = table.Column<int>(nullable: false),
@@ -367,6 +366,12 @@ namespace VetClinic.DAL.Migrations
                         name: "FK_OrderProcedures_Orders_OrderId",
                         column: x => x.OrderId,
                         principalTable: "Orders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_OrderProcedures_Pets_PetId",
+                        column: x => x.PetId,
+                        principalTable: "Pets",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -403,7 +408,7 @@ namespace VetClinic.DAL.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Date = table.Column<DateTime>(nullable: false, defaultValue: new DateTime(2021, 8, 5, 20, 8, 37, 521, DateTimeKind.Local).AddTicks(7223)),
+                    Date = table.Column<DateTime>(nullable: false),
                     Amount = table.Column<decimal>(nullable: false),
                     Bonus = table.Column<decimal>(nullable: false),
                     EmployeePositionId = table.Column<int>(nullable: false)

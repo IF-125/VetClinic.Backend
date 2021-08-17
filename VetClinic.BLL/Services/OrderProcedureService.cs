@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
+using VetClinic.Core.Entities.Enums;
 using VetClinic.Core.Interfaces.Repositories;
 using VetClinic.Core.Interfaces.Services;
 using static VetClinic.Core.Resources.TextMessages;
@@ -13,7 +14,6 @@ namespace VetClinic.BLL.Services
     public class OrderProcedureService : IOrderProcedureService
     {
         private readonly IOrderProcedureRepository _orderProcedureRepository;
-        private readonly IOrderRepository _orderRepository;
         private readonly IAppointmentRepository _appointmentRepository;
         private readonly IPetService _petService;
         private readonly IProcedureService _procedureService;
@@ -29,7 +29,6 @@ namespace VetClinic.BLL.Services
             _orderProcedureRepository = orderProcedureRepository;
             _petService = petService;
             _procedureService = procedureService;
-            _orderRepository = orderRepository;
             _appointmentRepository = appointmentRepository;
             _employeeService = employeeService;
         }
@@ -110,17 +109,15 @@ namespace VetClinic.BLL.Services
                 );
         }
 
-        public async Task<OrderProcedure> GenerateOrderProcedureAsync(int petId, int procedureId, bool isPaid)
+        public async Task<OrderProcedure> GenerateOrderProcedureAsync(int petId, int procedureId, PaymentOption paymentOption)
         {
             var pet = await _petService.GetByIdAsync(petId);
             var procedure = await _procedureService.GetByIdAsync(procedureId);
 
             Order order = new Order
             {
-                IsPaid = isPaid
+                PaymentOption = paymentOption
             };
-
-            await _orderRepository.InsertAsync(order);
 
             return new OrderProcedure
             {

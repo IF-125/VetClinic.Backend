@@ -1,4 +1,4 @@
-﻿namespace VetClinic.WebApi.ViewModels
+﻿namespace VetClinic.WebApi.ViewModels.AuthViewModels
 {
     public class LoginViewModel
     {

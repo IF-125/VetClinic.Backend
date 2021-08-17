@@ -1,13 +1,8 @@
 ﻿using System;
+using VetClinic.Core.Entities.Enums;
 
 namespace VetClinic.Core.Entities
 {
-    public enum AppointmentStatus
-    {
-        Opened = 1,
-        Closed
-    };
-
     public class Appointment
     {
         public int Id { get; set; }
