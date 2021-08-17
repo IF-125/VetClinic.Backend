@@ -104,7 +104,11 @@ namespace VetClinic.BLL.Services
                 filter: x => x.PetId == petId,
                 include: i => i
                     .Include(p => p.Procedure)
-                    .Include(o => o.Order),
+                    .Include(o => o.Order)
+                    .Include(p => p.Pet)
+                    .ThenInclude(a => a.AnimalType)
+                    .Include(p => p.Pet)
+                    .ThenInclude(c => c.Client),
                 asNoTracking: true
                 );
         }
