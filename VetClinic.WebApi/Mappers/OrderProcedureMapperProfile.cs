@@ -48,16 +48,6 @@ namespace VetClinic.WebApi.Mappers
 
                 .ReverseMap();
             #endregion
-
-            #region ConclusionDetailsViewModel mapping
-            CreateMap<OrderProcedure, ConclusionDetailsViewModel>()
-
-                .ForMember(x => x.Conclusion, y => y.MapFrom(src => src.Conclusion))
-
-                .ForMember(x => x.Details, y => y.MapFrom(src => src.Details))
-
-                .ForAllOtherMembers(x => x.Ignore());
-            #endregion
         }
     }
 }
