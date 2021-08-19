@@ -8,5 +8,7 @@ namespace VetClinic.Core.Interfaces.Services
     public interface IAppointmentService : IBaseService<Appointment, int>
     {
         public Task<IList<Appointment>> GetAppointmentsAsync();
+
+        public Task<IEnumerable<Appointment>> GetAppointmentsOfDoctorAsync(string doctorId);
     }
 }

@@ -1,8 +1,10 @@
-﻿using SendGrid.Helpers.Errors.Model;
+﻿using Microsoft.EntityFrameworkCore;
+using SendGrid.Helpers.Errors.Model;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
+using VetClinic.Core.Entities.Enums;
 using VetClinic.Core.Interfaces.Repositories;
 using VetClinic.Core.Interfaces.Services;
 using static VetClinic.Core.Resources.TextMessages;
@@ -12,9 +14,13 @@ namespace VetClinic.BLL.Services
     public class AppointmentService : IAppointmentService
     {
         private readonly IAppointmentRepository _appointmentRepository;
-        public AppointmentService(IAppointmentRepository appointmentRepository)
+        private readonly IOrderProcedureRepository _orderProcedureRepository;
+
+        public AppointmentService(IAppointmentRepository appointmentRepository,
+            IOrderProcedureRepository orderProcedureRepository)
         {
             _appointmentRepository = appointmentRepository;
+            _orderProcedureRepository = orderProcedureRepository;
         }
 
         public async Task<IList<Appointment>> GetAppointmentsAsync()
@@ -68,6 +74,13 @@ namespace VetClinic.BLL.Services
             }
             _appointmentRepository.DeleteRange(appointmentsToDelete);
             await _appointmentRepository.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<Appointment>> GetAppointmentsOfDoctorAsync(string doctorId)
+        {
+            return (await _orderProcedureRepository.GetAsync(
+                    filter: x => x.EmployeeId == doctorId && x.Status == OrderProcedureStatus.Assigned,
+                    include: x => x.Include(a => a.Appointment))).Select(a => a.Appointment);
         }
     }
 }
