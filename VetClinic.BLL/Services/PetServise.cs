@@ -13,29 +13,42 @@ namespace VetClinic.BLL.Services
     public class PetServise : IPetService
     {
         private readonly IPetRepository _petRepository;
+        private readonly IBlobService _blobService;
+        private readonly string _containerName;
+        private readonly string _containerPath;
 
-        public PetServise(IPetRepository petRepository)
+        public PetServise(IPetRepository petRepository, IBlobService blobService)
         {
             _petRepository = petRepository;
+            _blobService = blobService;
+            _containerName = "testcontainer";
+            _containerPath = "https://blobuploadsample21.blob.core.windows.net/testcontainer/";
+
         }
 
         public async Task<IList<Pet>> GetPetsAsync()
         {
-            return await _petRepository.GetAsync(include: x => x.Include(y => y.AnimalType),
-            asNoTracking: true);
+            return await _petRepository.GetAsync(
+                include: x => x.Include(y => y.AnimalType)
+                                .Include(y=>y.PetImages),
+                asNoTracking: true);
+
+           
         }
 
         public async Task<IList<Pet>> GetPetsByClientId(string clientId)
         {
             return await _petRepository.GetAsync(x => x.ClientId == clientId,
-                include: x => x
-            .Include(y => y.AnimalType),
+                include: x => x.Include(y => y.AnimalType)
+                                .Include(y => y.PetImages),
             asNoTracking: true);
         }
 
         public async Task<Pet> GetByIdAsync(int id)
         {
-            var pet = await _petRepository.GetFirstOrDefaultAsync(filter: x => x.Id == id);
+            var pet = await _petRepository.GetFirstOrDefaultAsync(filter: x => x.Id == id,
+                include: x => x.Include(y => y.AnimalType)
+                                .Include(y => y.PetImages));
             if (pet == null)
             {
                 throw new NotFoundException($"{nameof(Pet)} {EntityWasNotFound}");
@@ -60,7 +73,18 @@ namespace VetClinic.BLL.Services
 
         public async Task DeleteAsync(int id)
         {
-            var petToDelete = await _petRepository.GetFirstOrDefaultAsync(x => x.Id == id);
+            var petToDelete = await _petRepository.GetFirstOrDefaultAsync(filter: x => x.Id == id,
+                include: x => x.Include(y => y.AnimalType)
+                                .Include(y => y.PetImages));
+
+            if (petToDelete.PetImages!=null && petToDelete.PetImages.Count > 0)
+            {
+                foreach (var petImage in petToDelete.PetImages)
+                {
+                    var petImageBlobName = petImage.Path.Replace(_containerPath, default);
+                    await _blobService.DeleteBlob(petImageBlobName, _containerName);
+                }
+            }
 
             if (petToDelete==null)
                 throw  new NotFoundException($"{nameof(petToDelete)} {EntityWasNotFound}");
