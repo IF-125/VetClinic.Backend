@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -48,6 +49,7 @@ namespace VetClinic.WebApi.Controllers
             return Ok(orderProcedureViewModel);
         }
 
+        //TODO: consider removing this method
         [HttpGet("GetOrderedProceduresOfDoctor")]
         public async Task<IActionResult> GetOrderedProceduresOfDoctor(string doctorId)
         {
@@ -56,16 +58,6 @@ namespace VetClinic.WebApi.Controllers
             var orderedProceduresOfDoctorViewModel = _mapper.Map<IEnumerable<OrderProcedureOfDoctorViewModel>>(orderedProceduresOfDoctor);
 
             return Ok(orderedProceduresOfDoctorViewModel);
-        }
-
-        [HttpGet("GetMedicalCard")]
-        public async Task<IActionResult> GetMedicalCardOfPetAsync(int petId)
-        {
-            var medicalCard = await _orderProcedureService.GetMedicalCardOfPetAsync(petId);
-
-            var medicalCardModel = _mapper.Map<IEnumerable<MedicalCardViewModel>>(medicalCard);
-
-            return Ok(medicalCardModel);
         }
 
         [HttpPost]
@@ -97,6 +89,18 @@ namespace VetClinic.WebApi.Controllers
                 return Ok();
             }
             return BadRequest(validationResult.Errors);
+        }
+
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> UpdatePatch(int id, [FromBody] JsonPatchDocument<OrderProcedure> orderProcedureToUpdate)
+        {
+            var orderProcedure = await _orderProcedureService.GetByIdAsync(id);
+
+            orderProcedureToUpdate.ApplyTo(orderProcedure, ModelState);
+
+            _orderProcedureService.Update(id, orderProcedure);
+
+            return Ok(_mapper.Map<OrderProcedureViewModel>(orderProcedure));
         }
 
         [HttpDelete("{id}")]

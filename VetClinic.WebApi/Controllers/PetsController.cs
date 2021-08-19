@@ -53,7 +53,26 @@ namespace VetClinic.WebApi.Controllers
             return Ok(petViewModel);                   
         }
 
-        
+        [HttpGet("GetPetsToTreat/{doctorId}")]
+        public async Task<IActionResult> GetPetsToTreat(string doctorId)
+        {
+            var pets = await _petService.GetPetsToTreat(doctorId);
+
+            var petsViewModel = _mapper.Map<IEnumerable<PetViewModel>>(pets);
+
+            return Ok(petsViewModel);
+        }
+
+        [HttpGet("GetMedicalCard/{petId}")]
+        public async Task<IActionResult> GetMedicalCardOfPetAsync(int petId)
+        {
+            var pet = await _petService.GetMedicalCardOfPetAsync(petId);
+
+            var medicalCardModel = _mapper.Map<PetResponseViewModel>(pet);
+
+            return Ok(medicalCardModel);
+        }
+
         [HttpPost]
         public async Task<IActionResult> InsertPet(PetViewModel petViewModel)
         {
@@ -71,9 +90,8 @@ namespace VetClinic.WebApi.Controllers
             return BadRequest(validationResult.Errors);
         }
 
-
         [HttpPut]
-        public  IActionResult UpdatePet (int id, PetViewModel petViewModel)
+        public IActionResult UpdatePet(int id, PetViewModel petViewModel)
         {
             var pet = _mapper.Map<Pet>(petViewModel);
 
@@ -88,7 +106,6 @@ namespace VetClinic.WebApi.Controllers
 
             return BadRequest(validationResult.Errors);
         }
-
 
         [HttpPatch("{id}")]
         public async Task<IActionResult> UpdatePatch(int id, [FromBody] JsonPatchDocument<Pet> petToUpdate)

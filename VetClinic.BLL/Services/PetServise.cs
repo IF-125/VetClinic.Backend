@@ -2,7 +2,6 @@
 using SendGrid.Helpers.Errors.Model;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Repositories;
@@ -17,8 +16,7 @@ namespace VetClinic.BLL.Services
         private readonly IOrderProcedureRepository _orderProcedureRepository;
 
         public PetServise(IPetRepository petRepository,
-            IOrderProcedureRepository orderProcedureRepository
-            )
+            IOrderProcedureRepository orderProcedureRepository)
         {
             _petRepository = petRepository;
             _orderProcedureRepository = orderProcedureRepository;
@@ -40,11 +38,8 @@ namespace VetClinic.BLL.Services
 
         public async Task<Pet> GetByIdAsync(int id)
         {
-            var pet = await _petRepository.GetFirstOrDefaultAsync(filter: x => x.Id == id);
-            if (pet == null)
-            {
+            var pet = await _petRepository.GetFirstOrDefaultAsync(filter: x => x.Id == id) ??
                 throw new NotFoundException($"{nameof(Pet)} {EntityWasNotFound}");
-            }
 
             return pet;
         }
@@ -84,6 +79,31 @@ namespace VetClinic.BLL.Services
 
             _petRepository.DeleteRange(petsToDelete);
             await _petRepository.SaveChangesAsync();
+        }
+
+        public async Task<Pet> GetMedicalCardOfPetAsync(int petId)
+        {
+            return await _petRepository.GetFirstOrDefaultAsync(
+                filter: x => x.Id == petId,
+                include: i => i
+                    .Include(a => a.AnimalType)
+                    .Include(c => c.Client)
+                    .Include(p => p.OrderProcedures)
+                    .ThenInclude(p => p.Procedure)
+                    .Include(p => p.OrderProcedures)
+                    .ThenInclude(o => o.Order),
+                asNoTracking: true
+                );
+        }
+
+        public async Task<IEnumerable<Pet>> GetPetsToTreat(string doctorId)
+        {
+            return (await _orderProcedureRepository
+                .GetAsync(
+                    filter: x => x.EmployeeId == doctorId && x.Status == Core.Entities.Enums.OrderProcedureStatus.Assigned,
+                    include: x => x.Include(p => p.Pet)))
+                .Select(p => p.Pet)
+                .Distinct();
         }
     }
 }

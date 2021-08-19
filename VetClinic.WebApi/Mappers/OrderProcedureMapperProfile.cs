@@ -44,19 +44,19 @@ namespace VetClinic.WebApi.Mappers
 
                 .ForMember(x => x.ProcedureTitle, y => y.MapFrom(src => src.Procedure.Title))
 
-                .ForMember(x => x.PetName, y => y.MapFrom(src => src.Pet.Name))
-
-                .ForMember(x => x.PetInformation, y => y.MapFrom(src => src.Pet.Information))
-
-                .ForMember(x => x.PetBreed, y => y.MapFrom(src => src.Pet.Breed))
-
-                .ForMember(x => x.PetAge, y => y.MapFrom(src => src.Pet.Age))
-
-                .ForMember(x => x.AnimalType, y => y.MapFrom(src => src.Pet.AnimalType.Type))
-
-                .ForMember(x => x.Owner, y => y.MapFrom(src => src.Pet.Client.ToString()))
+                .ForMember(x => x.Status, y => y.MapFrom(src => src.Status.ToString()))
 
                 .ReverseMap();
+            #endregion
+
+            #region ConclusionDetailsViewModel mapping
+            CreateMap<OrderProcedure, ConclusionDetailsViewModel>()
+
+                .ForMember(x => x.Conclusion, y => y.MapFrom(src => src.Conclusion))
+
+                .ForMember(x => x.Details, y => y.MapFrom(src => src.Details))
+
+                .ForAllOtherMembers(x => x.Ignore());
             #endregion
         }
     }
