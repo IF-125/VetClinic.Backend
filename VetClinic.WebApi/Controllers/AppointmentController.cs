@@ -44,6 +44,16 @@ namespace VetClinic.WebApi.Controllers
             return Ok(appointmentViewModel);
         }
 
+        [HttpGet("GetAppointmentsOfDoctor/{doctorId}")]
+        public async Task<IActionResult> GetAppointmentsOfDoctor(string doctorId)
+        {
+            var appointments = await _appointmentService.GetAppointmentsOfDoctorAsync(doctorId);
+
+            var appointmentsViewModel = _mapper.Map<IEnumerable<AppointmentViewModel>>(appointments);
+
+            return Ok(appointmentsViewModel);
+        }
+
         [HttpPost]
         public async Task<IActionResult> InsertAppointment(AppointmentViewModel model)
         {
