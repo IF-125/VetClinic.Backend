@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace VetClinic.WebApi.ViewModels
+namespace VetClinic.WebApi.ViewModels.AuthViewModels
 {
     public class AuthResponseViewModel
     {
