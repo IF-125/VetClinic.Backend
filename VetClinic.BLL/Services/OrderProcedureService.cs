@@ -20,7 +20,6 @@ namespace VetClinic.BLL.Services
         private readonly IEmployeeService _employeeService;
 
         public OrderProcedureService(IOrderProcedureRepository orderProcedureRepository,
-            IOrderRepository orderRepository,
             IAppointmentRepository appointmentRepository,
             IPetService petService,
             IProcedureService procedureService,
@@ -60,6 +59,7 @@ namespace VetClinic.BLL.Services
             {
                 throw new BadRequestException($"{nameof(OrderProcedure)} {IdsDoNotMatch}");
             }
+
             _orderProcedureRepository.Update(orderProcedureToUpdate);
             _orderProcedureRepository.SaveChanges();
 
@@ -139,6 +139,7 @@ namespace VetClinic.BLL.Services
 
             await _appointmentRepository.InsertAsync(appointment);
 
+            orderProcedure.Status = OrderProcedureStatus.Assigned;
             orderProcedure.Appointment = appointment;
             orderProcedure.Employee = employee;
 

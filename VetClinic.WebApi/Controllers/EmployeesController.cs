@@ -95,16 +95,9 @@ namespace VetClinic.WebApi.Controllers
         [HttpPatch("{id}")]
         public async Task<IActionResult> UpdatePatch(string id, [FromBody] JsonPatchDocument<Employee> employeeToUpdate)
         {
-            try
-            {
-                var employee = await _employeeService.GetByIdAsync(id);
-                employeeToUpdate.ApplyTo(employee, ModelState);
-                return Ok(employee);
-            }
-            catch(NotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
+            var employee = await _employeeService.GetByIdAsync(id);
+            employeeToUpdate.ApplyTo(employee, ModelState);
+            return Ok(_mapper.Map<EmployeeViewModel>(employee));
         }
 
         [HttpDelete("{id}")]
