@@ -112,7 +112,10 @@ namespace VetClinic.WebApi.Controllers
         {
             var pet = await _petService.GetByIdAsync(id);
             petToUpdate.ApplyTo(pet, ModelState);
-            return Ok(pet);
+            _petService.Update(id, pet);
+
+            var petViewModel = _mapper.Map<PetViewModel>(pet);
+            return Ok(petViewModel);
         }
 
         [HttpDelete("{id}")]

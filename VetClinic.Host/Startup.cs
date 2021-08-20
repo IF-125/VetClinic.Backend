@@ -1,3 +1,4 @@
+using Azure.Storage.Blobs;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -54,6 +55,7 @@ namespace VetClinic.Host
             services.AddScoped<IProcedureRepository, ProcedureRepository>();
             services.AddScoped<IOrderProcedureRepository, OrderProcedureRepository>();
             services.AddScoped<IAnimalTypeRepository, AnimalTypeRepository>();
+            services.AddScoped<IPetImageRepository, PetImageRepository>();
 
             //Services
             services.AddScoped<IClientService, ClientService>();
@@ -71,6 +73,8 @@ namespace VetClinic.Host
             services.AddScoped<IJWTTokenGenerator, JWTTokenGenerator>();
             services.AddScoped<IAnimalTypeProcedureService, AnimalTypeProcedureService>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IPetImageService, PetImageService>();
+            services.AddSingleton<IBlobService, BlobService>();
 
             //Validators
             services.AddScoped<AppointmentValidator>();
@@ -88,6 +92,9 @@ namespace VetClinic.Host
             services.AddScoped<LoginValidator>();
             services.AddScoped<RegisterValidator>();
             #endregion
+
+            var blobConnection = Configuration.GetValue<string>("BlobConnection");
+            services.AddSingleton(x => new BlobServiceClient(blobConnection));
 
             services.AddCors();
             services.AddDbContext<VetClinicDbContext>(options =>

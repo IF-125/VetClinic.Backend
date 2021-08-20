@@ -1,4 +1,7 @@
-﻿namespace VetClinic.WebApi.ViewModels.PetViewModels
+﻿using System.Collections.Generic;
+using VetClinic.Core.Entities;
+
+namespace VetClinic.WebApi.ViewModels
 {
     public class PetViewModel
     {
@@ -9,5 +12,6 @@
         public int Age { get; set; }
         public string ClientId { get; set; }
         public string AnimalType { get; set; }
+        public ICollection<PetImageViewModel> PetImages { get; set; }
     }
 }
