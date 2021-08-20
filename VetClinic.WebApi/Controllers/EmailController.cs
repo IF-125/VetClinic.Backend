@@ -21,7 +21,11 @@ namespace VetClinic.WebApi.Controllers
         [HttpPost]
         public IActionResult Send(EmailViewModel model)
         {
-            _emailService.Send(model.From, model.To, model.Subject, model.Body);
+            string from = "user@email.com";
+            string to = "administrator@email.com";
+            string subject = "Request for an appointment.";
+            string body = "User wants to request " + model.Procedure + " for their pet " + model.Pet;
+            _emailService.Send(from, to, subject, body);
             return Ok();
         }
     }
