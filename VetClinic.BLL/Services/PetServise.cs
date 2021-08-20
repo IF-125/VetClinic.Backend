@@ -14,15 +14,17 @@ namespace VetClinic.BLL.Services
     public class PetServise : IPetService
     {
         private readonly IPetRepository _petRepository;
+        private readonly IOrderProcedureRepository _orderProcedureRepository;
         private readonly IBlobService _blobService;
         private readonly string _containerName;
         private readonly string _containerPath;
 
-        public PetServise(IPetRepository petRepository, IBlobService blobService)
         public PetServise(IPetRepository petRepository,
+            IBlobService blobService,
             IOrderProcedureRepository orderProcedureRepository)
         {
             _petRepository = petRepository;
+            _orderProcedureRepository = orderProcedureRepository;
             _blobService = blobService;
             _containerName = "testcontainer";
             _containerPath = "https://blobuploadsample21.blob.core.windows.net/testcontainer/";
@@ -35,8 +37,6 @@ namespace VetClinic.BLL.Services
                 include: x => x.Include(y => y.AnimalType)
                                 .Include(y=>y.PetImages),
                 asNoTracking: true);
-
-           
         }
 
         public async Task<IList<Pet>> GetPetsByClientId(string clientId)
@@ -55,7 +55,7 @@ namespace VetClinic.BLL.Services
             if (pet == null)
             {
                 throw new NotFoundException($"{nameof(Pet)} {EntityWasNotFound}");
-
+            }
             return pet;
         }
 
@@ -77,9 +77,10 @@ namespace VetClinic.BLL.Services
         {
             var petToDelete = await _petRepository.GetFirstOrDefaultAsync(filter: x => x.Id == id,
                 include: x => x.Include(y => y.AnimalType)
-                                .Include(y => y.PetImages));
+                                .Include(y => y.PetImages)) ??
+                    throw new NotFoundException($"{nameof(Pet)} {EntityWasNotFound}");
 
-            if (petToDelete.PetImages!=null && petToDelete.PetImages.Count > 0)
+            if (petToDelete.PetImages != null && petToDelete.PetImages.Count > 0)
             {
                 foreach (var petImage in petToDelete.PetImages)
                 {
@@ -88,8 +89,6 @@ namespace VetClinic.BLL.Services
                 }
             }
 
-            if (petToDelete==null)
-                throw  new NotFoundException($"{nameof(petToDelete)} {EntityWasNotFound}");
             _petRepository.Delete(petToDelete);
             await _petRepository.SaveChangesAsync();
         }
@@ -130,7 +129,7 @@ namespace VetClinic.BLL.Services
         {
             return (await _orderProcedureRepository
                 .GetAsync(
-                    filter: x => x.EmployeeId == doctorId && x.Status == Core.Entities.Enums.OrderProcedureStatus.Assigned,
+                    filter: x => x.EmployeeId == doctorId && x.Status == OrderProcedureStatus.Assigned,
                     include: x => x.Include(p => p.Pet).ThenInclude(a => a.AnimalType)))
                 .Select(p => p.Pet)
                 .Distinct();

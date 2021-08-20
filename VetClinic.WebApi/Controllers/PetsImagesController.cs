@@ -3,12 +3,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Services;
 using VetClinic.WebApi.Validators.EntityValidators;
-using VetClinic.WebApi.ViewModels;
+using VetClinic.WebApi.ViewModels.PetViewModels;
 
 namespace VetClinic.WebApi.Controllers
 {

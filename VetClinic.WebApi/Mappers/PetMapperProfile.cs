@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
-using System.Collections.Generic;
 using VetClinic.Core.Entities;
-using VetClinic.WebApi.ViewModels.OrderProcedureViewModels;
+using VetClinic.WebApi.ViewModels;
 using VetClinic.WebApi.ViewModels.PetViewModels;
 
 namespace VetClinic.WebApi.Mappers

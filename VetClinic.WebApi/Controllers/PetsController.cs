@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Services;
 using VetClinic.WebApi.Validators.EntityValidators;
+using VetClinic.WebApi.ViewModels;
 using VetClinic.WebApi.ViewModels.PetViewModels;
 using static VetClinic.Core.Resources.TextMessages;
 

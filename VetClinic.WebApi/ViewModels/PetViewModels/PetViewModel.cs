@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using VetClinic.Core.Entities;
+using VetClinic.WebApi.ViewModels.PetViewModels;
 
 namespace VetClinic.WebApi.ViewModels
 {

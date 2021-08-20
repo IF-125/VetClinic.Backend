@@ -1,4 +1,4 @@
-﻿namespace VetClinic.WebApi.ViewModels
+﻿namespace VetClinic.WebApi.ViewModels.PetViewModels
 {
     public class PetImageViewModel
     {
