@@ -11,5 +11,6 @@
         public int ProcedureId { get; set; }
         public int PetId { get; set; }
         public string EmployeeId { get; set; }
+        public int AppointmentId { get; set; }
     }
 }

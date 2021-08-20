@@ -55,7 +55,7 @@ namespace VetClinic.WebApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> InsertAppointment(AppointmentViewModel model)
+        public async Task<IActionResult> InsertAppointment(AppointmentToCreateViewModel model)
         {
             var newAppointment = _mapper.Map<Appointment>(model);
 
