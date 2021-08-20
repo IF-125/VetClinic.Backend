@@ -9,5 +9,6 @@
         public string Details { get; set; }
         public string OrderDate { get; set; }
         public string ProcedureTitle { get; set; }
+        public string EmployeeId { get; set; }
     }
 }

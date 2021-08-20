@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
+using VetClinic.Core.Entities.Enums;
 using VetClinic.Core.Interfaces.Repositories;
 using VetClinic.Core.Interfaces.Services;
 using static VetClinic.Core.Resources.TextMessages;
@@ -83,7 +84,7 @@ namespace VetClinic.BLL.Services
 
         public async Task<Pet> GetMedicalCardOfPetAsync(int petId)
         {
-            return await _petRepository.GetFirstOrDefaultAsync(
+            var pet = await _petRepository.GetFirstOrDefaultAsync(
                 filter: x => x.Id == petId,
                 include: i => i
                     .Include(a => a.AnimalType)
@@ -94,6 +95,10 @@ namespace VetClinic.BLL.Services
                     .ThenInclude(o => o.Order),
                 asNoTracking: true
                 );
+
+            pet.OrderProcedures = pet.OrderProcedures.Where(x => x.Status != OrderProcedureStatus.NotAssigned).ToList();
+
+            return pet;
         }
 
         public async Task<IEnumerable<Pet>> GetPetsToTreat(string doctorId)
@@ -101,7 +106,7 @@ namespace VetClinic.BLL.Services
             return (await _orderProcedureRepository
                 .GetAsync(
                     filter: x => x.EmployeeId == doctorId && x.Status == Core.Entities.Enums.OrderProcedureStatus.Assigned,
-                    include: x => x.Include(p => p.Pet)))
+                    include: x => x.Include(p => p.Pet).ThenInclude(a => a.AnimalType)))
                 .Select(p => p.Pet)
                 .Distinct();
         }
