@@ -6,5 +6,6 @@ namespace VetClinic.WebApi.ViewModels.AppointmentViewModels
     {
         public DateTime From { get; set; }
         public DateTime To { get; set; }
+        public int Status { get; set; }
     }
 }
