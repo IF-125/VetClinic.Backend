@@ -56,7 +56,7 @@ namespace VetClinic.WebApi.Controllers
                     var res = await _blobService.UploadFileBlob(fileName, file, _containerName);
 
                     if (res)
-                        return Ok($"Image {file.FileName} was added");
+                        return Ok(newPetImage);
                 }
 
                
