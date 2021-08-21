@@ -15,5 +15,7 @@ namespace VetClinic.Core.Interfaces.Services
         public Task<OrderProcedure> GenerateOrderProcedureAsync(int petId, int procedureId, PaymentOption paymentOption);
 
         public Task AddAppointmentAndDoctorToOrderProcedureAsync(int orderProcedureId, string employeeId, Appointment appointment);
+
+        public Task AddConclusionAndDetails(int orderProcedureId, string conclusion, string details);
     }
 }

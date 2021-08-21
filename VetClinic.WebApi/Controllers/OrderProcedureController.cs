@@ -76,6 +76,16 @@ namespace VetClinic.WebApi.Controllers
             return Ok();
         }
 
+        [HttpPost("AddMedicalReport/{orderProcedureId}")]
+        public async Task<IActionResult> AddMedicalReport(int orderProcedureId, MedicalReportViewModel medicalReportViewModel)
+        {
+            await _orderProcedureService.AddConclusionAndDetails(orderProcedureId,
+                medicalReportViewModel.Conclusion,
+                medicalReportViewModel.Details);
+
+            return Ok();
+        }
+        
         [HttpPut]
         public IActionResult Update(int id, OrderProcedureViewModel model)
         {

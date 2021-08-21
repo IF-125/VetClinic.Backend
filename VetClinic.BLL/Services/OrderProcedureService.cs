@@ -130,5 +130,16 @@ namespace VetClinic.BLL.Services
 
             Update(orderProcedureId, orderProcedure);
         }
+
+        public async Task AddConclusionAndDetails(int orderProcedureId, string conclusion, string details)
+        {
+            var orderProcedure = await GetByIdAsync(orderProcedureId);
+
+            orderProcedure.Conclusion = conclusion;
+            orderProcedure.Details = details;
+            orderProcedure.Status = OrderProcedureStatus.Completed;
+
+            Update(orderProcedureId, orderProcedure);
+        }
     }
 }
