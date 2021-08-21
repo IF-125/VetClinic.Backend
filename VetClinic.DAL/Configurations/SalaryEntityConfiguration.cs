@@ -22,7 +22,7 @@ namespace VetClinic.DAL.Configurations
 
             builder
                 .Property(x => x.Date)
-                .HasDefaultValue(DateTime.Now);
+                .IsRequired();
 
             builder
                 .HasOne(x => x.EmployeePosition)

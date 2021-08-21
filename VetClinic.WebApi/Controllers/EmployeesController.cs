@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Services;
 using VetClinic.WebApi.Validators.EntityValidators;
-using VetClinic.WebApi.ViewModels;
+using VetClinic.WebApi.ViewModels.EmployeeViewModels;
 using static VetClinic.Core.Resources.TextMessages;
 
 namespace VetClinic.WebApi.Controllers
@@ -95,16 +95,9 @@ namespace VetClinic.WebApi.Controllers
         [HttpPatch("{id}")]
         public async Task<IActionResult> UpdatePatch(string id, [FromBody] JsonPatchDocument<Employee> employeeToUpdate)
         {
-            try
-            {
-                var employee = await _employeeService.GetByIdAsync(id);
-                employeeToUpdate.ApplyTo(employee, ModelState);
-                return Ok(employee);
-            }
-            catch(NotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
+            var employee = await _employeeService.GetByIdAsync(id);
+            employeeToUpdate.ApplyTo(employee, ModelState);
+            return Ok(_mapper.Map<EmployeeViewModel>(employee));
         }
 
         [HttpDelete("{id}")]

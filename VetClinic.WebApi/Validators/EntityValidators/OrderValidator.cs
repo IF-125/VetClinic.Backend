@@ -7,7 +7,7 @@ namespace VetClinic.WebApi.Validators.EntityValidators
     {
         public OrderValidator()
         {
-            RuleFor(b => b.IsPaid).NotEmpty().WithMessage("Payment option must be selected");
+            RuleFor(b => b.PaymentOption).NotEmpty().WithMessage("Payment option must be selected");
         }
     }
 }

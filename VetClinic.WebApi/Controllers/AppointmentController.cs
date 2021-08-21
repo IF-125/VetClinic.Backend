@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Services;
 using VetClinic.WebApi.Validators.EntityValidators;
-using VetClinic.WebApi.ViewModels;
+using VetClinic.WebApi.ViewModels.AppointmentViewModels;
 using static VetClinic.Core.Resources.TextMessages;
 
 namespace VetClinic.WebApi.Controllers
@@ -44,8 +44,18 @@ namespace VetClinic.WebApi.Controllers
             return Ok(appointmentViewModel);
         }
 
+        [HttpGet("GetAppointmentsOfDoctor/{doctorId}")]
+        public async Task<IActionResult> GetAppointmentsOfDoctor(string doctorId)
+        {
+            var appointments = await _appointmentService.GetAppointmentsOfDoctorAsync(doctorId);
+
+            var appointmentsViewModel = _mapper.Map<IEnumerable<AppointmentViewModel>>(appointments);
+
+            return Ok(appointmentsViewModel);
+        }
+
         [HttpPost]
-        public async Task<IActionResult> InsertAppointment(AppointmentViewModel model)
+        public async Task<IActionResult> InsertAppointment(AppointmentToCreateViewModel model)
         {
             var newAppointment = _mapper.Map<Appointment>(model);
 

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
+using VetClinic.Core.Entities.Enums;
 using VetClinic.Core.Interfaces.Services.Base;
 
 namespace VetClinic.Core.Interfaces.Services
@@ -11,10 +12,10 @@ namespace VetClinic.Core.Interfaces.Services
 
         public Task<IEnumerable<OrderProcedure>> GetOrderProceduresOfDoctorAsync(string doctorId);
 
-        public Task<IList<OrderProcedure>> GetMedicalCardOfPetAsync(int petId);
-
-        public Task<OrderProcedure> GenerateOrderProcedureAsync(int petId, int procedureId, bool isPaid);
+        public Task<OrderProcedure> GenerateOrderProcedureAsync(int petId, int procedureId, PaymentOption paymentOption);
 
         public Task AddAppointmentAndDoctorToOrderProcedureAsync(int orderProcedureId, string employeeId, Appointment appointment);
+
+        public Task AddConclusionAndDetails(int orderProcedureId, string conclusion, string details);
     }
 }

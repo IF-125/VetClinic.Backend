@@ -11,11 +11,10 @@ namespace VetClinic.DAL.Configurations
         {
             builder
                 .Property(b => b.CreatedAt)
-                .IsRequired()
-                .HasDefaultValue(DateTime.Now);
+                .IsRequired();
 
             builder
-                .Property(b => b.IsPaid)
+                .Property(b => b.PaymentOption)
                 .IsRequired();
 
             builder

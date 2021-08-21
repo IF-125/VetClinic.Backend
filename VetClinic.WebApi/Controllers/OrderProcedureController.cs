@@ -1,11 +1,14 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Services;
 using VetClinic.WebApi.Validators.EntityValidators;
-using VetClinic.WebApi.ViewModels;
+using VetClinic.WebApi.ViewModels.AppointmentViewModels;
+using VetClinic.WebApi.ViewModels.OrderProcedureViewModels;
+using VetClinic.WebApi.ViewModels.OrderViewModels;
 using static VetClinic.Core.Resources.TextMessages;
 
 namespace VetClinic.WebApi.Controllers
@@ -46,6 +49,7 @@ namespace VetClinic.WebApi.Controllers
             return Ok(orderProcedureViewModel);
         }
 
+        //TODO: consider removing this method
         [HttpGet("GetOrderedProceduresOfDoctor")]
         public async Task<IActionResult> GetOrderedProceduresOfDoctor(string doctorId)
         {
@@ -56,20 +60,10 @@ namespace VetClinic.WebApi.Controllers
             return Ok(orderedProceduresOfDoctorViewModel);
         }
 
-        [HttpGet("GetMedicalCard")]
-        public async Task<IActionResult> GetMedicalCardOfPetAsync(int petId)
-        {
-            var medicalCard = await _orderProcedureService.GetMedicalCardOfPetAsync(petId);
-
-            var medicalCardModel = _mapper.Map<IEnumerable<MedicalCardViewModel>>(medicalCard);
-
-            return Ok(medicalCardModel);
-        }
-
         [HttpPost]
         public async Task<IActionResult> InsertOrderProcedure(int petId, int procedureId, OrderToCreateViewModel model)
         {
-            var orderProcedure = await _orderProcedureService.GenerateOrderProcedureAsync(petId, procedureId, model.IsPaid);
+            var orderProcedure = await _orderProcedureService.GenerateOrderProcedureAsync(petId, procedureId, model.PaymentOption);
             await _orderProcedureService.InsertAsync(orderProcedure);
             return Ok();
         }
@@ -82,6 +76,16 @@ namespace VetClinic.WebApi.Controllers
             return Ok();
         }
 
+        [HttpPost("AddMedicalReport/{orderProcedureId}")]
+        public async Task<IActionResult> AddMedicalReport(int orderProcedureId, MedicalReportViewModel medicalReportViewModel)
+        {
+            await _orderProcedureService.AddConclusionAndDetails(orderProcedureId,
+                medicalReportViewModel.Conclusion,
+                medicalReportViewModel.Details);
+
+            return Ok();
+        }
+        
         [HttpPut]
         public IActionResult Update(int id, OrderProcedureViewModel model)
         {
@@ -95,6 +99,18 @@ namespace VetClinic.WebApi.Controllers
                 return Ok();
             }
             return BadRequest(validationResult.Errors);
+        }
+
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> UpdatePatch(int id, [FromBody] JsonPatchDocument<OrderProcedure> orderProcedureToUpdate)
+        {
+            var orderProcedure = await _orderProcedureService.GetByIdAsync(id);
+
+            orderProcedureToUpdate.ApplyTo(orderProcedure, ModelState);
+
+            _orderProcedureService.Update(id, orderProcedure);
+
+            return Ok(_mapper.Map<OrderProcedureViewModel>(orderProcedure));
         }
 
         [HttpDelete("{id}")]

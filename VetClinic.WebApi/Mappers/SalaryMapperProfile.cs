@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using VetClinic.Core.Entities;
-using VetClinic.WebApi.ViewModels;
+using VetClinic.WebApi.ViewModels.SalaryViewModels;
 
 namespace VetClinic.WebApi.Mappers
 {

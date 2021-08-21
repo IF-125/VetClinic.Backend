@@ -70,6 +70,9 @@ namespace VetClinic.Host
             services.AddScoped<IProcedureService, ProcedureService>();
             services.AddScoped<IOrderProcedureService, OrderProcedureService>();
             services.AddScoped<IAnimalTypeService, AnimalTypeService>();
+            services.AddScoped<IJWTTokenGenerator, JWTTokenGenerator>();
+            services.AddScoped<IAnimalTypeProcedureService, AnimalTypeProcedureService>();
+            services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IPetImageService, PetImageService>();
             services.AddSingleton<IBlobService, BlobService>();
 

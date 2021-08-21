@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
+using VetClinic.Core.Entities.Enums;
 using VetClinic.Core.Interfaces.Repositories;
 using VetClinic.Core.Interfaces.Services;
 using static VetClinic.Core.Resources.TextMessages;
@@ -13,13 +14,17 @@ namespace VetClinic.BLL.Services
     public class PetServise : IPetService
     {
         private readonly IPetRepository _petRepository;
+        private readonly IOrderProcedureRepository _orderProcedureRepository;
         private readonly IBlobService _blobService;
         private readonly string _containerName;
         private readonly string _containerPath;
 
-        public PetServise(IPetRepository petRepository, IBlobService blobService)
+        public PetServise(IPetRepository petRepository,
+            IBlobService blobService,
+            IOrderProcedureRepository orderProcedureRepository)
         {
             _petRepository = petRepository;
+            _orderProcedureRepository = orderProcedureRepository;
             _blobService = blobService;
             _containerName = "testcontainer";
             _containerPath = "https://blobuploadsample21.blob.core.windows.net/testcontainer/";
@@ -32,8 +37,6 @@ namespace VetClinic.BLL.Services
                 include: x => x.Include(y => y.AnimalType)
                                 .Include(y=>y.PetImages),
                 asNoTracking: true);
-
-           
         }
 
         public async Task<IList<Pet>> GetPetsByClientId(string clientId)
@@ -53,7 +56,6 @@ namespace VetClinic.BLL.Services
             {
                 throw new NotFoundException($"{nameof(Pet)} {EntityWasNotFound}");
             }
-
             return pet;
         }
 
@@ -75,9 +77,10 @@ namespace VetClinic.BLL.Services
         {
             var petToDelete = await _petRepository.GetFirstOrDefaultAsync(filter: x => x.Id == id,
                 include: x => x.Include(y => y.AnimalType)
-                                .Include(y => y.PetImages));
+                                .Include(y => y.PetImages)) ??
+                    throw new NotFoundException($"{nameof(Pet)} {EntityWasNotFound}");
 
-            if (petToDelete.PetImages!=null && petToDelete.PetImages.Count > 0)
+            if (petToDelete.PetImages != null && petToDelete.PetImages.Count > 0)
             {
                 foreach (var petImage in petToDelete.PetImages)
                 {
@@ -86,8 +89,6 @@ namespace VetClinic.BLL.Services
                 }
             }
 
-            if (petToDelete==null)
-                throw  new NotFoundException($"{nameof(petToDelete)} {EntityWasNotFound}");
             _petRepository.Delete(petToDelete);
             await _petRepository.SaveChangesAsync();
         }
@@ -103,6 +104,35 @@ namespace VetClinic.BLL.Services
 
             _petRepository.DeleteRange(petsToDelete);
             await _petRepository.SaveChangesAsync();
+        }
+
+        public async Task<Pet> GetMedicalCardOfPetAsync(int petId)
+        {
+            var pet = await _petRepository.GetFirstOrDefaultAsync(
+                filter: x => x.Id == petId,
+                include: i => i
+                    .Include(a => a.AnimalType)
+                    .Include(c => c.Client)
+                    .Include(p => p.OrderProcedures)
+                    .ThenInclude(p => p.Procedure)
+                    .Include(p => p.OrderProcedures)
+                    .ThenInclude(o => o.Order),
+                asNoTracking: true
+                );
+
+            pet.OrderProcedures = pet.OrderProcedures.Where(x => x.Status != OrderProcedureStatus.NotAssigned).ToList();
+
+            return pet;
+        }
+
+        public async Task<IEnumerable<Pet>> GetPetsToTreat(string doctorId)
+        {
+            return (await _orderProcedureRepository
+                .GetAsync(
+                    filter: x => x.EmployeeId == doctorId && x.Status == OrderProcedureStatus.Assigned,
+                    include: x => x.Include(p => p.Pet).ThenInclude(a => a.AnimalType)))
+                .Select(p => p.Pet)
+                .Distinct();
         }
     }
 }

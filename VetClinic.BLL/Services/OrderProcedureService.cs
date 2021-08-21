@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
+using VetClinic.Core.Entities.Enums;
 using VetClinic.Core.Interfaces.Repositories;
 using VetClinic.Core.Interfaces.Services;
 using static VetClinic.Core.Resources.TextMessages;
@@ -13,14 +14,12 @@ namespace VetClinic.BLL.Services
     public class OrderProcedureService : IOrderProcedureService
     {
         private readonly IOrderProcedureRepository _orderProcedureRepository;
-        private readonly IOrderRepository _orderRepository;
         private readonly IAppointmentRepository _appointmentRepository;
         private readonly IPetService _petService;
         private readonly IProcedureService _procedureService;
         private readonly IEmployeeService _employeeService;
 
         public OrderProcedureService(IOrderProcedureRepository orderProcedureRepository,
-            IOrderRepository orderRepository,
             IAppointmentRepository appointmentRepository,
             IPetService petService,
             IProcedureService procedureService,
@@ -29,7 +28,6 @@ namespace VetClinic.BLL.Services
             _orderProcedureRepository = orderProcedureRepository;
             _petService = petService;
             _procedureService = procedureService;
-            _orderRepository = orderRepository;
             _appointmentRepository = appointmentRepository;
             _employeeService = employeeService;
         }
@@ -61,6 +59,7 @@ namespace VetClinic.BLL.Services
             {
                 throw new BadRequestException($"{nameof(OrderProcedure)} {IdsDoNotMatch}");
             }
+
             _orderProcedureRepository.Update(orderProcedureToUpdate);
             _orderProcedureRepository.SaveChanges();
 
@@ -99,28 +98,15 @@ namespace VetClinic.BLL.Services
                 asNoTracking: true);
         }
 
-        public async Task<IList<OrderProcedure>> GetMedicalCardOfPetAsync(int petId)
-        {
-            return await _orderProcedureRepository.GetAsync(
-                filter: x => x.PetId == petId,
-                include: i => i
-                    .Include(p => p.Procedure)
-                    .Include(o => o.Order),
-                asNoTracking: true
-                );
-        }
-
-        public async Task<OrderProcedure> GenerateOrderProcedureAsync(int petId, int procedureId, bool isPaid)
+        public async Task<OrderProcedure> GenerateOrderProcedureAsync(int petId, int procedureId, PaymentOption paymentOption)
         {
             var pet = await _petService.GetByIdAsync(petId);
             var procedure = await _procedureService.GetByIdAsync(procedureId);
 
             Order order = new Order
             {
-                IsPaid = isPaid
+                PaymentOption = paymentOption
             };
-
-            await _orderRepository.InsertAsync(order);
 
             return new OrderProcedure
             {
@@ -138,8 +124,20 @@ namespace VetClinic.BLL.Services
 
             await _appointmentRepository.InsertAsync(appointment);
 
+            orderProcedure.Status = OrderProcedureStatus.Assigned;
             orderProcedure.Appointment = appointment;
             orderProcedure.Employee = employee;
+
+            Update(orderProcedureId, orderProcedure);
+        }
+
+        public async Task AddConclusionAndDetails(int orderProcedureId, string conclusion, string details)
+        {
+            var orderProcedure = await GetByIdAsync(orderProcedureId);
+
+            orderProcedure.Conclusion = conclusion;
+            orderProcedure.Details = details;
+            orderProcedure.Status = OrderProcedureStatus.Completed;
 
             Update(orderProcedureId, orderProcedure);
         }
