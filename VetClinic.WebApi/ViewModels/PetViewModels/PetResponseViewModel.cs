@@ -12,6 +12,7 @@ namespace VetClinic.WebApi.ViewModels.PetViewModels
         public int Age { get; set; }
         public string AnimalType { get; set; }
         public string Owner { get; set; }
+        public ICollection<PetImageViewModel> PetImages { get; set; }
         public IList<MedicalCardViewModel> OrderProcedures { get; set; }
     }
 }
