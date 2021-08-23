@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -36,6 +37,11 @@ namespace VetClinic.WebApi.Controllers
         [HttpPost]
         public async Task<IActionResult> InsertPetImage(IFormFile file, [FromForm] PetImageViewModel petImageViewModel)
         {
+           if (petImageViewModel.PetId == 0)
+            {
+                petImageViewModel= JsonConvert.DeserializeObject<PetImageViewModel>(Request.Form["data"]);
+            }
+
             if (file == null || file.Length <= 0)
                 return BadRequest();
             else
@@ -48,7 +54,7 @@ namespace VetClinic.WebApi.Controllers
                 if (validationResult.IsValid)
                 {
                     string fileName = Guid.NewGuid().ToString();
-                    newPetImage.Path= _containerPath+fileName;
+                    newPetImage.Path = _containerPath + fileName;
 
                     await _petImageService.InsertAsync(newPetImage);
 
@@ -58,7 +64,6 @@ namespace VetClinic.WebApi.Controllers
                         return Ok(newPetImage);
                 }
 
-               
             }
             return BadRequest();
         }

@@ -84,7 +84,8 @@ namespace VetClinic.WebApi.Controllers
 
             if (validationResult.IsValid)
             {
-                await _petService.InsertAsync(newPet);
+                //TO DO: INSERT ASYNC WITH ID
+                await _petService.InsertAsyncReturnPet(newPet);
                 return Ok(newPet);
             }
 
