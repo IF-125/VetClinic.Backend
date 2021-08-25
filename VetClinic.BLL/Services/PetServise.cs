@@ -18,7 +18,6 @@ namespace VetClinic.BLL.Services
         private readonly IBlobService _blobService;
         private readonly string _containerName;
         private readonly string _containerPath;
-
         public PetServise(IPetRepository petRepository,
             IBlobService blobService,
             IOrderProcedureRepository orderProcedureRepository)
@@ -28,7 +27,6 @@ namespace VetClinic.BLL.Services
             _blobService = blobService;
             _containerName = "testcontainer";
             _containerPath = "https://blobuploadsample21.blob.core.windows.net/testcontainer/";
-
         }
 
         public async Task<IList<Pet>> GetPetsAsync()
@@ -65,7 +63,6 @@ namespace VetClinic.BLL.Services
             await _petRepository.SaveChangesAsync();
         }
 
-
         public  void Update(int id, Pet petToUpdate)
         {
             if (id != petToUpdate.Id)
@@ -89,7 +86,6 @@ namespace VetClinic.BLL.Services
                     await _blobService.DeleteBlob(petImageBlobName, _containerName);
                 }
             }
-
             _petRepository.Delete(petToDelete);
             await _petRepository.SaveChangesAsync();
         }

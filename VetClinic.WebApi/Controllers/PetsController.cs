@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Services;
 using VetClinic.WebApi.Validators.EntityValidators;
-using VetClinic.WebApi.ViewModels;
 using VetClinic.WebApi.ViewModels.PetViewModels;
 using static VetClinic.Core.Resources.TextMessages;
 
@@ -59,7 +58,7 @@ namespace VetClinic.WebApi.Controllers
         {
             var pets = await _petService.GetPetsToTreat(doctorId);
 
-            var petsViewModel = _mapper.Map<IEnumerable<PetViewModel>>(pets);
+            var petsViewModel = _mapper.Map<IEnumerable<PetViewModelOrigin>>(pets);
 
             return Ok(petsViewModel);
         }
@@ -75,7 +74,7 @@ namespace VetClinic.WebApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> InsertPet(PetViewModel petViewModel)
+        public async Task<IActionResult> InsertPet(PetViewModelOrigin petViewModel)
         {
             var newPet = _mapper.Map<Pet>(petViewModel);
 
@@ -92,7 +91,7 @@ namespace VetClinic.WebApi.Controllers
         }
 
         [HttpPut]
-        public IActionResult UpdatePet(int id, PetViewModel petViewModel)
+        public IActionResult UpdatePet(int id, PetViewModelOrigin petViewModel)
         {
             var pet = _mapper.Map<Pet>(petViewModel);
 
@@ -115,7 +114,7 @@ namespace VetClinic.WebApi.Controllers
             petToUpdate.ApplyTo(pet, ModelState);
             _petService.Update(id, pet);
 
-            var petViewModel = _mapper.Map<PetViewModel>(pet);
+            var petViewModel = _mapper.Map<PetViewModelOrigin>(pet);
             return Ok(petViewModel);
         }
 

@@ -14,6 +14,10 @@ namespace VetClinic.WebApi.Mappers
                 .ReverseMap();
             #endregion
 
+            #region PetViewModelOrigin mapping
+            CreateMap<Pet, PetViewModelOrigin>()
+                .ReverseMap();
+
             #region PetResponseViewModel mapping
             CreateMap<Pet, PetResponseViewModel>()
 
