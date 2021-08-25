@@ -65,14 +65,6 @@ namespace VetClinic.BLL.Services
             await _petRepository.SaveChangesAsync();
         }
 
-        public async Task<Pet> InsertAsyncReturnPet(Pet entity)
-        {
-            await _petRepository.InsertAsync(entity);
-            await _petRepository.SaveChangesAsync();
-
-            return entity;
-        }
-
 
         public  void Update(int id, Pet petToUpdate)
         {

@@ -15,6 +15,5 @@ namespace VetClinic.Core.Interfaces.Services
 
         public Task<IEnumerable<Pet>> GetPetsToTreat(string doctorId);
 
-        public Task<Pet> InsertAsyncReturnPet(Pet pet);
     }
 }
