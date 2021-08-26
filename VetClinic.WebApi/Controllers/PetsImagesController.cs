@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -17,25 +19,29 @@ namespace VetClinic.WebApi.Controllers
     {
         private readonly IBlobService _blobService;
         private readonly IPetImageService _petImageService;
-        private readonly string _containerName;
-        private readonly string _containerPath;
         private readonly IMapper _mapper;
+        private readonly IConfiguration _configuration;
 
         public PetsImagesController(
             IBlobService blobService, 
             IPetImageService petImageService,
-            IMapper mapper)
+            IMapper mapper,
+            IConfiguration configuration)
         {
             _blobService = blobService;
             _petImageService = petImageService;
-            _containerName = "testcontainer";
-            _containerPath = "https://blobuploadsample21.blob.core.windows.net/testcontainer/";
             _mapper = mapper;
+            _configuration = configuration;
         }
 
         [HttpPost]
         public async Task<IActionResult> InsertPetImage(IFormFile file, [FromForm] PetImageViewModel petImageViewModel)
         {
+           if (petImageViewModel.PetId == 0)
+            {
+                petImageViewModel= JsonConvert.DeserializeObject<PetImageViewModel>(Request.Form["data"]);
+            }
+
             if (file == null || file.Length <= 0)
                 return BadRequest();
             else
@@ -48,22 +54,18 @@ namespace VetClinic.WebApi.Controllers
                 if (validationResult.IsValid)
                 {
                     string fileName = Guid.NewGuid().ToString();
-                    newPetImage.Path= _containerPath+fileName;
+                    newPetImage.Path = _configuration["ContainerPath"] + fileName;
 
                     await _petImageService.InsertAsync(newPetImage);
 
-                    var res = await _blobService.UploadFileBlob(fileName, file, _containerName);
+                    var res = await _blobService.UploadFileBlob(fileName, file, _configuration["BlobContainerName"]);
 
                     if (res)
-                        return Ok($"Image {file.FileName} was added");
+                        return Ok(newPetImage);
                 }
-
-               
             }
             return BadRequest();
         }
-
-       
 
         [HttpGet]
         public async Task<IActionResult> GetAllPetImages(int petId)
@@ -73,26 +75,17 @@ namespace VetClinic.WebApi.Controllers
             return Ok(petImageList);
         }
 
-       
-
         [HttpDelete("DeletePetImage/{petImageId}")]
         public async Task<IActionResult> DeletePetImageByName(int petImageId)
         {
             var petImage = await _petImageService.GetByIdAsync(petImageId);
 
-            var petImageBlobName = petImage.Path.Replace(_containerPath, default);
+            var petImageBlobName = petImage.Path.Replace(_configuration["ContainerPath"], default);
 
-            await _blobService.DeleteBlob(petImageBlobName, _containerName);
+            await _blobService.DeleteBlob(petImageBlobName, _configuration["BlobContainerName"]);
 
             return Ok($"Image \"{petImageBlobName}\" has been deleted");
         }
-
-
-
-
-
-        
-      
 
 
     }

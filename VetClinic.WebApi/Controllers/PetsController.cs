@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Services;
 using VetClinic.WebApi.Validators.EntityValidators;
-using VetClinic.WebApi.ViewModels;
 using VetClinic.WebApi.ViewModels.PetViewModels;
 using static VetClinic.Core.Resources.TextMessages;
 
@@ -18,13 +17,14 @@ namespace VetClinic.WebApi.Controllers
     {
         private readonly IPetService _petService;
         private readonly IMapper _mapper;
+        private readonly PetValidator _petValidator;
 
-        //TODO: provide validator via DI
 
-        public PetsController(IPetService petService, IMapper mapper)
+        public PetsController(IPetService petService, IMapper mapper, PetValidator petValidator)
         {
             _petService = petService;
             _mapper = mapper;
+            _petValidator = petValidator;
         }
 
         [HttpGet]
@@ -59,7 +59,7 @@ namespace VetClinic.WebApi.Controllers
         {
             var pets = await _petService.GetPetsToTreat(doctorId);
 
-            var petsViewModel = _mapper.Map<IEnumerable<PetViewModel>>(pets);
+            var petsViewModel = _mapper.Map<IEnumerable<PetViewModelOrigin>>(pets);
 
             return Ok(petsViewModel);
         }
@@ -75,12 +75,11 @@ namespace VetClinic.WebApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> InsertPet(PetViewModel petViewModel)
+        public async Task<IActionResult> InsertPet(PetViewModelOrigin petViewModel)
         {
             var newPet = _mapper.Map<Pet>(petViewModel);
 
-            var validator = new PetValidator();
-            var validationResult = validator.Validate(newPet);
+            var validationResult = _petValidator.Validate(newPet);
 
             if (validationResult.IsValid)
             {
@@ -92,12 +91,11 @@ namespace VetClinic.WebApi.Controllers
         }
 
         [HttpPut]
-        public IActionResult UpdatePet(int id, PetViewModel petViewModel)
+        public IActionResult UpdatePet(int id, PetViewModelOrigin petViewModel)
         {
             var pet = _mapper.Map<Pet>(petViewModel);
 
-            var validator = new PetValidator();
-            var validationResult = validator.Validate(pet);
+            var validationResult = _petValidator.Validate(pet);
 
             if (validationResult.IsValid)
             {
@@ -115,7 +113,7 @@ namespace VetClinic.WebApi.Controllers
             petToUpdate.ApplyTo(pet, ModelState);
             _petService.Update(id, pet);
 
-            var petViewModel = _mapper.Map<PetViewModel>(pet);
+            var petViewModel = _mapper.Map<PetViewModelOrigin>(pet);
             return Ok(petViewModel);
         }
 

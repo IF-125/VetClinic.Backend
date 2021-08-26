@@ -10,7 +10,11 @@ using VetClinic.BLL.Services;
 using VetClinic.BLL.Tests.FakeData;
 using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Repositories;
+using VetClinic.Core.Interfaces.Services;
 using Xunit;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+
 
 namespace VetClinic.BLL.Tests.Services
 {
@@ -19,10 +23,13 @@ namespace VetClinic.BLL.Tests.Services
         private readonly PetServise _petServise;
         private readonly Mock<IPetRepository> _mockPetRepository = new Mock<IPetRepository>();
         private readonly Mock<IOrderProcedureRepository> _mockOrderProcedureRepository = new Mock<IOrderProcedureRepository>();
+        private readonly Mock<IBlobService> _mockIblobService = new Mock<IBlobService>();
+        private readonly Mock<IConfiguration> _mockConfiguration = new Mock<IConfiguration>();
+
 
         public PetServiceTests()
         {
-            _petServise = new PetServise(_mockPetRepository.Object, _mockOrderProcedureRepository.Object);
+            _petServise = new PetServise(_mockPetRepository.Object, _mockIblobService.Object, _mockOrderProcedureRepository.Object, _mockConfiguration.Object);
         }
 
         [Fact]
@@ -30,7 +37,8 @@ namespace VetClinic.BLL.Tests.Services
         {
             // Arrange
             var numberOfPets = 10;
-            _mockPetRepository.Setup(x => x.GetAsync(null, null, null, true).Result)
+            _mockPetRepository.Setup(x => x.GetAsync(null, null,
+               It.IsAny<Func<IQueryable<Pet>, IIncludableQueryable<Pet, object>>>(), true).Result)
                 .Returns(PetFakeData.GetPetFakeData());
             // Act
             IList<Pet> tempPets = await _petServise.GetPetsAsync();
@@ -47,7 +55,7 @@ namespace VetClinic.BLL.Tests.Services
             var id = 10;
             var name = "Lord10";
             var pets = PetFakeData.GetPetFakeData().AsQueryable();
-            _mockPetRepository.Setup(x => x.GetFirstOrDefaultAsync(x => x.Id == id, null, false).Result)
+            _mockPetRepository.Setup(x => x.GetFirstOrDefaultAsync(x => x.Id == id, It.IsAny<Func<IQueryable<Pet>, IIncludableQueryable<Pet, object>>>(), false).Result)
                 .Returns(pets.FirstOrDefault(x => x.Id == id));
             
             // Act
@@ -148,7 +156,7 @@ namespace VetClinic.BLL.Tests.Services
             var id = 10;
             var pets = PetFakeData.GetPetFakeData().AsQueryable();
 
-            _mockPetRepository.Setup(x => x.GetFirstOrDefaultAsync(x => x.Id == id, null, false).Result)
+            _mockPetRepository.Setup(x => x.GetFirstOrDefaultAsync(x => x.Id == id, It.IsAny<Func<IQueryable<Pet>, IIncludableQueryable<Pet, object>>>(), false).Result)
                 .Returns(pets.FirstOrDefault(x => x.Id == id));
 
             _mockPetRepository.Setup(x => x.Delete(It.IsAny<Pet>())).Verifiable();
@@ -168,7 +176,7 @@ namespace VetClinic.BLL.Tests.Services
             var id = 999;
             var pets = PetFakeData.GetPetFakeData().AsQueryable();
 
-            _mockPetRepository.Setup(x => x.GetFirstOrDefaultAsync(x => x.Id == id, null, false).Result)
+            _mockPetRepository.Setup(x => x.GetFirstOrDefaultAsync(x => x.Id == id, It.IsAny<Func<IQueryable<Pet>, IIncludableQueryable<Pet, object>>>(), false).Result)
                 .Returns(pets.FirstOrDefault(x => x.Id == id));
 
             _mockPetRepository.Setup(x => x.Delete(It.IsAny<Pet>())).Verifiable();
@@ -209,7 +217,7 @@ namespace VetClinic.BLL.Tests.Services
             var idArr = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 999, 1000 };
             var pets = PetFakeData.GetPetFakeData().AsQueryable();
 
-            // Act
+            
             _mockPetRepository.Setup(x => x.GetAsync(It.IsAny<Expression<Func<Pet, bool>>>(), null, null, false).Result)
                 .Returns((Expression<Func<Pet, bool>> filter,
                 Func<IQueryable<Pet>, IOrderedQueryable<Employee>> orderBy,
@@ -218,8 +226,58 @@ namespace VetClinic.BLL.Tests.Services
 
             _mockPetRepository.Setup(x => x.DeleteRange(It.IsAny<IEnumerable<Pet>>()));
 
-            // Assert
+            // Act, Assert
             Assert.Throws<AggregateException>(() => _petServise.DeleteRangeAsync(idArr).Wait());
         }
+
+        [Fact]
+        public void GetMedicalCardOfPet_ShouldReturnPetWithAssignOrderProcedure()
+        {
+            // Arrange
+            var petId = 1;
+            var pets = PetFakeData.GetPetFakeData().AsQueryable();
+
+            _mockPetRepository.Setup(x => x.GetFirstOrDefaultAsync(It.IsAny<Expression<Func<Pet, bool>>>(), It.IsAny<Func<IQueryable<Pet>, IIncludableQueryable<Pet, object>>>(), true).Result)
+                .Returns((Expression<Func<Pet, bool>> filter,
+                Func<IQueryable<Pet>, IIncludableQueryable<Pet, object>> include,
+                bool asNoTracking) => pets.Where(filter).FirstOrDefault());
+
+            // Act
+            var pet =  _petServise.GetMedicalCardOfPetAsync(petId).Result;
+
+            // Assert
+            Assert.Equal(1, pet.OrderProcedures.Count);
+        }
+
+        //[Fact]
+        //public void GetPetsToTreat_ShouldReturnPetToTreat()
+        //{
+        //    // Arrange
+        //    var orderProcedures = OrderProcedureFakeData.GetOrderProcedureFakeData().AsQueryable();
+        //    var doctorId = "f1a05cca-b479-4f72-bbda-96b8979f4afe";
+
+        //    _mockOrderProcedureRepository.Setup(x => x.GetAsync(
+        //        It.IsAny<Expression<Func<OrderProcedure, bool>>>(), null,
+        //        It.IsAny<Func<IQueryable<OrderProcedure>, IIncludableQueryable<OrderProcedure, object>>>(),
+        //        false).Result)
+        //        .Returns((Expression<Func<OrderProcedure, bool>> filter,
+        //                Func<IQueryable<OrderProcedure>, IOrderedQueryable<OrderProcedure>> orderBy,
+        //                Func<IQueryable<OrderProcedure>, IIncludableQueryable<OrderProcedure, object>> include,
+        //                bool asNoTracking) =>
+        //        {
+        //            var orders = orderProcedures.Where(filter);
+        //            return include(orders).ToList();
+        //        });
+
+        //    // Act
+        //    var pets = _petServise.GetPetsToTreat(doctorId).Result;
+
+        //    // Assert
+        //    Assert.Equal(1, pets.Count());
+
+        //}
+
+
+
     }
 }
