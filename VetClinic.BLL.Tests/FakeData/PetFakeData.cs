@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using VetClinic.Core.Entities;
+using VetClinic.Core.Entities.Enums;
 
 namespace VetClinic.BLL.Tests.FakeData
 {
@@ -14,7 +16,31 @@ namespace VetClinic.BLL.Tests.FakeData
                     Name = "Lord1",
                     Information = "Animal from the street1",
                     Breed = "Bebgal",
-                    Age = 2
+                    Age = 2,
+                    OrderProcedures=new List<OrderProcedure>
+                    {
+                        new OrderProcedure
+                        {
+                            Id = 1,
+                            Status= OrderProcedureStatus.Assigned,
+                            EmployeeId="1"
+
+
+                        },
+                        new OrderProcedure
+                        {
+                            Id = 2,
+                            Status= OrderProcedureStatus.NotAssigned,
+                            EmployeeId="1"
+                        }
+                        ,
+                        new OrderProcedure
+                        {
+                            Id = 3,
+                            Status= OrderProcedureStatus.NotAssigned,
+                            EmployeeId="1"
+                        }
+                    } 
                 },
                 new Pet
                 {

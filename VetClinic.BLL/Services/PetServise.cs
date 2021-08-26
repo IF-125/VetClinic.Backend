@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using SendGrid.Helpers.Errors.Model;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,17 +17,16 @@ namespace VetClinic.BLL.Services
         private readonly IPetRepository _petRepository;
         private readonly IOrderProcedureRepository _orderProcedureRepository;
         private readonly IBlobService _blobService;
-        private readonly string _containerName;
-        private readonly string _containerPath;
+        private readonly IConfiguration _configuration;
         public PetServise(IPetRepository petRepository,
             IBlobService blobService,
-            IOrderProcedureRepository orderProcedureRepository)
+            IOrderProcedureRepository orderProcedureRepository,
+            IConfiguration configuration)
         {
             _petRepository = petRepository;
             _orderProcedureRepository = orderProcedureRepository;
             _blobService = blobService;
-            _containerName = "testcontainer";
-            _containerPath = "https://blobuploadsample21.blob.core.windows.net/testcontainer/";
+            _configuration = configuration;
         }
 
         public async Task<IList<Pet>> GetPetsAsync()
@@ -82,8 +82,8 @@ namespace VetClinic.BLL.Services
             {
                 foreach (var petImage in petToDelete.PetImages)
                 {
-                    var petImageBlobName = petImage.Path.Replace(_containerPath, default);
-                    await _blobService.DeleteBlob(petImageBlobName, _containerName);
+                    var petImageBlobName = petImage.Path.Replace(_configuration["ContainerPath"], default);
+                    await _blobService.DeleteBlob(petImageBlobName, _configuration["BlobContainerName"]);
                 }
             }
             _petRepository.Delete(petToDelete);

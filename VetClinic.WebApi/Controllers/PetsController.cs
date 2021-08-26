@@ -17,13 +17,14 @@ namespace VetClinic.WebApi.Controllers
     {
         private readonly IPetService _petService;
         private readonly IMapper _mapper;
+        private readonly PetValidator _petValidator;
 
-        //TODO: provide validator via DI
 
-        public PetsController(IPetService petService, IMapper mapper)
+        public PetsController(IPetService petService, IMapper mapper, PetValidator petValidator)
         {
             _petService = petService;
             _mapper = mapper;
+            _petValidator = petValidator;
         }
 
         [HttpGet]
@@ -78,8 +79,7 @@ namespace VetClinic.WebApi.Controllers
         {
             var newPet = _mapper.Map<Pet>(petViewModel);
 
-            var validator = new PetValidator();
-            var validationResult = validator.Validate(newPet);
+            var validationResult = _petValidator.Validate(newPet);
 
             if (validationResult.IsValid)
             {
@@ -95,8 +95,7 @@ namespace VetClinic.WebApi.Controllers
         {
             var pet = _mapper.Map<Pet>(petViewModel);
 
-            var validator = new PetValidator();
-            var validationResult = validator.Validate(pet);
+            var validationResult = _petValidator.Validate(pet);
 
             if (validationResult.IsValid)
             {
