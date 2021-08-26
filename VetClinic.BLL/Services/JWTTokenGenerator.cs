@@ -18,12 +18,13 @@ namespace VetClinic.BLL.Services
             _config = configuration;
         }
 
-        public string GenerateToken(User user)
+        public string GenerateToken(User user, string role)
         {
             var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.GivenName, user.UserName),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email)
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim(ClaimTypes.Role, role)
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Token:Key"]));
