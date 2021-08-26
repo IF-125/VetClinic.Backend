@@ -83,7 +83,7 @@ namespace VetClinic.WebApi.Controllers
         public async Task<IActionResult> DeleteProcedure(int id)
         {
             await _procedureService.DeleteAsync(id);
-            return Ok($"{nameof(Procedure)} {EntityHasBeenDeleted}");
+            return Ok();
         }
 
         [HttpDelete]

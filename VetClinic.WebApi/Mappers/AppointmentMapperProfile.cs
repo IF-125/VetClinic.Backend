@@ -14,7 +14,10 @@ namespace VetClinic.WebApi.Mappers
                 .ForMember(x => x.From, y => y.MapFrom(src => src.From.ToString("HH:mm")))
 
                 .ForMember(x => x.To, y => y.MapFrom(src => src.To.ToString("HH:mm")))
-                .ForMember(x => x.PetName, y => y.MapFrom(src => src.OrderProcedure.Pet.Name))
+
+                .ForMember(x => x.OrderProcedureId, y => y.MapFrom(src => src.OrderProcedure.Id))
+
+                .ForMember(x => x.DoctorName, y => y.MapFrom(src => src.OrderProcedure.Employee.FirstName + " " + src.OrderProcedure.Employee.LastName))
 
                 .ReverseMap();
             #endregion

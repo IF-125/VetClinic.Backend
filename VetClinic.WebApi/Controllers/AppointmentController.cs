@@ -88,7 +88,7 @@ namespace VetClinic.WebApi.Controllers
         public async Task<IActionResult> DeleteAppointment(int id)
         {
             await _appointmentService.DeleteAsync(id);
-            return Ok($"{nameof(Appointment)} {EntityHasBeenDeleted}");
+            return Ok();
         }
 
         [HttpDelete]
