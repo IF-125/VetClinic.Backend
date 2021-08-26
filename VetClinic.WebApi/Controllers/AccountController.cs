@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
@@ -13,12 +15,17 @@ namespace VetClinic.WebApi.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IJWTTokenGenerator _token;
 
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, IJWTTokenGenerator token)
+        public AccountController(UserManager<User> userManager,
+            SignInManager<User> signInManager,
+            RoleManager<IdentityRole> roleManager,
+            IJWTTokenGenerator token)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _roleManager = roleManager;
             _token = token;
         }
   
@@ -29,15 +36,16 @@ namespace VetClinic.WebApi.Controllers
             {
                 return BadRequest(ModelState);
             }
-           
+
             User user = new User { Email = model.Email, UserName = model.Email, FirstName = model.FirstName, LastName = model.LastName };
-                
+
             var result = await _userManager.CreateAsync(user, model.Password);
             await _signInManager.SignInAsync(user, false);
 
             if (!result.Succeeded) return BadRequest(result.Errors);
 
             await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("Role", "Client"));
+            var role = await _roleManager.FindByNameAsync("Client");
             await _userManager.AddToRoleAsync(user, "Client");
 
             return Ok();
@@ -66,16 +74,16 @@ namespace VetClinic.WebApi.Controllers
 
             var roles = await _userManager.GetRolesAsync(user);
             var role = roles[0];
-            var token = _token.GenerateToken(user);
+            var token = _token.GenerateToken(user, role);
 
-            return Ok(new AuthResponseViewModel { IsAuthSuccessful = true, Token = token, Role = role });
+            return Ok(new AuthResponseViewModel {Token = token });
     }
 
         [HttpPost("Logout")]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-            return Redirect("/");
+            return Ok();
         }
     }
 }
