@@ -24,7 +24,8 @@ namespace VetClinic.WebApi.Controllers
             string from = "user@email.com";
             string to = "administrator@email.com";
             string subject = "Request for an appointment.";
-            string body = "User wants to request " + model.Procedure + " for their pet " + model.Pet;
+            string body = "User wants to request " + model.Procedure + " for their pet " + model.Pet + ". An OrderProcedure with id: " + 
+                model.OrderProcedure + " was created for their request.";
             _emailService.Send(from, to, subject, body);
             return Ok();
         }

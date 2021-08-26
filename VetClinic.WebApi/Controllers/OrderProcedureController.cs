@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
+using VetClinic.Core.Entities.Enums;
 using VetClinic.Core.Interfaces.Services;
 using VetClinic.WebApi.Validators.EntityValidators;
 using VetClinic.WebApi.ViewModels.AppointmentViewModels;
@@ -61,11 +62,11 @@ namespace VetClinic.WebApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> InsertOrderProcedure(int petId, int procedureId, OrderToCreateViewModel model)
+        public async Task<IActionResult> InsertOrderProcedure(int petId, int procedureId, int paymentOption)
         {
-            var orderProcedure = await _orderProcedureService.GenerateOrderProcedureAsync(petId, procedureId, model.PaymentOption);
+            var orderProcedure = await _orderProcedureService.GenerateOrderProcedureAsync(petId, procedureId, (PaymentOption) paymentOption);
             await _orderProcedureService.InsertAsync(orderProcedure);
-            return Ok();
+            return Ok(orderProcedure.Id);
         }
 
         [HttpPost("AddAppointmentAndEmployeeToOrderProcedure")]
