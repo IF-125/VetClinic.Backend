@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using SendGrid.Helpers.Errors.Model;
 using System;
@@ -12,9 +13,6 @@ using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Repositories;
 using VetClinic.Core.Interfaces.Services;
 using Xunit;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-
 
 namespace VetClinic.BLL.Tests.Services
 {
@@ -249,33 +247,35 @@ namespace VetClinic.BLL.Tests.Services
             Assert.Equal(1, pet.OrderProcedures.Count);
         }
 
-        //[Fact]
-        //public void GetPetsToTreat_ShouldReturnPetToTreat()
-        //{
-        //    // Arrange
-        //    var orderProcedures = OrderProcedureFakeData.GetOrderProcedureFakeData().AsQueryable();
-        //    var doctorId = "f1a05cca-b479-4f72-bbda-96b8979f4afe";
+        [Fact]
+        public void GetPetsToTreat_ShouldReturnPetToTreat()
+        {
+            // Arrange
+            var orderProcedures = OrderProcedureFakeData.GetOrderProcedureFakeData().AsQueryable();
+            var doctorId = "f1a05cca-b479-4f72-bbda-96b8979f4afe";
+            var numberAssignedPetInFakeData = 2;
 
-        //    _mockOrderProcedureRepository.Setup(x => x.GetAsync(
-        //        It.IsAny<Expression<Func<OrderProcedure, bool>>>(), null,
-        //        It.IsAny<Func<IQueryable<OrderProcedure>, IIncludableQueryable<OrderProcedure, object>>>(),
-        //        false).Result)
-        //        .Returns((Expression<Func<OrderProcedure, bool>> filter,
-        //                Func<IQueryable<OrderProcedure>, IOrderedQueryable<OrderProcedure>> orderBy,
-        //                Func<IQueryable<OrderProcedure>, IIncludableQueryable<OrderProcedure, object>> include,
-        //                bool asNoTracking) =>
-        //        {
-        //            var orders = orderProcedures.Where(filter);
-        //            return include(orders).ToList();
-        //        });
+            _mockOrderProcedureRepository.Setup(x => x.GetAsync(
+                It.IsAny<Expression<Func<OrderProcedure, bool>>>(), null,
+                It.IsAny<Func<IQueryable<OrderProcedure>, IIncludableQueryable<OrderProcedure, object>>>(),
+                false).Result)
+                .Returns((Expression<Func<OrderProcedure, bool>> filter,
+                        Func<IQueryable<OrderProcedure>, IOrderedQueryable<OrderProcedure>> orderBy,
+                        Func<IQueryable<OrderProcedure>, IIncludableQueryable<OrderProcedure, object>> include,
+                        bool asNoTracking) =>
+                {
+                    var orders = orderProcedures.Where(filter);
+                    var inc= include(orders).ToList();
+                    return inc;
+                });
 
-        //    // Act
-        //    var pets = _petServise.GetPetsToTreat(doctorId).Result;
+            // Act
+            var pets = _petServise.GetPetsToTreat(doctorId).Result;
 
-        //    // Assert
-        //    Assert.Equal(1, pets.Count());
+            // Assert
+            Assert.Equal(numberAssignedPetInFakeData, pets.Count());
 
-        //}
+        }
 
 
 

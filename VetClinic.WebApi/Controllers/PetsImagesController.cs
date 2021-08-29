@@ -76,9 +76,11 @@ namespace VetClinic.WebApi.Controllers
         }
 
         [HttpDelete("DeletePetImage/{petImageId}")]
-        public async Task<IActionResult> DeletePetImageByName(int petImageId)
+        public async Task<IActionResult> DeletePetImageById(int petImageId)
         {
             var petImage = await _petImageService.GetByIdAsync(petImageId);
+
+            await _petImageService.DeleteAsync(petImageId);
 
             var petImageBlobName = petImage.Path.Replace(_configuration["ContainerPath"], default);
 
