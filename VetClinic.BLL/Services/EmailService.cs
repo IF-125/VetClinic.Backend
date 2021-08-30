@@ -16,9 +16,9 @@ namespace VetClinic.BLL.Services
             email.Subject = subject;
             email.Body = new TextPart(TextFormat.Html) { Text = body };
 
-            // send email
             using var smtp = new SmtpClient();
             smtp.Connect("smtp.mailtrap.io", 2525, SecureSocketOptions.StartTls);
+            //TODO: remove username and password from code
             smtp.Authenticate("203499a0ee8d71", "4f68c4bc4fdc16");
             smtp.Send(email);
             smtp.Disconnect(true);
