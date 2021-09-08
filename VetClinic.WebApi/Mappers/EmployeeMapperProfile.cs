@@ -17,6 +17,10 @@ namespace VetClinic.WebApi.Mappers
                 .ForMember(x => x.Position, y => y.MapFrom(src => src.EmployeePosition.Position.Title))
 
                 .ReverseMap();
+
+            CreateMap<Employee, EmployeeToAddViewModel>()
+
+                .ReverseMap();
         }
     }
 }

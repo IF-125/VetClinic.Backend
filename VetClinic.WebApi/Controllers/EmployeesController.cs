@@ -56,7 +56,7 @@ namespace VetClinic.WebApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> InsertEmployeeAsync(EmployeeViewModel model)
+        public async Task<IActionResult> InsertEmployeeAsync(EmployeeToAddViewModel model)
         {
             var newEmployee = _mapper.Map<Employee>(model);
 
