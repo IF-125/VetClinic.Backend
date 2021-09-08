@@ -26,7 +26,8 @@ namespace VetClinic.BLL.Services
         public async Task<IList<Appointment>> GetAppointmentsAsync()
         {
             return await _appointmentRepository.GetAsync(
-                include: x => x.Include(p => p.OrderProcedure).ThenInclude(p => p.Pet), asNoTracking: true);
+                include: x => x.Include(p => p.OrderProcedure)
+                               .Include(p => p.OrderProcedure).ThenInclude(p => p.Employee), asNoTracking: true); ;
         }
 
         public async Task<Appointment> GetByIdAsync(int id)

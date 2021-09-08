@@ -35,7 +35,7 @@ namespace VetClinic.BLL.Services
         public async Task<IList<OrderProcedure>> GetOrderProceduresAsync()
         {
             return await _orderProcedureRepository
-                .GetAsync(asNoTracking: true);
+                .GetAsync(include: x => x.Include(p => p.Appointment), asNoTracking: true);
         }
 
         public async Task<OrderProcedure> GetByIdAsync(int id)

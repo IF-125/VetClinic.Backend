@@ -4,5 +4,6 @@
     {
         public string Pet { get; set; }
         public string Procedure { get; set; }
+        public string OrderProcedure { get; set; }
     }
 }

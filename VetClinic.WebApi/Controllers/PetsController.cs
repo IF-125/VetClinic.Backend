@@ -60,7 +60,7 @@ namespace VetClinic.WebApi.Controllers
         {
             var pets = await _petService.GetPetsToTreat(doctorId);
 
-            var petsViewModel = _mapper.Map<IEnumerable<PetViewModelOrigin>>(pets);
+            var petsViewModel = _mapper.Map<IEnumerable<PetResponseViewModel>>(pets);
 
             return Ok(petsViewModel);
         }
