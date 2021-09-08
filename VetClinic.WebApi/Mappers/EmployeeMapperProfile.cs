@@ -9,7 +9,6 @@ namespace VetClinic.WebApi.Mappers
     {
         public EmployeeMapperProfile()
         {
-            #region EmployeeViewModel mapping
             CreateMap<Employee, EmployeeViewModel>()
                 
                 .ForMember(x => x.FirstName, y => y.MapFrom(src => src.FirstName))
