@@ -1,8 +1,11 @@
-﻿namespace VetClinic.WebApi.ViewModels.EmployeeViewModels
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace VetClinic.WebApi.ViewModels.EmployeeViewModels
 {
-    public class EmployeeViewModel
+    public class EmployeeToCreateViewModel
     {
-        public string Id { get; set; }
         public string Email { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }

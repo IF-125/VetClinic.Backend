@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using VetClinic.Core.Entities;
+using VetClinic.WebApi.ViewModels.AppointmentViewModels;
 using VetClinic.WebApi.ViewModels.EmployeeViewModels;
 
 namespace VetClinic.WebApi.Mappers
@@ -8,6 +9,7 @@ namespace VetClinic.WebApi.Mappers
     {
         public EmployeeMapperProfile()
         {
+            #region EmployeeViewModel mapping
             CreateMap<Employee, EmployeeViewModel>()
                 
                 .ForMember(x => x.FirstName, y => y.MapFrom(src => src.FirstName))

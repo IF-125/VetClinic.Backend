@@ -65,7 +65,7 @@ namespace VetClinic.WebApi.Controllers
             if (validationResult.IsValid)
             {
                 await _employeeService.InsertAsync(newEmployee);
-                return Ok(_mapper.Map<EmployeeViewModel>(newEmployee));
+                return Ok(_mapper.Map<EmployeeToCreateViewModel>(newEmployee));
             }
             return BadRequest(validationResult.Errors);
         }
@@ -106,7 +106,7 @@ namespace VetClinic.WebApi.Controllers
             try
             {
                 await _employeeService.DeleteAsync(id);
-                return Ok($"{nameof(Employee)} {EntityHasBeenDeleted}");
+                return Ok();
             }
             catch(NotFoundException ex)
             {
