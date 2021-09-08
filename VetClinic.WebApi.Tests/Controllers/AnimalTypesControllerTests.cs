@@ -13,6 +13,7 @@ using VetClinic.Core.Interfaces.Services;
 using VetClinic.WebApi.Controllers;
 using VetClinic.WebApi.Mappers;
 using VetClinic.WebApi.ViewModels;
+using VetClinic.WebApi.ViewModels.AnimalTypesViewModels;
 using Xunit;
 using static VetClinic.Core.Resources.TextMessages;
 

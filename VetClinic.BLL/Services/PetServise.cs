@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using SendGrid.Helpers.Errors.Model;
 using System.Collections.Generic;
 using System.Linq;
@@ -108,10 +109,11 @@ namespace VetClinic.BLL.Services
             var pet = await _petRepository.GetFirstOrDefaultAsync(
                 filter: x => x.Id == petId,
                 include: i => i
-                    .Include(a => a.AnimalType)
-                    .Include(c => c.Client)
+                    .Include(p => p.AnimalType)
+                    .Include(p => p.Client)
+                    .Include(p => p.PetImages)
                     .Include(p => p.OrderProcedures)
-                    .ThenInclude(p => p.Procedure)
+                    .ThenInclude(o => o.Procedure)
                     .Include(p => p.OrderProcedures)
                     .ThenInclude(o => o.Order),
                 asNoTracking: true

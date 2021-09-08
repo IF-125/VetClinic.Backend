@@ -1,39 +1,41 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.Extensions.Configuration;
 using Moq;
+using SendGrid.Helpers.Errors.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using VetClinic.BLL.Services;
 using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Repositories;
 using VetClinic.Core.Interfaces.Services;
 using VetClinic.WebApi.Controllers;
 using VetClinic.WebApi.Mappers;
-using VetClinic.WebApi.ViewModels;
+using VetClinic.WebApi.Validators.EntityValidators;
+using VetClinic.WebApi.ViewModels.PetViewModels;
 using Xunit;
-using static VetClinic.Core.Resources.TextMessages;
-
 
 namespace VetClinic.WebApi.Tests.Controllers
 {
     public class PetsControllerTests
     {
         private readonly IMapper _mapper;
-        private readonly Mock<IPetRepository> _mockPetRepository;
-        private readonly IPetService _petService;
+        private readonly PetServise _petService;
+        private readonly Mock<IPetRepository> _mockPetRepository = new Mock<IPetRepository>();
+        private readonly Mock<IOrderProcedureRepository> _mockOrderProcedureRepository = new Mock<IOrderProcedureRepository>();
+        private readonly Mock<IBlobService> _mockIblobService = new Mock<IBlobService>();
+        private readonly Mock<IConfiguration> _mockConfiguration = new Mock<IConfiguration>();
+        private readonly PetValidator _validator;
 
         private readonly PetsController _petController;
 
         public PetsControllerTests()
         {
-            _mockPetRepository = new Mock<IPetRepository>();
-            _petService = new PetServise(_mockPetRepository.Object);
-            
-
-            if (_mapper==null)
+            if (_mapper == null)
             {
                 var mappingConfig = new MapperConfiguration(mc =>
                 {
@@ -42,7 +44,10 @@ namespace VetClinic.WebApi.Tests.Controllers
                 _mapper = mappingConfig.CreateMapper();
             }
 
-            _petController = new PetsController(_petService,_mapper);
+            _petService = new PetServise(_mockPetRepository.Object, _mockIblobService.Object, _mockOrderProcedureRepository.Object, _mockConfiguration.Object);
+            _validator = new PetValidator();
+            
+            _petController = new PetsController(_petService,_mapper, _validator);
         }
 
         private List<Pet> GetTestPets()
@@ -137,14 +142,16 @@ namespace VetClinic.WebApi.Tests.Controllers
         {
             // Arrange
             var pets = GetTestPets();
-            _mockPetRepository.Setup(x => x.GetAsync(null, null, null, true).Result).Returns(() => pets);
+            _mockPetRepository.Setup(x => x.GetAsync(null, null,
+               It.IsAny<Func<IQueryable<Pet>, IIncludableQueryable<Pet, object>>>(), true).Result)
+                .Returns(pets);
 
             // Act
             var result = _petController.GetAllPets().Result;
 
             // Assert
             var viewResult = Assert.IsType<OkObjectResult>(result);
-            var model = Assert.IsAssignableFrom<IEnumerable<PetViewModel>>(viewResult.Value);
+            var model = Assert.IsAssignableFrom<IEnumerable<PetResponseViewModel>>(viewResult.Value);
             Assert.Equal(pets.Count, model.Count());
         }
 
@@ -158,7 +165,7 @@ namespace VetClinic.WebApi.Tests.Controllers
             var name = "Lord10";
 
             _mockPetRepository.Setup(x => x.GetFirstOrDefaultAsync(
-                It.IsAny<Expression<Func<Pet, bool>>>(), null, false).Result)
+                It.IsAny<Expression<Func<Pet, bool>>>(), It.IsAny<Func<IQueryable<Pet>, IIncludableQueryable<Pet, object>>>(), false).Result)
                 .Returns((Expression<Func<Pet, bool>> filter,
                 Func<IQueryable<Pet>, IIncludableQueryable<Pet, object>> include,
                 bool asNoTracking) => pets.FirstOrDefault(filter));
@@ -168,33 +175,34 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             // Assert
             var viewResult = Assert.IsType<OkObjectResult>(result);
-            var model = Assert.IsAssignableFrom<PetViewModel>(viewResult.Value);
+            var model = Assert.IsAssignableFrom<PetResponseViewModel>(viewResult.Value);
 
             Assert.Equal(id, model.Id);
             Assert.Equal(name, model.Name); 
         }
 
         [Fact]
-        public void GetPetById_ReturnsNotFound()
+        public async Task GetPetById_ReturnsNotFound()
         {
             // Arrange
+            var pets = GetTestPets().AsQueryable();
             var id = -10;
 
-            _mockPetRepository.Setup(x => x.GetFirstOrDefaultAsync(null,null,false)
-                .Result);
+            _mockPetRepository.Setup(x => x.GetFirstOrDefaultAsync(
+               It.IsAny<Expression<Func<Pet, bool>>>(), It.IsAny<Func<IQueryable<Pet>, IIncludableQueryable<Pet, object>>>(), false).Result)
+               .Returns((Expression<Func<Pet, bool>> filter,
+               Func<IQueryable<Pet>, IIncludableQueryable<Pet, object>> include,
+               bool asNoTracking) => pets.FirstOrDefault(filter));
 
-            // Act
-            var result = _petController.GetPet(id).Result;
-
-            // Assert
-            Assert.IsType<NotFoundObjectResult>(result);
+            // Act, Assert
+            await Assert.ThrowsAsync<NullReferenceException>(() => _petController.GetPet(id));
         }
 
         [Fact]
         public void CanInsertPetAsync()
         {
             // Arrange
-            var newPetVM = new PetViewModel
+            var newPetVM = new PetViewModelOrigin
             {
                 Id = 11,
                 Name = "Lord11",
@@ -216,7 +224,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         public void InsertPetAsync_ShouldReturnValidationError()
         {
             // Arrange
-            var newPetVM = new PetViewModel
+            var newPetVM = new PetViewModelOrigin
             {
                 Id = 11,
                 Name = "Lord11",
@@ -237,7 +245,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         public void CanUpdatePet()
         {
             // Arrange
-            var newPetVM = new PetViewModel
+            var newPetVM = new PetViewModelOrigin
             {
                 Id = 1,
                 Name = "Lord1",
@@ -261,7 +269,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         public void UpdatePet_ReturnBadRequest_DueToValidationError()
         {
             // Arrange
-            var newPetVM = new PetViewModel
+            var newPetVM = new PetViewModelOrigin
             {
                 Id = 1,
                 Name = "Lord1",
@@ -285,7 +293,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         public void UpdatePet_ReturnBadRequest_DueToIdMismatch()
         {
             // Arrange
-            var newPetVM = new PetViewModel
+            var newPetVM = new PetViewModelOrigin
             {
                 Id = 1,
                 Name = "Lord1",
@@ -298,23 +306,22 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             _mockPetRepository.Setup(x => x.Update(It.IsAny<Pet>()));
 
-            // Act
-            var result = _petController.UpdatePet(id, newPetVM);
-
-
-            // Assert
-            Assert.IsType<BadRequestObjectResult>(result);
+            // Act, Assert
+            Assert.Throws<NotFoundException>(()=>_petController.UpdatePet(id, newPetVM));
         }
 
         [Fact]
         public void CanDeletePet()
         {
             // Arrange
+            var pets = GetTestPets().AsQueryable();
             var id = 1;
 
-            _mockPetRepository.Setup(
-                x => x.GetFirstOrDefaultAsync(x => x.Id == id, null, false).Result)
-                .Returns(new Pet { Id = id });
+            _mockPetRepository.Setup(x => x.GetFirstOrDefaultAsync(
+                It.IsAny<Expression<Func<Pet, bool>>>(), It.IsAny<Func<IQueryable<Pet>, IIncludableQueryable<Pet, object>>>(), false).Result)
+                .Returns((Expression<Func<Pet, bool>> filter,
+                Func<IQueryable<Pet>, IIncludableQueryable<Pet, object>> include,
+                bool asNoTracking) => pets.FirstOrDefault(filter));
 
             _mockPetRepository.Setup(x => x.Delete(It.IsAny<Pet>()));
 
@@ -326,19 +333,20 @@ namespace VetClinic.WebApi.Tests.Controllers
         }
 
         [Fact]
-        public void DeletePet_WhetPetDoesNotExist()
+        public async System.Threading.Tasks.Task DeletePet_WhetPetDoesNotExist()
         {
             // Arrange
+            var pets = GetTestPets().AsQueryable();
             var id = -10;
 
-            _mockPetRepository.Setup(x => x.GetFirstOrDefaultAsync(null, null, false)
-               .Result);
+            _mockPetRepository.Setup(x => x.GetFirstOrDefaultAsync(
+                It.IsAny<Expression<Func<Pet, bool>>>(), It.IsAny<Func<IQueryable<Pet>, IIncludableQueryable<Pet, object>>>(), false).Result)
+                .Returns((Expression<Func<Pet, bool>> filter,
+                Func<IQueryable<Pet>, IIncludableQueryable<Pet, object>> include,
+                bool asNoTracking) => pets.FirstOrDefault(filter));
 
-            // Act
-            var result = _petController.DeletePet(id).Result;
-
-            // Assert
-            Assert.IsType<NotFoundObjectResult>(result);
+            // Act, Assert
+            await Assert.ThrowsAsync<NullReferenceException>(() => _petController.DeletePet(id));
         }
 
         [Fact]
@@ -364,7 +372,7 @@ namespace VetClinic.WebApi.Tests.Controllers
         }
 
         [Fact]
-        public void DeleteRange_WhenSomePetNotFound()
+        public async Task DeleteRange_WhenSomePetNotFound()
         {
             // Arrange
             var pets = GetTestPets().AsQueryable();
@@ -378,13 +386,8 @@ namespace VetClinic.WebApi.Tests.Controllers
 
             _mockPetRepository.Setup(x => x.DeleteRange(It.IsAny<IEnumerable<Pet>>()));
 
-            // Act
-            var result = _petController.DeletePets(listOfIds).Result;
-            var badRequest = result as BadRequestObjectResult;
-
-            // Assert
-            Assert.IsType<BadRequestObjectResult>(result);
-            Assert.Equal($"{SomeEntitiesInCollectionNotFound} {nameof(Pet)}s to delete", badRequest.Value);
+            // Act, Assert
+            await Assert.ThrowsAsync<BadRequestException>(() => _petController.DeletePets(listOfIds));
 
         }
     }
