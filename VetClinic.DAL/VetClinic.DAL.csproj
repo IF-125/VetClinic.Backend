@@ -6,9 +6,6 @@
 
   <ItemGroup>
     <Folder Include="Context\" />
-    <Folder Include="Seeders\" />
-    <Folder Include="Seeders\" />
-    <Folder Include="Seeders\" />
   </ItemGroup>
    
    <ItemGroup>
