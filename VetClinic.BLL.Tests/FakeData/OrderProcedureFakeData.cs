@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using VetClinic.Core.Entities;
+using VetClinic.Core.Entities.Enums;
+
 namespace VetClinic.BLL.Tests.FakeData
 {
     public static class OrderProcedureFakeData
@@ -14,8 +16,10 @@ namespace VetClinic.BLL.Tests.FakeData
                     Details = "The patient appearts to be stable.",
                     OrderId = 1,
                     ProcedureId = 4,
-                    PetId = 3,
-                    EmployeeId = "f1a05cca-b479-4f72-bbda-96b8979f4afe"
+                    Pet = new Pet{ Id=1},
+                    PetId=1,
+                    EmployeeId = "f1a05cca-b479-4f72-bbda-96b8979f4afe",
+                    Status= OrderProcedureStatus.Assigned
                 },
                 new OrderProcedure
                 {
@@ -24,8 +28,10 @@ namespace VetClinic.BLL.Tests.FakeData
                     Details = "The patient is in critical condition.",
                     OrderId = 2,
                     ProcedureId = 2,
-                    PetId = 8,
-                    EmployeeId = "f1a05cca-b479-4f72-bbda-96b8979f4afe"
+                    Pet = new Pet{ Id=2},
+                    PetId=2,
+                    EmployeeId = "f1a05cca-b479-4f72-bbda-96b8979f4afe",
+                    Status= OrderProcedureStatus.NotAssigned
                 },
                 new OrderProcedure
                 {
@@ -33,9 +39,11 @@ namespace VetClinic.BLL.Tests.FakeData
                     Conclusion = "Procedure was unsuccessful.",
                     Details = "The patient is in critical condition.",
                     OrderId = 3,
-                    ProcedureId = 9,
-                    PetId = 7,
-                    EmployeeId = "f1a05cca-b479-4f72-bbda-96b8979f4afe"
+                    Pet = new Pet{ Id=3},
+                    PetId=3,
+                    ProcedureId = 9,                    
+                    EmployeeId = "f1a05cca-b479-4f72-bbda-96b8979f4afe",
+                    Status= OrderProcedureStatus.Assigned
                 },
                 new OrderProcedure
                 {
