@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using VetClinic.Core.Entities;
 using VetClinic.Core.Interfaces.Services;
+using VetClinic.DAL.Context;
 using VetClinic.WebApi.ViewModels.AuthViewModels;
 
 namespace VetClinic.WebApi.Controllers
@@ -47,7 +48,6 @@ namespace VetClinic.WebApi.Controllers
             await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("Role", "Client"));
             var role = await _roleManager.FindByNameAsync("Client");
             await _userManager.AddToRoleAsync(user, "Client");
-
             return Ok();
         }
         
@@ -83,6 +83,17 @@ namespace VetClinic.WebApi.Controllers
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
+            return Ok();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateRole([FromBody] string roleName)
+        {
+            var role = await _roleManager.FindByNameAsync(roleName);
+            if(role == null)
+            {
+                await _roleManager.CreateAsync(new IdentityRole(roleName));
+            }
             return Ok();
         }
     }
